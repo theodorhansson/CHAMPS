@@ -2,7 +2,7 @@
 Det här är en rewrite  av fotonikavdelningens vid Chalmers mc^2 cancer-projekt i Matlab för att mäta på VCELS. 
 
 Utvecklare:
-Jacob Billvén
-Sofia Damne
-Theodor Hansson
-Gustav Persson
+ - Jacob Billvén
+ - Sofia Damne 
+ - Theodor Hansson 
+ - Gustav Persson
