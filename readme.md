@@ -1,5 +1,5 @@
 # Välkommen till MCCX11-VT23-13!
-Det här är en rewrite  av fotonikavdelningens vid Chalmers mc^2 projekt i Matlab för att mäta på VCELS. 
+Det här är en rewrite kontrollscriptet för VCSEL-mätningar hos fotonikavdelningen vid Chalmers mc^2. 
 
 Utvecklare:
  - Jacob Billvén
