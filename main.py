@@ -13,7 +13,7 @@ def main(config_path):
     Meas_type = config_lower["measurement"]["type"]
 
     # Import measurement module
-    meas_module = "Measurement_type." + Meas_type
+    meas_module = "measurement_type." + Meas_type
     import_string = "import " + meas_module
     exec(import_string)
 
