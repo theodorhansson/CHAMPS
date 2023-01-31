@@ -28,8 +28,8 @@ def init(config):
 
     print("DC_config", DC_config)
 
-    # DC_unit = communication.get_DCsupply(DC_config)
-    # P_unit = communication.get_Sphere(P_config)
+    DC_unit = communication.get_DCsupply(DC_config)
+    P_unit = communication.get_PowerUnit(P_config)
 
     main(config, None, None)
 

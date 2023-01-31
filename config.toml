@@ -12,7 +12,9 @@ datapoints = 10
 
 [keith]
 type = "keithley"
-adress = "14"
+address = "14"
 
 [INT_sphere]
 type = "INT_sphere"
+range = 2
+min_time = 0.2
