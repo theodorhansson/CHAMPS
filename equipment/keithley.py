@@ -9,11 +9,11 @@ class keithley:
 
         rm = pyvisa.ResourceManager()
         self.instrument = rm.open_resource(conn_str)
-        self.instrument.read_terminationn("\n")
-        self.instrument.write_termination("\n")
 
-        self.instrument.write(":SOURCE:CURRENT:MODE:FIXED")
+        self.instrument.write(":SOURCE:FUNCTION CURRENT")
+        self.instrument.write(":SOURCE:CURRENT:MODE FIXED")
         self.instrument.write(":SOURCE:CURRENT:RANGE:AUTO 1")
+        self.instrument.write(":SENSE:VOLT:RANGE:AUTO 1")
 
         # self.instrument.write("CONFIGURE:VOLTAGE:DC")
 
@@ -25,9 +25,7 @@ class keithley:
         self.instrument.write(":SENSE:VOLTAGE:DC:PROTECTION " + str(volts))
 
     def set_current(self, current):
-        self.instrument.write(":SOURce:CURRent " + str(current))
-        pass
+        self.instrument.write(":SOURCE:CURRENT " + str(current))
 
     def set_output(self, state):
-        self.instrument.write(":OUTPut " + str(int(state)))
-        pass
+        self.instrument.write(":OUTPUT " + str(int(state)))
