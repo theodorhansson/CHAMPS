@@ -1,0 +1,14 @@
+[measurement]
+type = "ipv"
+DC_unit = "keith"
+
+I_start = 0
+I_end = 0.005
+V_max = 5
+P_cutoff = 0
+
+
+
+[keith]
+type = "keithley"
+adress = "14"
