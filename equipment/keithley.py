@@ -12,15 +12,22 @@ class keithley:
         self.instrument.read_terminationn("\n")
         self.instrument.write_termination("\n")
 
+        self.instrument.write(":SOURCE:CURRENT:MODE:FIXED")
+        self.instrument.write(":SOURCE:CURRENT:RANGE:AUTO 1")
+
+        # self.instrument.write("CONFIGURE:VOLTAGE:DC")
+
     def get_voltage(self):
-        ans = self.instrument.query("MEASURE:VOLTAGE?")
+        ans = self.instrument.query(":READ?")
         return float(ans)
 
-    def set_voltage_limit():
+    def set_voltage_limit(self, volts):
+        self.instrument.write(":SENSE:VOLTAGE:DC:PROTECTION " + str(volts))
+
+    def set_current(self, current):
+        self.instrument.write(":SOURce:CURRent " + str(current))
         pass
 
-    def set_current():
-        pass
-
-    def set_output(state):
+    def set_output(self, state):
+        self.instrument.write(":OUTPut " + str(int(state)))
         pass
