@@ -27,3 +27,6 @@ class keithley:
 
     def set_output(self, state):
         self.instrument.write(":OUTPUT " + str(int(state)))
+
+    def close(self):
+        pass
