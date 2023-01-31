@@ -15,8 +15,6 @@ class keithley:
         self.instrument.write(":SOURCE:CURRENT:RANGE:AUTO 1")
         self.instrument.write(":SENSE:VOLT:RANGE:AUTO 1")
 
-        # self.instrument.write("CONFIGURE:VOLTAGE:DC")
-
     def get_voltage(self):
         ans = self.instrument.query(":READ?")
         return float(ans)
