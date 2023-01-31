@@ -4,7 +4,7 @@ from equipment import *
 def get_DCsupply(config_dict):
     DC_type = config_dict["type"]
     match DC_type:
-        case "keithly":
+        case "keithley":
             return keithley.keithley(config_dict)
 
         case "powercube":
