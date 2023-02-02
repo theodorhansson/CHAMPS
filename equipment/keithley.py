@@ -11,7 +11,6 @@ class keithley:
         self.interface = "GPIB0"
 
     def get_voltage(self):
-        self.instrument.write(":SENSE:VOLT:RANGE:AUTO 1")
         ans = self.instrument.query(":READ?")
         ans = ans.split(",")[0]
         return float(ans)
@@ -23,12 +22,8 @@ class keithley:
         self.instrument.write(":SOURCE:CURRENT " + str(current))
 
     def get_current(self):
-        self.instrument.write(":SENSE:FUNCTION CURRENT")
-        self.instrument.write(":SENSE:CURRENT:RANGE:AUTO 1")
         ans = self.instrument.query(":READ?")
-
-        # Return to voltage mode
-        self.instrument.write(":SENSE:FUNCTION VOLT;:SENSE:VOLT:RANGE:AUTO 1")
+        ans = ans.split(",")[1]
         return float(ans)
 
     def set_output(self, state: bool):
