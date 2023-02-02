@@ -28,32 +28,34 @@ def init(config):
 
     print("DC_config", DC_config)
 
-    DC_unit = communication.get_DCsupply(DC_config)
-    P_unit = communication.get_PowerUnit(P_config)
-
-    main(config, None, None)
+    main(config, DC_config, P_config)
 
 
-def main(config, DC_unit, P_unit):
+def main(config, DC_config, P_config):
     # Main measurment loop
+    print(config)
 
     i_start = config["measurement"]["i_start"]
     i_end = config["measurement"]["i_end"]
-    V_max = config["measurement"]["V_max"]
+    V_max = config["measurement"]["v_max"]
     N_datapoints = config["measurement"]["datapoints"]
 
     Results = {"voltage": [], "current": [], "power": []}
 
     current_list = np.linspace(i_start, i_end, N_datapoints)
 
-    DC_unit.set_voltage_limit(V_max)
-    for current in current_list:
-        DC_unit.set_current(current)
-        volt = DC_unit.get_voltage()
-        power = P_unit.get_power()
-
-        Results["voltage"] = volt
-        Results["current"] = current
-        Results["power"] = power
+    with communication.get_DCsupply(DC_config) as DC_unit, communication.get_PowerUnit(
+        P_config
+    ) as P_unit:
+        DC_unit.set_voltage_limit(V_max)
+        for set_current in current_list:
+            DC_unit.set_current(set_current)
+            # Sleep här?
+            volt = DC_unit.get_voltage()
+            current = DC_unit.get_current()
+            power = P_unit.get_power()
+            Results["voltage"] = volt
+            Results["current"] = current
+            Results["power"] = power
 
     return Results

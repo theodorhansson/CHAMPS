@@ -1,5 +1,6 @@
 import win32com.client
 import time
+from utils import argument_checker
 
 # OBS: en datastream ger en konstant växande lista med värden
 # Based on python example from Ophir
@@ -15,22 +16,32 @@ import time
 # 7    3 uW
 
 
-_required_arguments = ["range", "min_measure time"]
+_required_arguments = ["range", "min_measure_time"]
 
 
 class INT_sphere:
-    def __init__(self, config_dict):
+    def __init__(self, config_dict: dict):
+        argument_checker(config_dict, _required_arguments)
         self._OphirCOM = win32com.client.Dispatch("OphirLMMeasurement.CoLMMeasurement")
         DeviceList = self._OphirCOM.ScanUSB()
         Device = DeviceList[0]
         self._DeviceHandle = self._OphirCOM.OpenUSBDevice(Device)
+        self._min_time = config_dict["min_measure_time"]
 
         # Set the default range
         default_range = config_dict["range"]
         self._OphirCOM.SetRange(self._DeviceHandle, 0, default_range)
 
+    def __enter__(self):
+        # Start output stream
+        self.set_output(True)
+
+    def set_min_time(self, min_time: float):
+        self._min_time = min_time
+
     def get_power(self):
         # Get reading from int. sphere
+        time.sleep(self._min_time)
         data = self._OphirCOM.GetData(self._DeviceHandle, 0)
         # Checks if there is any data
         if len(data[0]) > 0:
@@ -42,7 +53,7 @@ class INT_sphere:
             print(data)
             return None  # TODO Decide what value should be here
 
-    def set_range(self, newRange):
+    def set_range(self, newRange: int):
         # Set the measurement-range for the sphere
         self._OphirCOM.SetRange(self._DeviceHandle, 0, newRange)
 
@@ -51,7 +62,7 @@ class INT_sphere:
         ranges = self._OphirCOM.GetRanges(self._DeviceHandle, 0)
         return ranges
 
-    def set_output(self, state):
+    def set_output(self, state: bool):
         # Toggles reading from sphere
         if state:
             self._OphirCOM.StartStream(self._DeviceHandle, 0)
@@ -75,8 +86,8 @@ class INT_sphere:
         # Get name of current device_handle
         return self._DeviceHandle
 
-    def __del__(self):
-        # Stops and disconnects OphirCOM
+    def __exit__(self):
+        # Stops and disconnects all OphirCOM
         self._OphirCOM.StopAllStreams()
         self._OphirCOM.CloseAll()
 
