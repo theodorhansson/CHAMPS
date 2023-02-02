@@ -47,9 +47,9 @@ def main(config, DC_config, P_config):
 
     plot = animatedPlot("Voltage[V]", "Optical Power [W]", "IPV")
 
-    with communication.get_DCsupply(DC_config) as DC_unit, communication.get_PowerUnit(
-        P_config
-    ) as P_unit:
+    DC_obj = communication.get_DCsupply(DC_config)
+    Power_obj = communication.get_PowerUnit(P_config)
+    with DC_obj(DC_config) as DC_unit, Power_obj(P_config) as P_unit:
         DC_unit.set_voltage_limit(V_max)
         for set_current in current_list:
             DC_unit.set_current(set_current)

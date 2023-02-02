@@ -6,10 +6,10 @@ def get_DCsupply(config_dict):
     DC_type = config_dict["type"]
     match DC_type:
         case "keithley":
-            return keithley.keithley(config_dict)
+            return keithley.keithley
 
         case "powercube":
-            return powercube.powercube(config_dict)
+            return powercube.powercube
 
         case _:
             pass  # TODO error handling
