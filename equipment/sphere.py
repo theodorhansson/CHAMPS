@@ -8,6 +8,10 @@ import traceback
 
 # Based on python example from Ophir
 
+_required_arguments = [
+    "range",
+]
+
 
 class INT_sphere:
     def __init__(self, config_dict):
@@ -33,6 +37,11 @@ class INT_sphere:
         # Set the measurement-range for the sphere
         self._OphirCOM.SetRange(self._DeviceHandle, 0, newRange)
 
+    def get_ranges(self):
+        # Return the possible ranges
+        ranges = self._OphirCOM.GetRanges(self._DeviceHandle, 0)
+        return ranges
+
     def set_output(self, state):
         # Toggles reading from sphere
         if state:
@@ -40,7 +49,23 @@ class INT_sphere:
         else:
             self._OphirCOM.StopStream(self._DeviceHandle, 0)
 
+    def get_device_list(self):
+        # Get list of connected devices
+        return self._OphirCOM.ScanUSB()
+
+    def get_device_handle(self):
+        # Get name of current device_handle
+        return self._DeviceHandle
+
     def __del__(self):
         # Stops and disconnects OphirCOM
         self._OphirCOM.StopAllStreams()
         self._OphirCOM.CloseAll()
+
+
+def sphere_tests():
+    pass
+
+
+if __name__ == "__main__":
+    sphere_tests()
