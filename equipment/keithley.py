@@ -3,17 +3,8 @@ import pyvisa
 
 class keithley:
     def __init__(self, config_dict):
-        address = str(config_dict["address"])
-        interface = "GPIB0"
-        conn_str = interface + "::" + address  # like GPIB0::24
-
-        rm = pyvisa.ResourceManager()
-        self.instrument = rm.open_resource(conn_str)
-
-        self.instrument.write(":SOURCE:FUNCTION CURRENT")
-        self.instrument.write(":SOURCE:CURRENT:MODE FIXED")
-        self.instrument.write(":SOURCE:CURRENT:RANGE:AUTO 1")
-        self.instrument.write(":SENSE:VOLT:RANGE:AUTO 1")
+        self.address = str(config_dict["address"])
+        self.interface = "GPIB0"
 
     def get_voltage(self):
         ans = self.instrument.query(":READ?")
@@ -28,5 +19,16 @@ class keithley:
     def set_output(self, state):
         self.instrument.write(":OUTPUT " + str(int(state)))
 
-    def close(self):
-        pass
+    def __enter__(self):
+        conn_str = self.interface + "::" + self.address  # like GPIB0::24
+
+        rm = pyvisa.ResourceManager()
+        self.instrument = rm.open_resource(conn_str)
+
+        self.instrument.write(":SOURCE:FUNCTION CURRENT")
+        self.instrument.write(":SOURCE:CURRENT:MODE FIXED")
+        self.instrument.write(":SOURCE:CURRENT:RANGE:AUTO 1")
+        self.instrument.write(":SENSE:VOLT:RANGE:AUTO 1")
+
+    def __exit__(self, exception_type, exception_value, exception_trace):
+        self.instrument.close()
