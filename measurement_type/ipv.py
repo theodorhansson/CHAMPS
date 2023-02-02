@@ -1,5 +1,5 @@
 import communication
-from utils import argument_checker
+from utils import argument_checker, animatedPlot
 import numpy as np
 
 
@@ -28,7 +28,8 @@ def init(config):
 
     print("DC_config", DC_config)
 
-    main(config, DC_config, P_config)
+    Results = main(config, DC_config, P_config)
+    return Results
 
 
 def main(config, DC_config, P_config):
@@ -44,6 +45,8 @@ def main(config, DC_config, P_config):
 
     current_list = np.linspace(i_start, i_end, N_datapoints)
 
+    plot = animatedPlot("Voltage[V]", "Optical Power [W]", "IPV")
+
     with communication.get_DCsupply(DC_config) as DC_unit, communication.get_PowerUnit(
         P_config
     ) as P_unit:
@@ -57,5 +60,7 @@ def main(config, DC_config, P_config):
             Results["voltage"] = volt
             Results["current"] = current
             Results["power"] = power
+
+            plot.add_point(volt, power)
 
     return Results

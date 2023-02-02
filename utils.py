@@ -1,3 +1,6 @@
+import matplotlib.pyplot as plt
+
+
 def argument_checker(config: dict, expected_keys: list):
     # Behavior:
     # If extra parameter is found, warn user but continue program
@@ -19,6 +22,25 @@ def argument_checker(config: dict, expected_keys: list):
 
     elif Missing_parameters != set():
         raise Exception(f"Missing parameters {Missing_parameters}")
+
+
+class animatedPlot:
+    # Used to dynamically add datapoints
+    def __init__(
+        self, x_label: str, y_label: str, title: str, enable_grid: bool = False
+    ):
+        self.plot = plt.ion()
+        self.ax = plt.subplot(111)
+
+        self.ax.set_title(title)
+        self.ax.set_xlabel(x_label)
+        self.ax.set_ylabel(y_label)
+        self.ax.grid(enable_grid)
+
+    def add_point(self, x: float, y: float):
+        self.ax.scatter(x, y)
+        plt.draw()
+        plt.pause(0.0001)
 
 
 if __name__ == "__main__":

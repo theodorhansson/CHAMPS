@@ -10,16 +10,21 @@ def main(config_path):
 
     config_lower = dict_2_lower(config)
 
-    Meas_type = config_lower["measurement"]["type"]
+    meas_type = config_lower["measurement"]["type"]
 
-    # Import measurement module
-    meas_module = "measurement_type." + Meas_type
-    import_string = "import " + meas_module
-    exec(import_string)
+    measurement = identify_measurement_type(meas_type)
+    measurement(config_lower)
 
-    # Run measurement module
-    meas_init = meas_module + ".init(config_lower)"
-    exec(meas_init)
+
+def identify_measurement_type(measurment: str):
+    # Matches measurement name with correct module
+    match measurment:
+        case "ipv":
+            import measurement_type.ipv
+
+            return measurement_type.ipv.init
+        case _:
+            pass  # TODO error handling
 
 
 def dict_2_lower(indict: dict) -> dict:

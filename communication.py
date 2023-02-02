@@ -2,6 +2,7 @@ from equipment import *
 
 
 def get_DCsupply(config_dict):
+    # For DC power supplies
     DC_type = config_dict["type"]
     match DC_type:
         case "keithley":
@@ -15,6 +16,7 @@ def get_DCsupply(config_dict):
 
 
 def get_PowerUnit(config_dict):
+    # For measuring power
     Power_type = config_dict["type"]
 
     match Power_type:
