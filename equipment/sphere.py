@@ -1,16 +1,21 @@
 import win32com.client
 import time
-import traceback
 
-# Idé: Få upp ett GUI om fler än en ophir ansluten samtidigt
-# OBS: bör nog lägga in en fördröjning mellan mätningar. Hantera i IPV?
-# TODO testa mig på sfär
-
+# OBS: en datastream ger en konstant växande lista med värden
 # Based on python example from Ophir
 
-_required_arguments = [
-    "range",
-]
+# Avaliable ranges for IS6-D-UV
+# 0    auto
+# 1    1 W
+# 2    300 mW
+# 3    30 mW
+# 4    3 mW
+# 5    300 uW
+# 6    30 uW
+# 7    3 uW
+
+
+_required_arguments = ["range", "min_measure time"]
 
 
 class INT_sphere:
@@ -24,14 +29,18 @@ class INT_sphere:
         default_range = config_dict["range"]
         self._OphirCOM.SetRange(self._DeviceHandle, 0, default_range)
 
-        # exists = OphirCOM.IsSensorExists(self._DeviceHandle, 0)
-        # if exists:
-
     def get_power(self):
         # Get reading from int. sphere
         data = self._OphirCOM.GetData(self._DeviceHandle, 0)
-        power = data[0][0]
-        return power
+        # Checks if there is any data
+        if len(data[0]) > 0:
+            # Extract last power value from datastream
+            power = data[0][-1]
+            return power
+        else:
+            # print("Not connected/initialized")
+            print(data)
+            return None  # TODO Decide what value should be here
 
     def set_range(self, newRange):
         # Set the measurement-range for the sphere
@@ -46,6 +55,15 @@ class INT_sphere:
         # Toggles reading from sphere
         if state:
             self._OphirCOM.StartStream(self._DeviceHandle, 0)
+            # Wait for instrument to start
+            for _ in range(10):
+                data = self.get_power()
+                print(data)
+                if data != None:
+                    break
+                else:
+                    # Wait for start
+                    time.sleep(0.4)
         else:
             self._OphirCOM.StopStream(self._DeviceHandle, 0)
 
@@ -62,9 +80,47 @@ class INT_sphere:
         self._OphirCOM.StopAllStreams()
         self._OphirCOM.CloseAll()
 
+    def test(self):
+        self._OphirCOM.StartStream(self._DeviceHandle, 0)
+        for _ in range(10):
+            time.sleep(0.2)  # wait a little for data
+            data = self._OphirCOM.GetData(self._DeviceHandle, 0)
+            if (
+                len(data[0]) > 0
+            ):  # if any data available, print the first one from the batch
+                print(
+                    "Reading = {0}, TimeStamp = {1}, Status = {2} ".format(
+                        data[0][0], data[1][0], data[2][0]
+                    )
+                )
+            else:
+                print("no data")
+
 
 def sphere_tests():
-    pass
+    test_dict = dict(range=3)
+    SP = INT_sphere(test_dict)
+    SP.set_output(True)
+    dt = 0.1
+    print("start loop")
+    for _ in range(20):
+        print(SP.get_power())
+        time.sleep(dt)
+
+    time.sleep(5)
+    for _ in range(10):
+        print(SP.get_power())
+        time.sleep(dt)
+
+    del SP
+
+    # print(SP.test())
+
+
+def sphere_tests2():
+    test_dict = dict(range=3)
+    SP = INT_sphere(test_dict)
+    SP.test()
 
 
 if __name__ == "__main__":
