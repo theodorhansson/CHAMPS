@@ -1,22 +1,31 @@
 import serial
+from utils import argument_checker
+
+_required_arguments = ["port"]
 
 
 class powercube:
     def __init__(self, config_dict):
+        argument_checker(config_dict, _required_arguments)
         self.port = str(config_dict["port"])
 
     def get_voltage(self):
         self.serial_port.write(b"VOUT1?")
         ans = self.serial_port.read(1000)
-        return ans
+        return float(ans)  # TODO: type?
 
-    def set_voltage_limit(self, volt):
+    def set_voltage_limit(self, volt: float):
         self.serial_port.write(b"VSET1:" + str(volt))
 
-    def set_current(self, current):
+    def set_current(self, current: float):
         self.serial_port.write(b"ISET1:" + str(current))
 
-    def set_output(self, state):
+    def get_current(self):
+        self.serial_port.write(b"IOUT1?")
+        ans = self.serial_port.read(1000)
+        return float(ans)  # TODO: type?
+
+    def set_output(self, state: bool):
         self.serial_port.write(b"OUT" + str(int(state)))
 
     def __enter__(self):
