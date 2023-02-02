@@ -1,5 +1,5 @@
 import communication
-from measurement_type.utils import argument_checker
+from utils import argument_checker
 import numpy as np
 
 
