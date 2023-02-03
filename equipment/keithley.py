@@ -39,7 +39,7 @@ class keithley:
         self.instrument.write(":SOURCE:CURRENT:MODE FIXED")
         self.instrument.write(":SOURCE:CURRENT:RANGE:AUTO 1")
 
-        self.instrument.write(":SENSE:FUNCTION VOLT")   #Sets what the display shall show
+        self.instrument.write(":SENSE:FUNCTION 'VOLT'")   #Sets what the display shall show
         self.instrument.write(":SENSE:VOLT:RANGE:AUTO 1")
 
     def close(self):

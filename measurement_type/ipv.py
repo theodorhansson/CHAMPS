@@ -54,7 +54,11 @@ def main(config, DC_config, P_config):
 
     P_unit.open()
     DC_unit.open()
+    DC_unit.set_current(0.0)
     DC_unit.set_voltage_limit(V_max)
+
+    #TODO: ramp up current
+
     for set_current in current_list:
         DC_unit.set_current(set_current)
         # Sleep här?
