@@ -1,6 +1,7 @@
 import communication
 from utils import argument_checker, animatedPlot
 import numpy as np
+import traceback
 
 
 _DC_name_key = "dc_unit"
@@ -50,25 +51,32 @@ def main(config, DC_config, P_config):
     P_unit = communication.get_PowerUnit(P_config)
     DC_unit = communication.get_DCsupply(DC_config)
 
-    print(dir(P_unit))
-
     P_unit.open()
     DC_unit.open()
     DC_unit.set_current(0.0)
     DC_unit.set_voltage_limit(V_max)
 
-    #TODO: ramp up current
+    # TODO: ramp up current
 
-    for set_current in current_list:
-        DC_unit.set_current(set_current)
-        # Sleep här?
-        volt = DC_unit.get_voltage()
-        current = DC_unit.get_current()
-        power = P_unit.get_power()
-        Results["voltage"] = volt
-        Results["current"] = current
-        Results["power"] = power
-        plot.add_point(volt, power)
-        print("IPV data", volt, current, power)
+    try:
+        for set_current in current_list:
+            DC_unit.set_current(set_current)
+            # Sleep här?
+            volt = DC_unit.get_voltage()
+            current = DC_unit.get_current()
+            power = P_unit.get_power()
+            Results["voltage"] = volt
+            Results["current"] = current
+            Results["power"] = power
+            plot.add_point(volt, power)
+            print("IPV data", volt, current, power)
+    except Exception:
+        traceback.print_exc()
+    finally:
+        DC_unit.set_current(0)
+        DC_unit.set_output(False)
+        P_unit.close()
+        DC_unit.close()
 
+    # TODO: keep plot alive after measurement
     return Results
