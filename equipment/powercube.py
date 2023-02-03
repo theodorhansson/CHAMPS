@@ -28,7 +28,7 @@ class powercube:
     def set_output(self, state: bool):
         self.serial_port.write(b"OUT" + str(int(state)))
 
-    def __enter__(self):
+    def open(self):
         self.serial_port = serial.Serial(self.port)
 
         self.serial_port.baudrate = 9600
@@ -36,5 +36,5 @@ class powercube:
         self.serial_port.bytesize = 8
         self.serial_port.stopbits = 0
 
-    def __exit__(self, exception_type, exception_value, exception_trace):
+    def close(self):
         self.serial_port.close()
