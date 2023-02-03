@@ -6,13 +6,13 @@ I_start = 0
 I_end = 0.005
 V_max = 5
 P_cutoff = 0
-datapoints = 10
+datapoints = 50
 
 
 
 [keith]
 type = "keithley"
-address = "14"
+address = "24"
 
 [INT_sphere]
 type = "INT_sphere"
