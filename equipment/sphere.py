@@ -32,7 +32,7 @@ class INT_sphere:
         default_range = config_dict["range"]
         self._OphirCOM.SetRange(self._DeviceHandle, 0, default_range)
 
-    def __enter__(self):
+    def open(self):
         # Start output stream
         self.set_output(True)
 
@@ -50,7 +50,7 @@ class INT_sphere:
             return power
         else:
             # print("Not connected/initialized")
-            print(data)
+            print("Get_power_none", data)
             return None  # TODO Decide what value should be here
 
     def set_range(self, newRange: int):
@@ -86,7 +86,7 @@ class INT_sphere:
         # Get name of current device_handle
         return self._DeviceHandle
 
-    def __exit__(self, exception_type, exception_value, exception_trace):
+    def close(self, exception_type, exception_value, exception_trace):
         # Stops and disconnects all OphirCOM
         self._OphirCOM.StopAllStreams()
         self._OphirCOM.CloseAll()

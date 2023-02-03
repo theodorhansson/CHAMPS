@@ -24,7 +24,7 @@ def identify_measurement_type(measurment: str):
 
             return measurement_type.ipv.init
         case _:
-            pass  # TODO error handling
+            raise Exception("Measurement type not found")  # TODO Change this
 
 
 def dict_2_lower(indict: dict) -> dict:
