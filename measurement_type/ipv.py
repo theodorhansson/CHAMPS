@@ -1,5 +1,5 @@
 import communication
-from utils import argument_checker, animatedPlot
+from utils import argument_checker, AnimatedPlot
 import numpy as np
 import traceback
 import time
@@ -47,7 +47,7 @@ def main(config, DC_config, P_config):
 
     current_list = np.linspace(i_start, i_end, N_datapoints)
 
-    plot = animatedPlot("Voltage[V]", "Optical Power [W]", "IPV")
+    plot = AnimatedPlot("Voltage[V]", "Optical Power [W]", "IPV")
 
     P_unit = communication.get_PowerUnit(P_config)
     DC_unit = communication.get_DCsupply(DC_config)
@@ -58,11 +58,9 @@ def main(config, DC_config, P_config):
     DC_unit.set_voltage_limit(V_max)
     DC_unit.set_output(True)
 
-    for current in np.arange(0, current_list[0], 0.00025):
+    for current in np.linspace(0, current_list[0], 10):
         DC_unit.set_current(current)
-        # time.sleep(0.01)
-
-    # TODO: ramp up current
+        time.sleep(0.05)
 
     try:
         for set_current in current_list:
@@ -84,5 +82,7 @@ def main(config, DC_config, P_config):
         P_unit.close()
         DC_unit.close()
 
+    plot.keep_open()
+
     # TODO: keep plot alive after measurement
-    return Results
+    return Results, plot

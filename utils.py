@@ -24,7 +24,7 @@ def argument_checker(config: dict, expected_keys: list):
         raise Exception(f"Missing parameters {Missing_parameters}")
 
 
-class animatedPlot:
+class AnimatedPlot:
     # Used to dynamically add datapoints
     def __init__(
         self, x_label: str, y_label: str, title: str, enable_grid: bool = False
@@ -38,9 +38,15 @@ class animatedPlot:
         self.ax.grid(enable_grid)
 
     def add_point(self, x: float, y: float):
+        # Adds point and updates figure
         self.ax.scatter(x, y)
         plt.draw()
         plt.pause(0.0001)
+
+    def keep_open(self):
+        # Keeps plot open
+        plt.ioff()  # Turn off interactive
+        plt.show()
 
 
 if __name__ == "__main__":
@@ -55,3 +61,9 @@ if __name__ == "__main__":
     }
 
     argument_checker(test_dict, ["ABC"])
+
+    plot = AnimatedPlot("A", "B", "C")
+    plot.add_point(1, 2)
+    plot.add_point(3, 2)
+    plot.keep_plot()
+    print("hi")
