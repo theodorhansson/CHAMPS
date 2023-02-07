@@ -2,6 +2,7 @@ import communication
 from utils import argument_checker, animatedPlot
 import numpy as np
 import traceback
+import time
 
 
 _DC_name_key = "dc_unit"
@@ -55,6 +56,11 @@ def main(config, DC_config, P_config):
     DC_unit.open()
     DC_unit.set_current(0.0)
     DC_unit.set_voltage_limit(V_max)
+    DC_unit.set_output(True)
+
+    for current in np.arange(0, current_list[0], 0.00025):
+        DC_unit.set_current(current)
+        # time.sleep(0.01)
 
     # TODO: ramp up current
 
