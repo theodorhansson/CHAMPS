@@ -42,6 +42,7 @@ def main(config, DC_config, P_config):
     i_end = config["measurement"]["i_end"]
     V_max = config["measurement"]["v_max"]
     N_datapoints = config["measurement"]["datapoints"]
+    rollover_threshold = optional_config["rollover_threshold"]
 
     Results = {"voltage": [], "current": [], "power": []}
 
@@ -79,7 +80,7 @@ def main(config, DC_config, P_config):
 
             if power > power_max:
                 power_max = power
-            if power < (rollover_threshold * power_max) and (do_rollover == True):
+            if power < (rollover_threshold * power_max) and rollover_threshold:
                 break
 
     except Exception:
