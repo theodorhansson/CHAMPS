@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 def argument_checker(config: dict, expected_keys: list):
@@ -22,6 +23,32 @@ def argument_checker(config: dict, expected_keys: list):
 
     elif Missing_parameters != set():
         raise Exception(f"Missing parameters {Missing_parameters}")
+
+
+def interval_2_points(specification: list[list]) -> list:
+    # Takes in list [[A, x, B],...] and returns a list of all points
+    # in specified intervals where A, B are start and end, and x step size
+
+    if type(specification[0]) != list:
+        print(f"Warning: Interval specification {specification} not list of lists.")
+        # Fix error not list of list
+        specification = [specification]
+
+    points = []
+    for pairs in specification:
+        if type(pairs) != list:
+            # Checks if sublist is list
+            raise Exception(f"Interval sub-specification {pairs} not list")
+        elif len(pairs) != 3:
+            # Check if every sub-interval specified correct
+            raise Exception(f"Interval sub-specification {pairs} not length 3.")
+
+        start = pairs[0]
+        delta = pairs[1]
+        end = pairs[2]
+        sub_interval = np.arange(start, end, delta)
+        points.append(sub_interval)
+    return points
 
 
 class AnimatedPlot:
@@ -61,6 +88,10 @@ if __name__ == "__main__":
     }
 
     argument_checker(test_dict, ["ABC"])
+
+    interval = [[1, 0.1, 3]]
+
+    print(interval_2_points(interval))
 
     plot = AnimatedPlot("A", "B", "C")
     plot.add_point(1, 2)

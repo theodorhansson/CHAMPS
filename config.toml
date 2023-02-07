@@ -2,12 +2,9 @@
 type = "ipv"
 DC_unit = "keith"
 P_unit = "INT_sphere"
-I_start = 0
-I_end = 0.005
 V_max = 5
 P_cutoff = 0
-datapoints = 50
-
+current = [[0.001, 0.0001, 0.005], [0.005, 0.0005, 0.015]]
 
 
 [keith]
