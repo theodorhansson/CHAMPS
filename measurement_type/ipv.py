@@ -16,7 +16,7 @@ _required_arguments = [
     "v_max",
     "datapoints",
 ]
-# _optional_arguments = {"p_cutoff": 0}
+_optional_arguments = {"rollover_threshold": 0}
 
 
 def init(config):
@@ -63,17 +63,25 @@ def main(config, DC_config, P_config):
         time.sleep(0.05)
 
     try:
+        power_max = 0
         for set_current in current_list:
             DC_unit.set_current(set_current)
-            # Sleep här?
+
             volt = DC_unit.get_voltage()
             current = DC_unit.get_current()
             power = P_unit.get_power()
-            Results["voltage"] = volt
-            Results["current"] = current
-            Results["power"] = power
+
+            Results["voltage"].append(volt)
+            Results["current"].append(current)
+            Results["power"].append(power)
             plot.add_point(volt, power)
             print("IPV data", volt, current, power)
+
+            if power > power_max:
+                power_max = power
+            if power < (rollover_threshold * power_max) and (do_rollover == True):
+                break
+
     except Exception:
         traceback.print_exc()
     finally:
