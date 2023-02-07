@@ -86,7 +86,7 @@ class INT_sphere:
         # Get name of current device_handle
         return self._DeviceHandle
 
-    def close(self, exception_type, exception_value, exception_trace):
+    def close(self):
         # Stops and disconnects all OphirCOM
         self._OphirCOM.StopAllStreams()
         self._OphirCOM.CloseAll()
