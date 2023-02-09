@@ -11,7 +11,7 @@ def argument_checker(config: dict, expected_keys: list, optional_config: dict = 
     config_values = set(config.keys())
     expected_set = set(expected_keys)
     optional_set = set(optional_config)
-    total_accepted_set = expected_set + optional_set
+    total_accepted_set = expected_set | optional_set
 
     changed_from_default = config_values & optional_set  # In both sets
     for key in changed_from_default:  # Set optional config values to those from toml
