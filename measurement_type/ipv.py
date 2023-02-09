@@ -3,6 +3,7 @@ from utils import argument_checker, AnimatedPlot
 import numpy as np
 import traceback
 import time
+from utils import *
 
 
 _DC_name_key = "dc_unit"
@@ -61,9 +62,7 @@ def main(config, DC_config, P_config, optional_config=_optional_arguments):
     DC_unit.set_voltage_limit(V_max)
     DC_unit.set_output(True)
 
-    for current in np.linspace(0, current_list[0], 10):
-        DC_unit.set_current(current)
-        time.sleep(0.05)
+    ramp_current(DC_unit, 0, current_list[0])
 
     try:
         power_max = 0
@@ -88,6 +87,7 @@ def main(config, DC_config, P_config, optional_config=_optional_arguments):
     except Exception:
         traceback.print_exc()
     finally:
+        ramp_current(DC_unit, DC_unit.get_current(), 0)
         DC_unit.set_current(0)
         DC_unit.set_output(False)
         P_unit.close()
