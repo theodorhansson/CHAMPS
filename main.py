@@ -16,9 +16,9 @@ def main(config_path):
     measurement_init(config_lower)
 
 
-def identify_measurement_type(measurment: str):
+def identify_measurement_type(measurement: str):
     # Matches measurement name with correct module
-    match measurment:
+    match measurement:
         case "ipv":
             import measurement_type.ipv
 

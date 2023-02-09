@@ -7,12 +7,12 @@ _required_arguments = ["address"]
 class keithley:
     def __init__(self, config_dict: dict):
         argument_checker(config_dict, _required_arguments)
-        self.address = str(config_dict["address"])
+        self.address = str(config_dict["gpib_address"])
         self.interface = "GPIB0"
 
     def get_voltage(self):
         ans = self.instrument.query(":READ?")
-        ans = ans.split(",")[0] #First item is voltage
+        ans = ans.split(",")[0]  # First item is voltage
         return float(ans)
 
     def set_voltage_limit(self, volts: float):
@@ -23,7 +23,7 @@ class keithley:
 
     def get_current(self):
         ans = self.instrument.query(":READ?")
-        ans = ans.split(",")[1]     #Second item is current
+        ans = ans.split(",")[1]  # Second item is current
         return float(ans)
 
     def set_output(self, state: bool):
@@ -39,7 +39,9 @@ class keithley:
         self.instrument.write(":SOURCE:CURRENT:MODE FIXED")
         self.instrument.write(":SOURCE:CURRENT:RANGE:AUTO 1")
 
-        self.instrument.write(":SENSE:FUNCTION 'VOLT'")   #Sets what the display shall show
+        self.instrument.write(
+            ":SENSE:FUNCTION 'VOLT'"
+        )  # Sets what the display shall show
         self.instrument.write(":SENSE:VOLT:RANGE:AUTO 1")
 
     def close(self):

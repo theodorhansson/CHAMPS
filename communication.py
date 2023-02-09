@@ -5,7 +5,7 @@ def get_DCsupply(config_dict):
     # For DC power supplies
     DC_type = config_dict["type"]
     match DC_type:
-        case "keithley":
+        case "keithley2400":
             return keithley.keithley(config_dict)
 
         case "powercube":

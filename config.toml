@@ -1,15 +1,15 @@
 [measurement]
 type = "ipv"
-DC_unit = "keith"
+DC_unit = "keithley2400"
 P_unit = "INT_sphere"
 V_max = 5
 P_cutoff = 0
 current = [[0.001, 0.0001, 0.005], [0.005, 0.0005, 0.015]]
 
 
-[keith]
-type = "keithley"
-address = "24"
+[keithley2400]
+type = "keithley2400"
+gpib_address = "24"
 
 [INT_sphere]
 type = "INT_sphere"
