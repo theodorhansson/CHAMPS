@@ -2,15 +2,21 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def argument_checker(config: dict, expected_keys: list):
+def argument_checker(config: dict, expected_keys: list, optional_config: dict = {}):
     # Behavior:
     # If extra parameter is found, warn user but continue program
     # If parameter missing, raise exception
 
     config_values = set(config.keys())
     expected_set = set(expected_keys)
+    optional_set = set(optional_config)
+    total_accepted_set = expected_set + optional_set
 
-    Extra_parameters = config_values - expected_set
+    changed_from_default = config_values & optional_set  # In both sets
+    for key in changed_from_default:  # Set optional config values to those from toml
+        optional_config[key] = config[key]
+
+    Extra_parameters = config_values - total_accepted_set
     Missing_parameters = expected_set - config_values
 
     if Extra_parameters != set() and Missing_parameters != set():
@@ -23,6 +29,9 @@ def argument_checker(config: dict, expected_keys: list):
 
     elif Missing_parameters != set():
         raise Exception(f"Missing parameters {Missing_parameters}")
+
+    if optional_config:
+        return optional_config
 
 
 def interval_2_points(specification: list[list]) -> list:
