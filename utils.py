@@ -7,6 +7,7 @@ def argument_checker(config: dict, expected_keys: list, optional_config: dict = 
     # Behavior:
     # If extra parameter is found, warn user but continue program
     # If parameter missing, raise exception
+    # If given optional parameters and default values, updates their value
 
     config_values = set(config.keys())
     expected_set = set(expected_keys)
@@ -31,7 +32,7 @@ def argument_checker(config: dict, expected_keys: list, optional_config: dict = 
     elif Missing_parameters != set():
         raise Exception(f"Missing parameters {Missing_parameters}")
 
-    if optional_config:
+    if optional_config:  # If we gave optionals, we return the updated ones
         return optional_config
 
 
@@ -62,6 +63,7 @@ def interval_2_points(specification: list[list]) -> list:
 
 
 def ramp_current(DC_supply, start, stop, step=10):
+    # Ramps up/down current to/from given values for a supplied DC_unit
     current_steps = np.linspace(start, stop, step)
 
     for current in current_steps:
