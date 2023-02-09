@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import time
 
 
 def argument_checker(config: dict, expected_keys: list, optional_config: dict = {}):
@@ -58,6 +59,14 @@ def interval_2_points(specification: list[list]) -> list:
         sub_interval = np.arange(start, end, delta)
         points.append(sub_interval)
     return points
+
+
+def ramp_current(DC_supply, start, stop, step=10):
+    current_steps = np.linspace(start, stop, step)
+
+    for current in current_steps:
+        DC_supply.set_current(current)
+        time.sleep(50 * 1e-3)  # 50 ms
 
 
 class AnimatedPlot:
