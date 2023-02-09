@@ -20,7 +20,9 @@ _optional_arguments = {"rollover_threshold": 0}
 
 
 def init(config):
-    argument_checker(config["measurement"], _required_arguments)
+    optional_config = argument_checker(
+        config["measurement"], _required_arguments, _optional_arguments
+    )
     # Used for getting instrument objects
     DC_name = config["measurement"][_DC_name_key]
     DC_config = config[DC_name]
@@ -30,11 +32,11 @@ def init(config):
 
     print("DC_config", DC_config)
 
-    Results = main(config, DC_config, P_config)
+    Results = main(config, DC_config, P_config, optional_config)
     return Results
 
 
-def main(config, DC_config, P_config):
+def main(config, DC_config, P_config, optional_config=_optional_arguments):
     # Main measurement loop
     print(config)
 
