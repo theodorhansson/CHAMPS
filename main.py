@@ -30,7 +30,7 @@ def main(config_path):
     if save_file[-4:] == ".txt":
         save_file = save_file[0:-4]  # strip .txt from name
     timestamp = time.strftime(rf"%Y%m%d-%H%M%S")
-    save_file = save_file + "-" + timestamp + ".txt"
+    save_file = save_file + "-" + meas_name + "-" + timestamp + ".txt"
 
     np.savetxt(save_file, resultarr, header=" ".join(result_headers))
 
