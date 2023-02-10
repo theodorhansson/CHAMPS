@@ -31,7 +31,7 @@ def init(config):
 
     print("DC_config", DC_config)
 
-    Results = ipv_main(config, DC_config, P_config, optional_config)
+    Results, _ = ipv_main(config, DC_config, P_config, optional_config)
     return Results
 
 
@@ -62,8 +62,8 @@ def ipv_main(config, DC_config, P_config, optional_config=_optional_arguments):
 
         for interval in interval_list:
             start_current = interval[0]
-            prev_end_current = interval[-1]
             ramp_current(DC_unit, prev_end_current, start_current)
+            prev_end_current = interval[-1]
 
             for set_current in interval:
                 DC_unit.set_current(set_current)
