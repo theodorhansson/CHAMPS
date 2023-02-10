@@ -1,7 +1,7 @@
 import pyvisa
 from utils import argument_checker
 
-_required_arguments = ["address"]
+_required_arguments = ["gpib_address"]
 
 
 class keithley:

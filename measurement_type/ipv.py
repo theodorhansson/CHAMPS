@@ -14,7 +14,6 @@ _required_arguments = [
     "p_unit",
     "current",
     "v_max",
-    "datapoints",
 ]
 _optional_arguments = {"rollover_threshold": 0}
 
