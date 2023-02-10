@@ -12,8 +12,7 @@ _required_arguments = [
     "type",
     "dc_unit",
     "p_unit",
-    "i_start",
-    "i_end",
+    "current",
     "v_max",
     "datapoints",
 ]
@@ -33,28 +32,23 @@ def init(config):
 
     print("DC_config", DC_config)
 
-    Results = main(config, DC_config, P_config, optional_config)
+    Results = ipv_main(config, DC_config, P_config, optional_config)
     return Results
 
 
-def main(config, DC_config, P_config, optional_config=_optional_arguments):
+def ipv_main(config, DC_config, P_config, optional_config=_optional_arguments):
     # Main measurement loop
     print(config)
 
-    i_start = config["measurement"]["i_start"]
-    i_end = config["measurement"]["i_end"]
     V_max = config["measurement"]["v_max"]
-    N_datapoints = config["measurement"]["datapoints"]
     rollover_threshold = optional_config["rollover_threshold"]
-
-    Results = {"voltage": [], "current": [], "power": []}
-
-    current_list = np.linspace(i_start, i_end, N_datapoints)
+    interval_list = config["measurement"]["current"]
 
     plot = AnimatedPlot("Voltage[V]", "Optical Power [W]", "IPV")
 
     P_unit = communication.get_PowerUnit(P_config)
     DC_unit = communication.get_DCsupply(DC_config)
+    Results = {"voltage": [], "current": [], "power": []}
 
     P_unit.open()
     DC_unit.open()
@@ -62,27 +56,32 @@ def main(config, DC_config, P_config, optional_config=_optional_arguments):
     DC_unit.set_voltage_limit(V_max)
     DC_unit.set_output(True)
 
-    ramp_current(DC_unit, 0, current_list[0])
-
     try:
         power_max = 0
-        for set_current in current_list:
-            DC_unit.set_current(set_current)
+        prev_end_current = 0
 
-            volt = DC_unit.get_voltage()
-            current = DC_unit.get_current()
-            power = P_unit.get_power()
+        for interval in interval_list:
+            start_current = interval[0]
+            prev_end_current = interval[-1]
+            ramp_current(DC_unit, prev_end_current, start_current)
 
-            Results["voltage"].append(volt)
-            Results["current"].append(current)
-            Results["power"].append(power)
-            plot.add_point(volt, power)
-            print("IPV data", volt, current, power)
+            for set_current in interval:
+                DC_unit.set_current(set_current)
 
-            if power > power_max:
-                power_max = power
-            if power < (rollover_threshold * power_max) and rollover_threshold:
-                break
+                volt = DC_unit.get_voltage()
+                current = DC_unit.get_current()
+                power = P_unit.get_power()
+
+                Results["voltage"].append(volt)
+                Results["current"].append(current)
+                Results["power"].append(power)
+                plot.add_point(volt, power)
+                print("IPV data", volt, current, power)
+
+                if power > power_max:
+                    power_max = power
+                if power < (rollover_threshold * power_max) and rollover_threshold:
+                    break
 
     except Exception:
         traceback.print_exc()
