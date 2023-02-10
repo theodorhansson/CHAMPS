@@ -1,4 +1,5 @@
 [measurement]
+save_file = "c:/LABDATA/SAVEFILE.txt"
 type = "ipv"
 DC_unit = "keithley2400"
 P_unit = "INT_sphere"
