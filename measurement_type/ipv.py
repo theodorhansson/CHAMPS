@@ -1,9 +1,13 @@
 import communication
-from utils import argument_checker, AnimatedPlot, interval_2_points
+from utils import (
+    argument_checker,
+    AnimatedPlot,
+    interval_2_points,
+    optional_arguments_merge,
+    ramp_current,
+)
 import numpy as np
 import traceback
-import time
-from utils import *
 
 
 _DC_name_key = "dc_unit"
@@ -18,33 +22,31 @@ _required_arguments = [
 _optional_arguments = {"rollover_threshold": 0}
 
 
-def init(config):
-    optional_config = argument_checker(
-        config["measurement"], _required_arguments, _optional_arguments
-    )
-    # Used for getting instrument objects
-    DC_name = config["measurement"][_DC_name_key]
-    DC_config = config[DC_name]
+def init(config: dict):
+    # Get config dict and check for optional arguments
+    IPV_config = config["measurement"]
+    IPV_config_opt = optional_arguments_merge(IPV_config, _optional_arguments)
+    argument_checker(IPV_config_opt, _required_arguments, _optional_arguments)
 
-    P_name = config["measurement"][_P_name_key]
+    # Used for getting instrument objects
+    DC_name = IPV_config[_DC_name_key]
+    DC_config = config[DC_name]
+    P_name = IPV_config[_P_name_key]
     P_config = config[P_name]
 
-    print("DC_config", DC_config)
-
-    Results, _ = ipv_main(config, DC_config, P_config, optional_config)
+    Results, _ = ipv_main(IPV_config_opt, DC_config, P_config)
     return Results
 
 
-def ipv_main(config, DC_config, P_config, optional_config=_optional_arguments):
+def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
     # Main measurement loop
-    print(config)
 
-    V_max = config["measurement"]["v_max"]
-    rollover_threshold = optional_config["rollover_threshold"]
-    intervals = config["measurement"]["current"]
+    V_max = IPV_config["v_max"]
+    rollover_threshold = IPV_config["rollover_threshold"]
+    intervals = IPV_config["current"]
     interval_list = interval_2_points(intervals)
 
-    plot = AnimatedPlot("Voltage[V]", "Optical Power [W]", "IPV")
+    plot = AnimatedPlot("Current[A]", "Optical Power [W]", "IPV")
 
     P_unit = communication.get_PowerUnit(P_config)
     DC_unit = communication.get_DCsupply(DC_config)
@@ -75,7 +77,7 @@ def ipv_main(config, DC_config, P_config, optional_config=_optional_arguments):
                 Results["voltage"].append(volt)
                 Results["current"].append(current)
                 Results["power"].append(power)
-                plot.add_point(volt, power)
+                plot.add_point(current, power)
                 print("IPV data", volt, current, power)
 
                 if power > power_max:
@@ -86,13 +88,13 @@ def ipv_main(config, DC_config, P_config, optional_config=_optional_arguments):
     except Exception:
         traceback.print_exc()
     finally:
+        # Tries to shut down instruments
         ramp_current(DC_unit, DC_unit.get_current(), 0)
         DC_unit.set_current(0)
         DC_unit.set_output(False)
-        P_unit.close()
         DC_unit.close()
+        P_unit.close()
 
     plot.keep_open()
 
-    # TODO: keep plot alive after measurement
     return Results, plot

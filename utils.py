@@ -3,20 +3,15 @@ import numpy as np
 import time
 
 
-def argument_checker(config: dict, expected_keys: list, optional_config: dict = {}):
+def argument_checker(config: dict, expected_keys: list, optional_config: dict = dict()):
     # Behavior:
     # If extra parameter is found, warn user but continue program
     # If parameter missing, raise exception
-    # If given optional parameters and default values, updates their value
 
     config_values = set(config.keys())
     expected_set = set(expected_keys)
-    optional_set = set(optional_config)
+    optional_set = set(optional_config.keys())
     total_accepted_set = expected_set | optional_set
-
-    changed_from_default = config_values & optional_set  # In both sets
-    for key in changed_from_default:  # Set optional config values to those from toml
-        optional_config[key] = config[key]
 
     Extra_parameters = config_values - total_accepted_set
     Missing_parameters = expected_set - config_values
@@ -32,8 +27,12 @@ def argument_checker(config: dict, expected_keys: list, optional_config: dict = 
     elif Missing_parameters != set():
         raise Exception(f"Missing parameters {Missing_parameters}")
 
-    if optional_config:  # If we gave optionals, we return the updated ones
-        return optional_config
+
+def optional_arguments_merge(config: dict = dict(), optional_default=dict()):
+    # Merges config and optional dicts. Value in config overwrites default
+    out_dict = optional_default
+    out_dict.update(config)
+    return out_dict
 
 
 def interval_2_points(specification: list[list]) -> list:
@@ -42,8 +41,14 @@ def interval_2_points(specification: list[list]) -> list:
 
     if type(specification[0]) != list:
         print(f"Warning: Interval specification {specification} not list of lists.")
-        # Fix error not list of list
-        specification = [specification]
+        if len(specification) == 3:
+            print("Attempting inteval fix.")
+            # Fix error not list of list, by putting in list
+            specification = [specification]
+        else:
+            raise Exception(
+                f"Interval specification {specification} not list and not length 3."
+            )
 
     points = []
     for pairs in specification:
@@ -97,6 +102,7 @@ class AnimatedPlot:
 
 
 if __name__ == "__main__":
+    # Some tests
 
     test_dict = {
         "ABC": "EFG",
@@ -106,15 +112,19 @@ if __name__ == "__main__":
         "78": 12,
         "12A": "abc",
     }
+    opt_dict = {"12A": "ABC", "CTH": "KTH"}
 
-    argument_checker(test_dict, ["ABC"])
+    argument_checker(test_dict, ["ABC"], optional_config=opt_dict)
 
-    interval = [[1, 0.1, 3]]
+    # interval = [[1, 0.1, 3]]
 
-    print(interval_2_points(interval))
+    # print(interval_2_points(interval))
 
-    plot = AnimatedPlot("A", "B", "C")
-    plot.add_point(1, 2)
-    plot.add_point(3, 2)
-    plot.keep_plot()
-    print("hi")
+    # conf = {"type": "chalmers", "abc": "123", "petg": 111}
+    # opt = {"petg": 222, "PPP": "ASDASD"}
+    # print(optional_arguments_merge(conf, opt))
+
+    # plot = AnimatedPlot("A", "B", "C")
+    # plot.add_point(1, 2)
+    # plot.add_point(3, 2)
+    # plot.keep_open()
