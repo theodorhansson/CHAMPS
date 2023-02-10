@@ -1,5 +1,5 @@
 import communication
-from utils import argument_checker, AnimatedPlot
+from utils import argument_checker, AnimatedPlot, interval_2_points
 import numpy as np
 import traceback
 import time
@@ -42,7 +42,8 @@ def ipv_main(config, DC_config, P_config, optional_config=_optional_arguments):
 
     V_max = config["measurement"]["v_max"]
     rollover_threshold = optional_config["rollover_threshold"]
-    interval_list = config["measurement"]["current"]
+    intervals = config["measurement"]["current"]
+    interval_list = interval_2_points(intervals)
 
     plot = AnimatedPlot("Voltage[V]", "Optical Power [W]", "IPV")
 
