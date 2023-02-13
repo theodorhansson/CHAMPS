@@ -24,7 +24,11 @@ class INT_sphere:
         argument_checker(config_dict, _required_arguments)
         self._OphirCOM = win32com.client.Dispatch("OphirLMMeasurement.CoLMMeasurement")
         DeviceList = self._OphirCOM.ScanUSB()
-        Device = DeviceList[0]
+        try:
+            Device = DeviceList[0]
+        except Exception as e:
+            print("You don't seem to have an Integrating Sphere connected")
+            raise e
         self._DeviceHandle = self._OphirCOM.OpenUSBDevice(Device)
         self._min_time = config_dict["min_measure_time"]
 
