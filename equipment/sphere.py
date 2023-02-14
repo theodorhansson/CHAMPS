@@ -16,12 +16,12 @@ from utils import argument_checker
 # 7    3 uW
 
 # Avaliable wavelengths for IS6-D-UV
-# 1    940 nm
-# 2    300 nm
-# 3    633 nm
-# 4    543 nm
-# 5    870 nm
-# 6    850 nm
+# 0    940 nm
+# 1    300 nm
+# 2    633 nm
+# 3    543 nm
+# 4    870 nm
+# 5    850 nm
 
 
 _required_arguments = ["range", "min_measure_time", "wavelength", "type"]
