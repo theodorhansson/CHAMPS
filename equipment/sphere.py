@@ -66,6 +66,15 @@ class INT_sphere:
         ranges = self._OphirCOM.GetRanges(self._DeviceHandle, 0)
         return ranges
 
+    def get_wavelengths(self):
+        # Returns possible ranges
+        wavelengths = self._OphirCOM.GetWavelengths(self._DeviceHandle, 0)
+        return wavelengths
+        # TODO: returns also current setting?
+
+    def set_wavelength(self, newWavelength: int):
+        self._OphirCOM.SetWavelength(self._DeviceHandle, 0, newWavelength)
+
     def set_output(self, state: bool):
         # Toggles reading from sphere
         if state:
