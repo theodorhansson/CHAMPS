@@ -4,7 +4,11 @@ import time
 
 
 def argument_checker(
-    config: dict, expected_keys: list, optional_config: dict = dict(), warn_extra=True
+    config: dict,
+    expected_keys: list,
+    optional_config: dict = dict(),
+    warn_extra=True,
+    source_func="",
 ):
     # Behavior:
     # If extra parameter is found, warn user but continue program
@@ -18,16 +22,19 @@ def argument_checker(
     Extra_parameters = config_values - total_accepted_set
     Missing_parameters = expected_set - config_values
 
+    if source_func:
+        source_func = " in " + source_func
+
     if Extra_parameters != set() and Missing_parameters != set() and warn_extra:
         raise Exception(
-            f"Extra parameter {Extra_parameters} and missing parameter {Missing_parameters} detected."
+            f"Extra parameter {Extra_parameters} and missing parameter {Missing_parameters} detected{source_func}."
         )
 
     elif Extra_parameters != set() and warn_extra:
-        print(f"Warning: Unused parameter {Extra_parameters}")
+        print(f"Warning: Unused parameter {Extra_parameters}{source_func}")
 
     elif Missing_parameters != set():
-        raise Exception(f"Missing parameters {Missing_parameters}")
+        raise Exception(f"Missing parameters {Missing_parameters}{source_func}")
 
 
 def optional_arguments_merge(config: dict = dict(), optional_default=dict()):

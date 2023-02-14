@@ -5,7 +5,9 @@ _required_arguments = ["type"]
 
 
 def get_DCsupply(config_dict):
-    argument_checker(config_dict, _required_arguments, warn_extra=False)
+    argument_checker(
+        config_dict, _required_arguments, warn_extra=False, source_func="communication"
+    )
 
     # For DC power supplies
     DC_type = config_dict["type"]

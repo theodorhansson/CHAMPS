@@ -6,7 +6,7 @@ _required_arguments = ["gpib_address", "type"]
 
 class keithley:
     def __init__(self, config_dict: dict):
-        argument_checker(config_dict, _required_arguments)
+        argument_checker(config_dict, _required_arguments, source_func="keithley")
         self.address = str(config_dict["gpib_address"])
         self.interface = "GPIB0"
 

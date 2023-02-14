@@ -28,7 +28,9 @@ def init(config: dict):
     IPV_config = config["measurement"]
     IPV_name = IPV_config["type"]
     # Check and merge optional arguments
-    argument_checker(IPV_config, _required_arguments, _optional_arguments)
+    argument_checker(
+        IPV_config, _required_arguments, _optional_arguments, source_func="IPV init"
+    )
     IPV_config_opt = optional_arguments_merge(IPV_config, _optional_arguments)
 
     # Used for getting instrument objects
