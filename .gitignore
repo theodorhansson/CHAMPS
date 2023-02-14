@@ -161,3 +161,12 @@ cython_debug/
 
 # Visual Studio Code config files
 .vscode/
+
+#archives
+*.7z
+*.zip
+*.tar.gz
+
+#Dev files
+OphirComCP.py
+playground.py
