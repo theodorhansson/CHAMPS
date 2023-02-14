@@ -24,7 +24,7 @@ from utils import argument_checker
 # 6    850 nm
 
 
-_required_arguments = ["range", "min_measure_time", "wavelength"]
+_required_arguments = ["range", "min_measure_time", "wavelength", "type"]
 
 
 class INT_sphere:

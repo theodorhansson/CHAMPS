@@ -1,7 +1,12 @@
 from equipment import *
+from utils import argument_checker
+
+_required_arguments = ["type"]
 
 
 def get_DCsupply(config_dict):
+    argument_checker(config_dict, _required_arguments, warn_extra=False)
+
     # For DC power supplies
     DC_type = config_dict["type"]
     match DC_type:

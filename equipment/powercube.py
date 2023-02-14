@@ -1,7 +1,7 @@
 import serial
 from utils import argument_checker
 
-_required_arguments = ["port"]
+_required_arguments = ["port", "type"]
 
 
 class powercube:

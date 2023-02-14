@@ -3,7 +3,9 @@ import numpy as np
 import time
 
 
-def argument_checker(config: dict, expected_keys: list, optional_config: dict = dict()):
+def argument_checker(
+    config: dict, expected_keys: list, optional_config: dict = dict(), warn_extra=True
+):
     # Behavior:
     # If extra parameter is found, warn user but continue program
     # If parameter missing, raise exception
@@ -16,12 +18,12 @@ def argument_checker(config: dict, expected_keys: list, optional_config: dict = 
     Extra_parameters = config_values - total_accepted_set
     Missing_parameters = expected_set - config_values
 
-    if Extra_parameters != set() and Missing_parameters != set():
+    if Extra_parameters != set() and Missing_parameters != set() and warn_extra:
         raise Exception(
             f"Extra parameter {Extra_parameters} and missing parameter {Missing_parameters} detected."
         )
 
-    elif Extra_parameters != set():
+    elif Extra_parameters != set() and warn_extra:
         print(f"Warning: Unused parameter {Extra_parameters}")
 
     elif Missing_parameters != set():
