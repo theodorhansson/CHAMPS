@@ -15,8 +15,16 @@ from utils import argument_checker
 # 6    30 uW
 # 7    3 uW
 
+# Avaliable wavelengths for IS6-D-UV
+# 1    940 nm
+# 2    300 nm
+# 3    633 nm
+# 4    543 nm
+# 5    870 nm
+# 6    850 nm
 
-_required_arguments = ["range", "min_measure_time"]
+
+_required_arguments = ["range", "min_measure_time", "wavelength"]
 
 
 class INT_sphere:
@@ -24,13 +32,21 @@ class INT_sphere:
         argument_checker(config_dict, _required_arguments)
         self._OphirCOM = win32com.client.Dispatch("OphirLMMeasurement.CoLMMeasurement")
         DeviceList = self._OphirCOM.ScanUSB()
-        Device = DeviceList[0]
+        try:
+            Device = DeviceList[0]
+        except Exception as e:
+            print("You don't seem to have an Integrating Sphere connected")
+            raise e
         self._DeviceHandle = self._OphirCOM.OpenUSBDevice(Device)
         self._min_time = config_dict["min_measure_time"]
 
         # Set the default range
         default_range = config_dict["range"]
-        self._OphirCOM.SetRange(self._DeviceHandle, 0, default_range)
+        self.set_range(default_range)
+
+        # Set sensivitve wavelength
+        wavelength = config_dict["wavelength"]
+        self.set_wavelength(wavelength)
 
     def open(self):
         # Start output stream
@@ -55,12 +71,21 @@ class INT_sphere:
 
     def set_range(self, newRange: int):
         # Set the measurement-range for the sphere
-        self._OphirCOM.SetRange(self._DeviceHandle, 0, newRange)
+        self._OphirCOM.SetRange(self._DeviceHandle, 0, int(newRange))
 
     def get_ranges(self):
         # Return the possible ranges
         ranges = self._OphirCOM.GetRanges(self._DeviceHandle, 0)
         return ranges
+
+    def get_wavelengths(self):
+        # Returns possible ranges
+        # ((current index),('940', '300',...))
+        wavelengths = self._OphirCOM.GetWavelengths(self._DeviceHandle, 0)
+        return wavelengths
+
+    def set_wavelength(self, newWavelength: int):
+        self._OphirCOM.SetWavelength(self._DeviceHandle, 0, int(newWavelength))
 
     def set_output(self, state: bool):
         # Toggles reading from sphere

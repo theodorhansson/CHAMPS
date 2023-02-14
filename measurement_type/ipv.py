@@ -48,12 +48,17 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
 
     plot = AnimatedPlot("Current[A]", "Optical Power [W]", "IPV")
 
-    P_unit = communication.get_PowerUnit(P_config)
-    DC_unit = communication.get_DCsupply(DC_config)
-    Results = {"voltage": [], "current": [], "power": []}
+    try:
+        P_unit = communication.get_PowerUnit(P_config)
+        DC_unit = communication.get_DCsupply(DC_config)
+        Results = {"voltage": [], "current": [], "power": []}
 
-    P_unit.open()
-    DC_unit.open()
+        P_unit.open()
+        DC_unit.open()
+    except:
+        print("Something went wrong when getting and opening the resources")
+        exit()
+
     DC_unit.set_current(0.0)
     DC_unit.set_voltage_limit(V_max)
     DC_unit.set_output(True)
