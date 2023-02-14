@@ -17,3 +17,7 @@ type = "INT_sphere"
 range = 2
 min_measure_time = 0.2
 wavelength = 5
+
+[powercube]
+type = "powercube"
+port = "com4"
