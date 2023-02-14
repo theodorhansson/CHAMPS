@@ -15,10 +15,10 @@ class powercube:
         return float(ans)  # TODO: type?
 
     def set_voltage_limit(self, volt: float):
-        self.serial_port.write(b"VSET1:" + str(volt))
+        self.serial_port.write(b"VSET1:" + bytes(str(volt), encoding="utf-8"))
 
     def set_current(self, current: float):
-        self.serial_port.write(b"ISET1:" + str(current))
+        self.serial_port.write(b"ISET1:" + bytes(str(current), encoding="utf-8"))
 
     def get_current(self):
         self.serial_port.write(b"IOUT1?")
@@ -26,7 +26,7 @@ class powercube:
         return float(ans)  # TODO: type?
 
     def set_output(self, state: bool):
-        self.serial_port.write(b"OUT" + str(int(state)))
+        self.serial_port.write(b"OUT" + bytes(str(int(state)), encoding="utf-8"))
 
     def open(self):
         self.serial_port = serial.Serial(self.port)
@@ -34,7 +34,7 @@ class powercube:
         self.serial_port.baudrate = 9600
         self.serial_port.parity = serial.PARITY_NONE
         self.serial_port.bytesize = 8
-        self.serial_port.stopbits = 0
+        self.serial_port.stopbits = 1
 
     def close(self):
         self.serial_port.close()
