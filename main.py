@@ -2,6 +2,7 @@ import tomllib
 import sys
 import numpy as np
 import time
+import tomli_w
 
 default_conf_path = "config.toml"
 
@@ -15,7 +16,9 @@ def main(config_path):
     meas_name = config_lower["measurement"]["type"]
 
     measurement_init = identify_measurement_type(meas_name)
-    result_dict = measurement_init(config_lower)  # Begin the measurement!
+    result_dict, used_config_dict = measurement_init(
+        config_lower
+    )  # Begin the measurement!
 
     resultarr = []
     result_headers = []
@@ -34,6 +37,9 @@ def main(config_path):
     save_file = save_folder + meas_name + "-" + timestamp + ".txt"
 
     np.savetxt(save_file, resultarr, header=" ".join(result_headers))
+
+    save_toml = save_folder + meas_name + "-" + timestamp + ".toml"
+    # Code for file save of TOML
 
 
 def identify_measurement_type(measurement: str):
