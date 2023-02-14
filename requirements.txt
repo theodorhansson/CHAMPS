@@ -1,4 +1,7 @@
-numpy>=1.24.1
-pyserial>=3.5
-PyVISA>=1.13.0
-pywin32>=305
+matplotlib==3.6.3
+numpy==1.24.1
+pyserial==3.5
+PyVISA==1.13.0
+pywin32==305
+tomli_w==1.0.0
+win32gui==221.6
