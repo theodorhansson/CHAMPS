@@ -94,7 +94,9 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
                 if power < (rollover_threshold * power_max) and rollover_threshold:
                     break
 
-    except Exception:
+    except KeyboardInterrupt:
+        print("Keyboard interrupt detected, stopping.")
+    except:
         traceback.print_exc()
     finally:
         # Tries to shut down instruments

@@ -36,10 +36,12 @@ def main(config_path):
 
     np.savetxt(save_file + ".txt", resultarr, header=" ".join(result_headers))
 
+    # Save the data
     with open(save_file + ".toml", "wb"):
         tomli_w.dump(used_config, f)
-
-    # Code for file save of TOML
+    # Save the config
+    with open(save_file + ".toml", "wb") as f:
+        tomli_w.dump(config, f)
 
 
 def identify_measurement_type(measurement: str):
