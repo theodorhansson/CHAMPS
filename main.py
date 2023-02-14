@@ -26,11 +26,12 @@ def main(config_path):
     resultarr = np.array(resultarr)
     resultarr = np.transpose(resultarr)  # One data type per column
 
-    save_file = config_lower["measurement"]["save_file"]
-    if save_file[-4:] == ".txt":
-        save_file = save_file[0:-4]  # strip .txt from name
+    save_folder = config_lower["measurement"]["save_folder"]
+    if save_folder[-1:] != "/":
+        save_folder = save_folder + "/"  # make sure it ends with /
+
     timestamp = time.strftime(rf"%Y%m%d-%H%M%S")
-    save_file = save_file + "-" + meas_name + "-" + timestamp + ".txt"
+    save_file = save_folder + meas_name + "-" + timestamp + ".txt"
 
     np.savetxt(save_file, resultarr, header=" ".join(result_headers))
 
