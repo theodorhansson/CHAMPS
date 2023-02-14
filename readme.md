@@ -1,4 +1,4 @@
-# Välkommen till CHAMPS!
+# Welcome to CHAMPS!
 Chalmers Automated Measurement Photonics System
 
 This is a rewrite of the control script for VCSEL measurements at the photonics department at Chalmers MC2. 
