@@ -48,8 +48,15 @@ def identify_measurement_type(measurement: str):
             import measurement_type.ipv
 
             return measurement_type.ipv.init
+
+        case "spectrum":
+            import measurement_type.spectrum
+
+            return measurement_type.spectrum.init
+
         case _:
-            raise Exception("Measurement type not found")  # TODO Change this
+            # TODO Change this
+            raise Exception(f"No measurement of type {measurement} found.")
 
 
 def dict_2_lower(indict: dict) -> dict:

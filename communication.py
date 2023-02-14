@@ -22,7 +22,8 @@ def get_DCsupply(config_dict):
             return powercube.powercube(config_dict)
 
         case _:
-            raise Exception("Instrument not found")  # TODO Change this
+            # TODO Change this
+            raise Exception(f"No DC-unit of type {DC_type} found.")
 
 
 def get_PowerUnit(config_dict):
@@ -40,7 +41,8 @@ def get_PowerUnit(config_dict):
             return sphere.INT_sphere(config_dict)
 
         case _:
-            raise Exception("Instrument not found")  # TODO Change this
+            # TODO Change this
+            raise Exception(f"No Power unit of type {Power_type} found.")
 
 
 def get_OSA():
