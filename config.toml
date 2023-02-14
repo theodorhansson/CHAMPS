@@ -1,23 +1,19 @@
 [measurement]
-save_folder = "c:/LABDATA"
-type = "ipv"
+Type = "ipv"
+Save_folder = "c:/LABDATA"
 DC_unit = "keithley2400"
 P_unit = "INT_sphere"
 V_max = 5
-P_cutoff = 0
-current = [[0.001, 0.0001, 0.005], [0.005, 0.0005, 0.015]]
-
+Rollover_threshold = 0
+Current = [[0.001, 0.0001, 0.005], [0.005, 0.0005, 0.015]]
 
 [keithley2400]
-type = "keithley2400"
-gpib_address = "24"
+GPIB_address = "24"
 
 [INT_sphere]
-type = "INT_sphere"
-range = 2
-min_measure_time = 0.2
-wavelength = 5
+Range = 2
+Min_measure_time = 0.2
+Wavelength = 5
 
 [powercube]
-type = "powercube"
-port = "com4"
+Port = "com4"
