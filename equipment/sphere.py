@@ -29,7 +29,7 @@ _required_arguments = ["range", "min_measure_time", "wavelength", "type"]
 
 class INT_sphere:
     def __init__(self, config_dict: dict):
-        argument_checker(config_dict, _required_arguments)
+        argument_checker(config_dict, _required_arguments, source_func="sphere")
         self._OphirCOM = win32com.client.Dispatch("OphirLMMeasurement.CoLMMeasurement")
         DeviceList = self._OphirCOM.ScanUSB()
         try:

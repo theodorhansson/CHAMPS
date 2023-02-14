@@ -6,7 +6,7 @@ _required_arguments = ["port", "type"]
 
 class powercube:
     def __init__(self, config_dict):
-        argument_checker(config_dict, _required_arguments)
+        argument_checker(config_dict, _required_arguments, source_func="powercube")
         self.port = str(config_dict["port"])
 
     def get_voltage(self):
