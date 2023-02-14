@@ -19,7 +19,7 @@ _required_arguments = [
     "current",
     "v_max",
 ]
-_optional_arguments = {"rollover_threshold": 0}
+_optional_arguments = {"rollover_threshold": 0, "rollover_min": 0}
 
 
 def init(config: dict):
@@ -47,6 +47,7 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
 
     V_max = IPV_config["v_max"]
     rollover_threshold = IPV_config["rollover_threshold"]
+    rollover_min = IPV_config["rollover_min"]
     intervals = IPV_config["current"]
     interval_list = interval_2_points(intervals)
 
@@ -68,10 +69,10 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
     DC_unit.set_output(True)
 
     try:
-        power_max = 0
         prev_end_current = 0
 
         for interval in interval_list:
+            power_max = 0
             start_current = interval[0]
             ramp_current(DC_unit, prev_end_current, start_current)
             prev_end_current = interval[-1]
@@ -89,8 +90,8 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
                 plot.add_point(current, power)
                 print("IPV data", volt, current, power)
 
-                if power > power_max:
-                    power_max = power
+                if power > rollover_min:
+                    power_max = max(power, power_max)
                 if power < (rollover_threshold * power_max) and rollover_threshold:
                     break
 
