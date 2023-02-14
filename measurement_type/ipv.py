@@ -18,6 +18,7 @@ _required_arguments = [
     "p_unit",
     "current",
     "v_max",
+    "save_folder",
 ]
 _optional_arguments = {"rollover_threshold": 0, "rollover_min": 0}
 
@@ -61,6 +62,7 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
         P_unit.open()
         DC_unit.open()
     except:
+        traceback.print_exc()
         print("Something went wrong when getting and opening the resources")
         exit()
 
