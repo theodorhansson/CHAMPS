@@ -111,6 +111,7 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
         DC_unit.close()
         P_unit.close()
 
+    print("IPV measurements done. Keeping plot alive for your convenience.")
     plot.keep_open()
 
     return Results
