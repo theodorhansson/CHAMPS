@@ -1,8 +1,12 @@
-# Välkommen till MCCX11-VT23-13!
-Det här är en rewrite kontrollscriptet för VCSEL-mätningar hos fotonikavdelningen vid Chalmers mc^2. 
+# Välkommen till CHAMPS!
+Chalmers Automated Measurement Photonics System
 
-Utvecklare:
- - Jacob Billvén
- - Sofia Damne 
- - Theodor Hansson 
- - Gustav Persson
+This is a rewrite of the control script for VCSEL measurements at the photonics department at Chalmers MC2. 
+The script is part of the MCCX11-VT23-13 bachlelor's project.
+  
+
+Devs:
+- Jacob Billvén
+- Sofia Damne
+- Theodor Hansson
+- Gustav Persson
