@@ -18,3 +18,22 @@ Wavelength = 5
 
 [powercube]
 Port = "com4"
+
+
+# Avaliable ranges for IS6-D-UV
+# 0    auto
+# 1    1 W
+# 2    300 mW
+# 3    30 mW
+# 4    3 mW
+# 5    300 uW
+# 6    30 uW
+# 7    3 uW
+
+# Avaliable wavelengths for IS6-D-UV
+# 1    940 nm
+# 2    300 nm
+# 3    633 nm
+# 4    543 nm
+# 5    870 nm
+# 6    850 nm
