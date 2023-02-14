@@ -1,1 +1,1 @@
-__all__ = ["keithley", "powercube", "sphere"]
+__all__ = ["keithley2400", "powercube", "ophir_IS6_D_UV"]

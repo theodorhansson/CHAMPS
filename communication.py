@@ -16,7 +16,7 @@ def get_DCsupply(config_dict):
     DC_type = config_dict["type"]
     match DC_type:
         case "keithley2400":
-            return keithley.keithley(config_dict)
+            return keithley2400.keithley2400(config_dict)
 
         case "powercube":
             return powercube.powercube(config_dict)
@@ -37,7 +37,7 @@ def get_PowerUnit(config_dict):
 
     match Power_type:
         case "int_sphere":
-            return sphere.INT_sphere(config_dict)
+            return ophir_IS6_D_UV.INT_sphere(config_dict)
 
         case _:
             raise Exception("Instrument not found")  # TODO Change this
