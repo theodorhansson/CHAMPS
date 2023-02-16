@@ -44,9 +44,10 @@ def optional_arguments_merge(config: dict = dict(), optional_default=dict()):
     return out_dict
 
 
-def interval_2_points(specification: list[list]) -> list:
-    # Takes in list [[A, x, B],...] and returns a list of all points
-    # in specified intervals where A, B are start and end, and x step size
+def interval_2_points(specification: list[list]) -> list[list]:
+    # Takes in list [[A, x, B],[C, y, D]] and returns a list of all points
+    # in specified intervals where A, B are start and end, and x step size.
+    # Output like: [[A, A+x, ..., B], [C, C+y, ..., D]]
 
     if type(specification[0]) != list:
         print(f"Warning: Interval specification {specification} not list of lists.")
