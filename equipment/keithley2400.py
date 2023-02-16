@@ -55,3 +55,68 @@ class keithley2400:
 
     def close(self):
         self.instrument.close()
+
+
+def performance_test():
+    # Test to determine how fast keithley is for different operations
+    import time
+
+    N = 50
+
+    config = {"gpib_address": 24, "type": "jipsdf"}
+    Keith = keithley2400(config)
+
+    time.sleep(0.1)
+    t_start = time.time()
+    for _ in range(N):
+        Keith.set_current(0)
+    t_end = time.time()
+    t_per = (t_end - t_start) / N
+    print(f"Time per set_current {t_per}")
+
+    time.sleep(0.1)
+    t_start = time.time()
+    for _ in range(N):
+        Keith.get_current()
+    t_end = time.time()
+    t_per = (t_end - t_start) / N
+    print(f"Time per get_current {t_per}")
+
+    time.sleep(0.1)
+    t_start = time.time()
+    for _ in range(N):
+        Keith.get_voltage()
+    t_end = time.time()
+    t_per = (t_end - t_start) / N
+    print(f"Time per get_voltage {t_per}")
+
+    time.sleep(0.1)
+    t_start = time.time()
+    for _ in range(N):
+        Keith.get_voltage_and_current()
+    t_end = time.time()
+    t_per = (t_end - t_start) / N
+    print(f"Time per get_voltage_and_current {t_per}")
+
+    time.sleep(0.1)
+    t_start = time.time()
+    for _ in range(N):
+        Keith.set_current(0)
+        Keith.get_voltage()
+        Keith.get_current()
+    t_end = time.time()
+    t_per = (t_end - t_start) / N
+    print(f"Time per full old loop {t_per}")
+
+    time.sleep(0.1)
+    t_start = time.time()
+    for _ in range(N):
+        Keith.set_current(0)
+        Keith.get_voltage_and_current()
+    t_end = time.time()
+    t_per = (t_end - t_start) / N
+    print(f"Time per full new loop {t_per}")
+
+
+if __name__ == "__main__":
+    performance_test()
