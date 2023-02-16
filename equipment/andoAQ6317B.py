@@ -30,12 +30,12 @@ class SpectrumAnalyzer:
         # Exit instrument
         self.instrument.close()
 
-    def set_avg(self, avg_factor: int):
+    def set_avg_factor(self, avg_factor: int):
         # Sets the number of averaging times for measurement, ****: 1 to 1000 (1 step)
         GPIB_write = ":AVG" + str(avg_factor)
         self.instrument.write(GPIB_write)
 
-    def get_avg(self):
+    def get_avg_factor(self):
         GPIB_write = ":AVG?"
         avg = self.instrument.write(GPIB_write)
         return avg
