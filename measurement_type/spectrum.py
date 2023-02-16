@@ -10,7 +10,7 @@ import numpy as np
 import traceback
 
 _DC_name_key = "dc_unit"
-_OSA_name_key = "osa"
+_OSA_name_key = "osa_unit"
 _required_arguments = [
     "type",
     "dc_unit",
@@ -20,13 +20,11 @@ _required_arguments = [
     "save_folder",
     "center_wavelength",
     "linear_resoultion",
+    "Wavelength_span",
 ]
 _optional_arguments = {
     "sampel_points": 0,
     "avg_factor": 5,
-    "reference_level": -40,
-    "display_level_scale": 10,
-    "sensitivity": "SHI1",
 }
 
 
@@ -39,7 +37,7 @@ def init(config: dict):
         spectrum_config,
         _required_arguments,
         _optional_arguments,
-        source_func="IPV init",
+        source_func="Spectrum init",
     )
     spectrum_config_opt = optional_arguments_merge(spectrum_config, _optional_arguments)
 
@@ -82,7 +80,12 @@ def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
     DC_unit.set_voltage_limit(V_max)
     DC_unit.set_output(True)
 
-    # TODO: OSA INIT
+    OSA_unit.set_center_wavelength_nm(spectrum_config["center_wavelength"])
+    OSA_unit.set_wavelength_span_nm(spectrum_config["span"])
+    OSA_unit.set_sensitivity(spectrum_config["sensitivity"])
+    OSA_unit.set_linear_resolution_nm(spectrum_config["linear_resolution"])
+    OSA_unit.set_avg_factor(spectrum_config["avg_factor"])
+    OSA_unit.set_sample_points(spectrum_config["sampel_points"])
 
     try:
         prev_end_current = 0
