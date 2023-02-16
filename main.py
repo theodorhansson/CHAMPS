@@ -38,7 +38,7 @@ def main(config_path):
 
     # Save the config
     with open(save_file + ".toml", "wb") as f:
-        tomli_w.dump(config, f)
+        tomli_w.dump(used_config, f)
 
 
 def identify_measurement_type(measurement: str):
