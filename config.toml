@@ -1,27 +1,12 @@
-#[measurement]
-# Type = "ipv"
-# Save_folder = "c:/LABDATA"
-# DC_unit = "keithley2400"    #Refers to the [] below only
-# P_unit = "INT_sphere"
-# V_max = 5
-# Rollover_threshold = 0  # Stops measurement when power < rollover_threshold * maxpower
-# Rollover_min = 0.1      # Doesn't do rollover check on values lower than this
-# Current = [[0.001, 0.0001, 0.005], [0.005, 0.0005, 0.015]]  # [min, step, max]
-
 [measurement]
-Type = "spectrum"
+Type = "ipv"
 Save_folder = "c:/LABDATA"
 DC_unit = "keithley2400"    #Refers to the [] below only
-OSA_unit = "ando"           #Refers to the [] below only
+P_unit = "INT_sphere"
 V_max = 5
+Rollover_threshold = 0  # Stops measurement when power < rollover_threshold * maxpower
+Rollover_min = 0        # Doesn't do rollover check on values lower than this
 Current = [[0.001, 0.0001, 0.005], [0.005, 0.0005, 0.015]]  # [min, step, max]
-
-Center_wavelength = 850 #nm
-linear_resoultion = 0.1 #nm
-Wavelength_span = 20 #nm
-avg_factor = 10
-sensitivity = "SHI1"
-
 
 [keithley2400]  
 type = "keithley2400"   # The specific type of unit
@@ -36,12 +21,6 @@ Wavelength = 5
 [powercube]
 type = "powercube"
 Port = "com4"
-
-[ando]
-type = "ando_osa"
-GPIB_address = 20
-reference_level = -40
-display_level_scale = 10
 
 
 # Avaliable ranges for IS6-D-UV
