@@ -28,9 +28,9 @@ class keithley2400:
 
     def get_voltage_and_current(self) -> list[float]:
         ans = self.instrument.query(":READ?")
-        data = ans.split(",")[0:1]  # [volt, current, unknown, unknown]
+        data = ans.split(",")[0:2]  # [volt, current, unknown, unknown]
         data = [float(x) for x in data]
-        return float(data)
+        return data
 
     def set_output(self, state: bool):
         self.instrument.write(":OUTPUT " + str(int(state)))
