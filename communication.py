@@ -74,7 +74,7 @@ class Communication:
     def pyvisa_resource_util(self):
         # Checks if self.resource_manager exists, if not create it.
         if not hasattr(self, "resource_manager"):
-            self.resource_manager = pyvisa.ResourceManager
+            self.resource_manager = pyvisa.ResourceManager()
         return self.resource_manager
 
 
