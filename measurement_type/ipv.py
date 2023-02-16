@@ -54,11 +54,12 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
     intervals = IPV_config["current"]
     interval_list = interval_2_points(intervals)
 
-    plot = AnimatedPlot("Current[A]", "Optical Power [W]", "IPV")
+    Plot = AnimatedPlot("Current[A]", "Optical Power [W]", "IPV")
+    Instrument_COM = communication.Communication()
 
     try:
-        P_unit = communication.get_PowerUnit(P_config)
-        DC_unit = communication.get_DCsupply(DC_config)
+        P_unit = Instrument_COM.get_PowerUnit(P_config)
+        DC_unit = Instrument_COM.get_DCsupply(DC_config)
         Results = {"voltage": [], "current": [], "power": []}
 
         P_unit.open()
@@ -91,7 +92,7 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
                 Results["voltage"].append(volt)
                 Results["current"].append(current)
                 Results["power"].append(power)
-                plot.add_point(current, power)
+                Plot.add_point(current, power)
                 print("IPV data", volt, current, power)
 
                 if power > rollover_min:
@@ -112,6 +113,6 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
         P_unit.close()
 
     print("IPV measurements done. Keeping plot alive for your convenience.")
-    plot.keep_open()
+    Plot.keep_open()
 
     return Results
