@@ -5,7 +5,7 @@ DC_unit = "keithley2400"    #Refers to the [] below only
 P_unit = "INT_sphere"
 V_max = 5
 Rollover_threshold = 0  # Stops measurement when power < rollover_threshold * maxpower
-Rollover_min = 0.1      # Doesn't do rollover check on values lower than this
+Rollover_min = 0        # Doesn't do rollover check on values lower than this
 Current = [[0.001, 0.0001, 0.005], [0.005, 0.0005, 0.015]]  # [min, step, max]
 Plot_interval = 20  #Update plot every nth measurement
 
