@@ -5,10 +5,16 @@ _required_arguments = ["gpib_address", "type"]
 
 
 class keithley:
-    def __init__(self, config_dict: dict):
+    def __init__(self, config_dict: dict, resource_manager: object = None):
         argument_checker(config_dict, _required_arguments, source_func="keithley")
         self.address = str(config_dict["gpib_address"])
         self.interface = "GPIB0"
+
+        # Use parent resource manager if exists
+        if resource_manager != None:
+            self.resource_manager = resource_manager
+        else:
+            self.resource_manager = pyvisa.ResourceManager()
 
     def get_voltage(self):
         ans = self.instrument.query(":READ?")
@@ -32,8 +38,7 @@ class keithley:
     def open(self):
         conn_str = self.interface + "::" + self.address  # like GPIB0::24
 
-        rm = pyvisa.ResourceManager()
-        self.instrument = rm.open_resource(conn_str)
+        self.instrument = self.resource_manager.open_resource(conn_str)
 
         self.instrument.write(":SOURCE:FUNCTION CURRENT")
         self.instrument.write(":SOURCE:CURRENT:MODE FIXED")
