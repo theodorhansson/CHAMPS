@@ -3,34 +3,45 @@ from utils import argument_checker
 
 _required_arguments = ["gpib_address", "type"]
 
+# Many comments in methods from "AQ6317B OPTICAL SPECTRUM ANALYZER INSTRUCTION MANUAL", ANDO ELECTRIC 2000
+### Read manual page 384 for commands ###
 
-# NOTE: GPIB1 is used for controlling unit, GPIB2 is used for contrilling other units.
-### Read manual page 384 ###
+# NOTE: GPIB1 is used for controlling unit, GPIB2 is used for controlling other units.
+# TODO: Better typecheck?
 
 
 class SpectrumAnalyzer:
-    def __init__(self, config_dict: dict):
+    def __init__(self, config_dict: dict, resource_manager=None):
         self.address = str(config_dict["gpib_address"])
         self.interface_ID = "GPIB0"
+        self.conn_str = self.interface_ID + "::" + self.address
 
-    def open(self):
-        # Define where instrument is
-        conn_str = self.interface_ID + "::" + self.address
-        rm = pyvisa.ResourceManager()
-        self.instrument = rm.open_resource(conn_str)
+        # Use parent resource manager if exists
+        if resource_manager != None:
+            self.resource_manager = resource_manager
+        else:
+            self.resource_manager = pyvisa.ResourceManager()
+
+    def open(self):  # TODO: move to __init__?
+        # Define instrument with pyvisa
+        self.instrument = self.resource_manager.open_resource(self.conn_str)
 
     def close(self):
         # Exit instrument
         self.instrument.close()
 
-    def set_avg(self):
-        pass
+    def set_avg(self, avg_factor: int):
+        # Sets the number of averaging times for measurement, ****: 1 to 1000 (1 step)
+        GPIB_write = ":AVG" + str(avg_factor)
+        self.instrument.write(GPIB_write)
 
     def get_avg(self):
-        pass
+        GPIB_write = ":AVG?"
+        avg = self.instrument.write(GPIB_write)
+        return avg
 
     def set_center_wavelength_nm(self, center_wl: float):
-        # Sets the center wavelength in nm
+        # Sets the center wavelength (Unit: nm), ****.**: 600.00 to 1750.00 (0.01 step)
         GPIB_write = ":CTRWL" + str(round(center_wl, 2))
         self.instrument.write(GPIB_write)
 
@@ -39,53 +50,83 @@ class SpectrumAnalyzer:
         center_wl = self.instrument.write(GPIB_write)
         return center_wl
 
-    def set_level_scale(self):
-        pass
+    def set_level_scale(self, scale: float):
+        # Sets the scale of the level axis, **.*: 0.1 to 10.0 (0.1 step. Unit: dB/DIV) or LIN (linear scale)
+        GPIB_write = ":LSCL" + str(round(scale, 1))
+        self.instrument.write(GPIB_write)
 
     def get_level_scale(self):
-        pass
+        GPIB_write = ":LSCL?"
+        avg = self.instrument.write(GPIB_write)
+        return avg
 
-    def get_linear_resolutuin(self):
-        pass
+    def set_linear_resolution_nm(self, resolution: float):
+        # Sets the resolution. (Unit: nm), *.**: 0.01 to 2.0 (1-2-5 steps)
+        GPIB_write = ":RESLN" + str(round(resolution, 2))
+        self.instrument.write(GPIB_write)
 
-    def set_linear_resolutuin(self):
-        pass
+    def get_linear_resolution_nm(self):
+        GPIB_write = ":RESLN?"
+        resolution = self.instrument.write(GPIB_write)
+        return resolution
 
-    def set_num_sample(self):
-        pass
+    def set_sample_points(self, n_points: int):
+        # Sets the sampling point for measurement. ****: 11 to 20001 (1 step), 0(auto)
+        GPIB_write = ":SMPL" + str(n_points)
+        self.instrument.write(GPIB_write)
 
-    def get_num_sample(self):
-        pass
+    def get_sample_points(self):
+        GPIB_write = ":SMPL?"
+        n_points = self.instrument.write(GPIB_write)
+        return n_points
 
-    def set_ref_level(self):
-        pass
+    def set_ref_level_dBm(self, level: float):
+        # Sets the reference level. [in LOG] (Unit: dBm), ***.*: -90.0 to 20.0 (0.1 step)
+        GPIB_write = ":REFL" + str(level)
+        self.instrument.write(GPIB_write)
 
     def get_ref_level(self):
-        pass
+        GPIB_write = ":REFL?"
+        n_points = self.instrument.write(GPIB_write)
+        return n_points
 
-    def set_sensitivity(self):
-        pass
+    def set_sensitivity(self, sensitivity_id: str):
+        # Avaliable sensitivities:
+        # SNHD: SENS NORM RANGE HOLD
+        # SNAT: SENS NORM RANGE AUTO
+        # SMID: SENS MID
+        # SHI1: SENS HIGH1
+        # SHI2: SENS HIGH2
+        # SHI3: SENS HIGH3
+        GPIB_write = ":" + sensitivity_id
+        self.instrument.write(GPIB_write)
 
     def get_sensitivity(self):
-        pass
+        GPIB_write = ":SENS?"
+        sensitivity = self.instrument.write(GPIB_write)
+        return sensitivity
 
-    def set_wavelength_span(self):
-        pass
+    def set_wavelength_span_nm(self, span: float):
+        # Sets the span. (Unit_ nm), ****.*: 0, 0.5 to 1200.0 (0.1 step)
+        GPIB_write = ":SPAN" + str(round(span, 1))
+        self.instrument.write(GPIB_write)
 
     def get_wavelength_span(self):
-        pass
+        GPIB_write = ":SPAN?"
+        span = self.instrument.write(GPIB_write)
+        return span
 
-    def get_wavelength(self):
-        pass
-
-    def get_spectrum_data(self):
-        pass
+    def get_wavelength_data_A(self, range: str = ""):
+        # Trace A wavelength data **** : 1 to 20001, "R1-R20001" when range ommitted
+        GPIB_write = ":WDATA" + range
+        wavelength_data = self.instrument.write(GPIB_write)
+        return wavelength_data
 
     def set_single_span(self):
         pass
 
     def get_connected_visa_devices(self):
-        devices = pyvisa.ResourceManager()
+        return self.resource_manager.list_resources()
 
 
 def test_OSA():
