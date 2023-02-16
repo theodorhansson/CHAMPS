@@ -10,7 +10,6 @@ class keithley2400:
         self.address = str(config_dict["gpib_address"])
         self.interface = "GPIB0"
 
-    def get_voltage(self):
     def get_voltage(self) -> float:
         ans = self.instrument.query(":READ?")
         ans = ans.split(",")[0]  # First item is voltage
@@ -22,11 +21,16 @@ class keithley2400:
     def set_current(self, current: float):
         self.instrument.write(":SOURCE:CURRENT " + str(current))
 
-    def get_current(self):
     def get_current(self) -> float:
         ans = self.instrument.query(":READ?")
         ans = ans.split(",")[1]  # Second item is current
         return float(ans)
+
+    def get_voltage_and_current(self) -> list[float]:
+        ans = self.instrument.query(":READ?")
+        data = ans.split(",")[0:1]  # [volt, current, unknown, unknown]
+        data = [float(x) for x in data]
+        return float(data)
 
     def set_output(self, state: bool):
         self.instrument.write(":OUTPUT " + str(int(state)))

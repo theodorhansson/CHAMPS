@@ -89,8 +89,7 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
             for set_current in interval:
                 DC_unit.set_current(set_current)
 
-                volt = DC_unit.get_voltage()
-                current = DC_unit.get_current()
+                volt, current = DC_unit.get_voltage_and_current()
                 power = P_unit.get_power()
 
                 Results["voltage"].append(volt)
