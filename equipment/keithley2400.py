@@ -29,19 +29,22 @@ class keithley2400:
     def set_output(self, state: bool):
         self.instrument.write(":OUTPUT " + str(int(state)))
 
-    def open(self):
+    def open(self):  # TODO: Rename to open_current?
+        # Define where instrument is
         conn_str = self.interface + "::" + self.address  # like GPIB0::24
 
+        # Open and create instrument class
         rm = pyvisa.ResourceManager()
         self.instrument = rm.open_resource(conn_str)
 
+        # Initialize current mode
         self.instrument.write(":SOURCE:FUNCTION CURRENT")
         self.instrument.write(":SOURCE:CURRENT:MODE FIXED")
         self.instrument.write(":SOURCE:CURRENT:RANGE:AUTO 1")
 
-        self.instrument.write(
-            ":SENSE:FUNCTION 'VOLT'"
-        )  # Sets what the display shall show
+        # Sets what the display shall show
+        self.instrument.write(":SENSE:FUNCTION 'VOLT'")
+
         self.instrument.write(":SENSE:VOLT:RANGE:AUTO 1")
 
     def close(self):

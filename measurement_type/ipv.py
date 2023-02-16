@@ -33,7 +33,7 @@ def init(config: dict):
     )
     IPV_config_opt = optional_arguments_merge(IPV_config, _optional_arguments)
 
-    # Used for getting instrument objects
+    # Used for getting instrument objects and their names
     DC_name = IPV_config[_DC_name_key]
     DC_config = config[DC_name]
     P_name = IPV_config[_P_name_key]
@@ -41,12 +41,13 @@ def init(config: dict):
 
     Results = ipv_main(IPV_config_opt, DC_config, P_config)
 
+    # Get the used config and return it to main
     return_dict = {IPV_name: IPV_config_opt, DC_name: DC_config, P_name: P_config}
     return Results, return_dict
 
 
 def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
-    # Main measurement loop
+    # The main IPV function
 
     V_max = IPV_config["v_max"]
     rollover_threshold = IPV_config["rollover_threshold"]
@@ -57,6 +58,7 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
     plot = AnimatedPlot("Current[A]", "Optical Power [W]", "IPV")
 
     try:
+        # Attempts to get instruments
         P_unit = communication.get_PowerUnit(P_config)
         DC_unit = communication.get_DCsupply(DC_config)
         Results = {"voltage": [], "current": [], "power": []}
@@ -68,14 +70,17 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
         print("Something went wrong when getting and opening the resources")
         exit()
 
+    # Set instrument to 0 for safety
     DC_unit.set_current(0.0)
     DC_unit.set_voltage_limit(V_max)
     DC_unit.set_output(True)
 
+    # The main measurement loop
     try:
         prev_end_current = 0
 
         for interval in interval_list:
+            # Code to ramp current between intervals
             power_max = 0
             start_current = interval[0]
             ramp_current(DC_unit, prev_end_current, start_current)
@@ -94,6 +99,7 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
                 plot.add_point(current, power)
                 print("IPV data", volt, current, power)
 
+                # Code to handle rollover functionality
                 if power > rollover_min:
                     power_max = max(power, power_max)
                 if power < (rollover_threshold * power_max) and rollover_threshold:
@@ -102,9 +108,10 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
     except KeyboardInterrupt:
         print("Keyboard interrupt detected, stopping.")
     except:
+        # print error if error isn't catched
         traceback.print_exc()
     finally:
-        # Tries to shut down instruments
+        # Safely shut down instrument, even if error is detected
         ramp_current(DC_unit, DC_unit.get_current(), 0)
         DC_unit.set_current(0)
         DC_unit.set_output(False)

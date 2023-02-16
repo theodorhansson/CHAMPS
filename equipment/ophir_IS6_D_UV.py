@@ -53,6 +53,7 @@ class INT_sphere:
         self.set_output(True)
 
     def set_min_time(self, min_time: float):
+        # If you want to change min_time later
         self._min_time = min_time
 
     def get_power(self):

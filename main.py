@@ -12,29 +12,32 @@ def main(config_path):
         config = tomllib.load(f)
 
     config_lower = dict_2_lower(config)  # sanitize the config dict
-
     meas_name = config_lower["measurement"]["type"]
 
     measurement_init = identify_measurement_type(meas_name)
     result_dict, used_config = measurement_init(config_lower)  # Begin the measurement!
 
-    resultarr = []
+    # Extract results from dict and put in list
+    resultarray = []
     result_headers = []
     for key in result_dict.keys():
         result_headers.append(key)
-        resultarr.append(result_dict[key])  # One data type per row
+        resultarray.append(result_dict[key])  # One data type per row
 
-    resultarr = np.array(resultarr)
-    resultarr = np.transpose(resultarr)  # One data type per column
+    # Change to numpy array
+    resultarray = np.array(resultarray)
+    resultarray = np.transpose(resultarray)  # One data type per column
 
+    # Logic on where to save file
     save_folder = config_lower["measurement"]["save_folder"]
     if save_folder[-1:] != "/":
         save_folder = save_folder + "/"  # make sure it ends with /
 
-    timestamp = time.strftime(rf"%Y%m%d-%H%M%S")
+    timestamp = time.strftime(rf"%Y%m%d-%H%M%S")  # get the current time
     save_file = save_folder + meas_name + "-" + timestamp
 
-    np.savetxt(save_file + ".txt", resultarr, header=" ".join(result_headers))
+    # Save the data
+    np.savetxt(save_file + ".txt", resultarray, header=" ".join(result_headers))
 
     # Save the config
     with open(save_file + ".toml", "wb") as f:
