@@ -11,6 +11,7 @@ class keithley2400:
         self.interface = "GPIB0"
 
     def get_voltage(self):
+    def get_voltage(self) -> float:
         ans = self.instrument.query(":READ?")
         ans = ans.split(",")[0]  # First item is voltage
         return float(ans)
@@ -22,6 +23,7 @@ class keithley2400:
         self.instrument.write(":SOURCE:CURRENT " + str(current))
 
     def get_current(self):
+    def get_current(self) -> float:
         ans = self.instrument.query(":READ?")
         ans = ans.split(",")[1]  # Second item is current
         return float(ans)
