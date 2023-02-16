@@ -36,7 +36,7 @@ def get_PowerUnit(config_dict):
     Power_type = config_dict["type"]
 
     match Power_type:
-        case "int_sphere":
+        case "ophir_IS6_D_UV":
             return ophir_IS6_D_UV.INT_sphere(config_dict)
 
         case _:

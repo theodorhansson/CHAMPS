@@ -14,7 +14,7 @@ type = "keithley2400"   # The specific type of unit
 GPIB_address = "24"
 
 [INT_sphere]
-type = "INT_sphere"
+type = "ophir_IS6_D_UV"
 Range = 2
 Min_measure_time = 0.2  #How long to wait between new data to arrive from sphere
 Wavelength = 5
