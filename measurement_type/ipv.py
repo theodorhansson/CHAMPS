@@ -86,7 +86,7 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
             ramp_current(DC_unit, prev_end_current, start_current)
             prev_end_current = interval[-1]
 
-            for set_current in interval:
+            for count, set_current in enumerate(interval):
                 DC_unit.set_current(set_current)
 
                 volt, current = DC_unit.get_voltage_and_current()
@@ -99,9 +99,12 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
                 print("IPV data", volt, current, power)
 
                 # Code to handle rollover functionality
+                if count % 25 == 0:
+                    plot.update()
                 if power > rollover_min:
                     power_max = max(power, power_max)
                 if power < (rollover_threshold * power_max) and rollover_threshold:
+                    plot.update()
                     break
 
     except KeyboardInterrupt:

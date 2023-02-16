@@ -99,15 +99,17 @@ class AnimatedPlot:
         self.ax.grid(enable_grid)
 
     def add_point(self, x: float, y: float):
-        # Adds point and updates figure
+        # Adds point
         self.ax.scatter(x, y)
-        plt.draw()
-        plt.pause(0.0001)
 
     def keep_open(self):
         # Keeps plot open
         plt.ioff()  # Turn off interactive
         plt.show()
+
+    def update(self):
+        plt.draw()
+        plt.pause(0.0001)
 
 
 if __name__ == "__main__":
