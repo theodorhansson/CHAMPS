@@ -65,6 +65,8 @@ def performance_test():
 
     config = {"gpib_address": 24, "type": "jipsdf"}
     Keith = keithley2400(config)
+    Keith.open()
+    Keith.set_output(True)
 
     time.sleep(0.1)
     t_start = time.time()
@@ -116,6 +118,9 @@ def performance_test():
     t_end = time.time()
     t_per = (t_end - t_start) / N
     print(f"Time per full new loop {t_per}")
+
+    Keith.set_output(False)
+    Keith.close()
 
 
 if __name__ == "__main__":
