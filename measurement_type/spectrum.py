@@ -88,7 +88,6 @@ def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
         prev_end_current = 0
 
         for interval in current_interval_list:
-            power_max = 0
             start_current = interval[0]
             ramp_current(DC_unit, prev_end_current, start_current)
             prev_end_current = interval[-1]
