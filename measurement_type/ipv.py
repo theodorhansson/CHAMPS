@@ -20,7 +20,7 @@ _required_arguments = [
     "v_max",
     "save_folder",
 ]
-_optional_arguments = {"rollover_threshold": 0, "rollover_min": 0}
+_optional_arguments = {"rollover_threshold": 0, "rollover_min": 0, "plot_interval": 20}
 
 
 def init(config: dict):
@@ -50,6 +50,7 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
     # The main IPV function
 
     V_max = IPV_config["v_max"]
+    plot_update_interval = IPV_config["plot_interval"]
     rollover_threshold = IPV_config["rollover_threshold"]
     rollover_min = IPV_config["rollover_min"]
     intervals = IPV_config["current"]
@@ -99,13 +100,13 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
                 print("IPV data", volt, current, power)
 
                 # Code to handle rollover functionality
-                if count % 25 == 0:
+                if count % plot_update_interval == 0:  # approx 0.5s per measurement
                     plot.update()
                 if power > rollover_min:
                     power_max = max(power, power_max)
                 if power < (rollover_threshold * power_max) and rollover_threshold:
-                    plot.update()
                     break
+            plot.update()
 
     except KeyboardInterrupt:
         print("Keyboard interrupt detected, stopping.")
