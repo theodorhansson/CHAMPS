@@ -11,7 +11,7 @@ _required_arguments = ["gpib_address", "type"]
 
 
 class SpectrumAnalyzer:
-    def __init__(self, config_dict: dict, resource_manager=None):
+    def __init__(self, config_dict: dict, resource_manager: object = None):
         self.address = str(config_dict["gpib_address"])
         self.interface_ID = "GPIB0"
         self.conn_str = self.interface_ID + "::" + self.address
