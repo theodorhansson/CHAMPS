@@ -19,18 +19,21 @@ class keithley2400:
         self.instrument.write(":SENSE:VOLTAGE:DC:PROTECTION " + str(volts))
 
     def set_current(self, current: float):
+        current = current * 1e-3  # mA to A
         self.instrument.write(":SOURCE:CURRENT " + str(current))
 
     def get_current(self) -> float:
         ans = self.instrument.query(":READ?")
-        ans = ans.split(",")[1]  # Second item is current
-        return float(ans)
+        current = ans.split(",")[1]  # Second item is current
+        current = float(current) * 1e3  # A to mA
+        return current
 
     def get_voltage_and_current(self) -> list[float]:
         ans = self.instrument.query(":READ?")
         data = ans.split(",")[0:2]  # [volt, current, unknown, unknown]
         data = [float(x) for x in data]
-        return data
+        data[1] = data[1] * 1e3  # A to mA
+        return data  # [volt, mA]
 
     def set_output(self, state: bool):
         self.instrument.write(":OUTPUT " + str(int(state)))

@@ -64,6 +64,7 @@ class INT_sphere:
         if len(data[0]) > 0:
             # Extract last power value from datastream
             power = data[0][-1]
+            power = power * 1e3  # W to mW
             return power
         else:
             # print("Not connected/initialized")

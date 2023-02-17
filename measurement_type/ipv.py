@@ -56,7 +56,7 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
     intervals = IPV_config["current"]
     interval_list = interval_2_points(intervals)
 
-    plot = AnimatedPlot("Current[A]", "Optical Power [W]", "IPV")
+    plot = AnimatedPlot("Current[mA]", "Optical Power [mW]", "IPV")
 
     try:
         # Attempts to get instruments

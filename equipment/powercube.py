@@ -8,6 +8,9 @@ class powercube:
     def __init__(self, config_dict):
         argument_checker(config_dict, _required_arguments, source_func="powercube")
         self.port = str(config_dict["port"])
+        print(
+            "Now this stuff is seriously untested. Please reconsider using this file."
+        )
 
     def get_voltage(self):
         self.serial_port.write(b"VOUT1?")
