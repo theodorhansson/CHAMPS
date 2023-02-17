@@ -63,10 +63,11 @@ def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
     current_interval_list = interval_2_points(current_intervals)
 
     # plot = AnimatedPlot("Current[A]", "Optical Power [W]", "IPV") TODO: keep?
+    Instrument_COM = communication.Communication()
 
     try:
-        OSA_unit = communication.get_OSA(OSA_config)
-        DC_unit = communication.get_DCsupply(DC_config)
+        OSA_unit = Instrument_COM.get_OSA(OSA_config)
+        DC_unit = Instrument_COM.get_DCsupply(DC_config)
         Results = {"voltage": [], "current": [], "spectrum": []}
 
         OSA_unit.open()
