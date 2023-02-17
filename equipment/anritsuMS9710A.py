@@ -41,45 +41,45 @@ class SpectrumAnalyzer:
     def set_avg_factor(self, avg_factor: int | str):
         # Sets the number of points for point averaging.
         # Data range 2<= n <= 1000, or "OFF"
-        GPIB_write = ":AVT " + str(avg_factor)
+        GPIB_write = "AVT " + str(avg_factor)
         self.instrument.write(GPIB_write)
 
     def get_avg_factor(self):
-        GPIB_write = ":AVT?"
+        GPIB_write = "AVT?"
         avg = self.instrument.query(GPIB_write)
         return avg
 
     def set_center_wavelength_nm(self, center_wl: float):
         # Sets a center wavelength. The unit is always nm.
         # Input value down to the second decimal place. Data range: 600 <= n <= 1750
-        GPIB_write = ":CNT " + str(round(center_wl, 2))
+        GPIB_write = "CNT " + str(round(center_wl, 2))
         self.instrument.write(GPIB_write)
 
     def get_center_wavelength_nm(self):
-        GPIB_write = ":CNT?"
+        GPIB_write = "CNT?"
         center_wl = self.instrument.query(GPIB_write)
         return center_wl
 
     def set_level_scale_dBm(self, level_scale: float):
         # Selects a log scale as a level scale and sets a scale value
         # Data range: 0.1 <= level_scale <= 10.0
-        GPIB_write = ":LOG " + str(round(level_scale, 1))
+        GPIB_write = "LOG " + str(round(level_scale, 1))
         self.instrument.write(GPIB_write)
 
     def get_level_scale(self) -> str:
         # Returns whether a log or linear scale is set as a level scale.
-        GPIB_write = ":LVS?"
+        GPIB_write = "LVS?"
         scale_type = self.instrument.query(GPIB_write)
         return scale_type
 
     def set_linear_resolution_nm(self, resolution: float):
         # n indicates measurement resolution. The unit is always nm.
         # input one of the following values: 1.0, 0.5, 0.2, 0.1, 0.07, 0.05
-        GPIB_write = ":RES " + str(resolution)
+        GPIB_write = "RES " + str(resolution)
         self.instrument.write(GPIB_write)
 
     def get_linear_resolution_nm(self):
-        GPIB_write = ":RES?"
+        GPIB_write = "RES?"
         resolution = self.instrument.write(GPIB_write)
         return resolution
 
@@ -101,7 +101,7 @@ class SpectrumAnalyzer:
         self.instrument.write(GPIB_write)
 
     def get_ref_level(self):
-        GPIB_write = "MKD ?"
+        GPIB_write = "MKD?"
         n_points = self.instrument.query(GPIB_write)
         return n_points
 
@@ -117,14 +117,14 @@ class SpectrumAnalyzer:
         self.instrument.write(GPIB_write)
 
     def get_wavelength_span(self):
-        GPIB_write = "SPN ?"
+        GPIB_write = "SPN?"
         span = self.instrument.query(GPIB_write)
         return span
 
     def get_wavelength_data_A(self, range: str = ""):
         # Outputs ASCII measurement data equivalent to the number of sampling points from memory A.
         # NOTE: Range option not supported
-        GPIB_write = "DMA ?"
+        GPIB_write = "DMA?"
         wavelength_data = self.instrument.query(GPIB_write)
         return wavelength_data
 
