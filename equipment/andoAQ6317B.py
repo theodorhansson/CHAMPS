@@ -2,7 +2,7 @@ import pyvisa
 from utils import argument_checker, optional_arguments_merge
 
 _required_arguments = ["gpib_address", "type"]
-_optional_arguments = {"reference_level": -40, "display_level_scale": 10}
+_optional_arguments = {"reference_level_dbm": -40, "display_level_scale_dbm": 10}
 
 # Many comments in methods from "AQ6317B OPTICAL SPECTRUM ANALYZER INSTRUCTION MANUAL", ANDO ELECTRIC 2000
 ### Read manual page 384 for commands ###
@@ -20,8 +20,8 @@ class SpectrumAnalyzer:
         self.interface_ID = "GPIB0"
         self.conn_str = self.interface_ID + "::" + self.address
 
-        self.reference_level = config_dict["reference_level"]
-        self.display_level_scale = config_dict["display_level_scale"]
+        self.reference_level_dBm = config_dict["reference_level_dbm"]
+        self.display_level_scale_dBm = config_dict["display_level_scale_dbm"]
 
         # Use parent resource manager if exists
         if resource_manager != None:
@@ -32,8 +32,8 @@ class SpectrumAnalyzer:
     def open(self):  # TODO: move to __init__?
         # Define instrument with pyvisa
         self.instrument = self.resource_manager.open_resource(self.conn_str)
-        self.set_ref_level_dBm(self.reference_level)
-        self.set_level_scale(self.display_level_scale)
+        self.set_ref_level_dBm(self.reference_level_dBm)
+        self.set_level_scale_dBm(self.display_level_scale_dBm)
 
     def close(self):
         # Exit instrument
