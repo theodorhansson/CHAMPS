@@ -44,14 +44,29 @@ def optional_arguments_merge(config: dict = dict(), optional_default=dict()):
     return out_dict
 
 
-def interval_2_points(specification: list[list]) -> list:
+def interval_2_points(specification: list | list[list] | float | int) -> list[list]:
     # Takes in list [[A, x, B],...] and returns a list of all points
     # in specified intervals where A, B are start and end, and x step size
+    # Also accepts single value
 
-    if type(specification[0]) != list:
-        print(f"Warning: Interval specification {specification} not list of lists.")
+    if type(specification) == float or type(specification) == int:
+        # Handles case where specification is number
+        out_list = [[specification]]
+        return out_list
+
+    elif (
+        type(specification[0]) == float
+        or type(specification[0]) == int
+        and len(specification) == 1
+    ):
+        # Handles case where specification is number in list
+        out_list = [[specification[0]]]
+        return out_list
+
+    elif type(specification[0]) != list:
+        # print(f"Warning: Interval specification {specification} not list of lists.")
         if len(specification) == 3:
-            print("Attempting inteval fix.")
+            # print("Attempting inteval fix.")
             # Fix error not list of list, by putting in list
             specification = [specification]
         else:
@@ -71,8 +86,19 @@ def interval_2_points(specification: list[list]) -> list:
         start = pairs[0]
         delta = pairs[1]
         end = pairs[2]
-        sub_interval = np.arange(start, end, delta)
+
+        if abs(start - end) <= delta:
+            # Handles case where points are closer then shortest distance
+            sub_interval = np.array([start, end])
+        else:
+            sub_interval = np.arange(start, end, delta)
+
+        if end not in sub_interval:
+            # Adds end point if not in interavl
+            sub_interval = np.append(sub_interval, end)
+
         points.append(sub_interval)
+
     return points
 
 
@@ -112,24 +138,52 @@ class AnimatedPlot:
         plt.pause(0.0001)
 
 
+def _test_interval_2_points():
+    print("list of list")
+    interval = [[1, 0.1, 3]]
+    print(interval_2_points(interval), "\n")
+
+    print("list")
+    interval = [1, 0.1, 3]
+    print(interval_2_points(interval), "\n")
+
+    print("list of num")
+    interval = [5]
+    print(interval_2_points(interval), "\n")
+
+    print("num")
+    interval = 5
+    print(interval_2_points(interval), "\n")
+
+    print("second interval short")
+    interval = [[1, 0.1, 3], [1, 10, 3]]
+    print(interval_2_points(interval), "\n")
+
+    print("second interval short")
+    interval = [[1, 0.1, 3], [1, 10, 3]]
+    print(interval_2_points(interval), "\n")
+
+    print("Interval same points")
+    interval = [[1, 0.1, 1]]
+    print(interval_2_points(interval), "\n")
+
+
 if __name__ == "__main__":
     # Some tests
 
-    test_dict = {
-        "ABC": "EFG",
-        "HI": {"JK": "HK"},
-        "volTage": 10,
-        "A": {"B": {"C": {"D": 7}}},
-        "78": 12,
-        "12A": "abc",
-    }
-    opt_dict = {"12A": "ABC", "CTH": "KTH"}
+    _test_interval_2_points()
 
-    argument_checker(test_dict, ["ABC"], optional_config=opt_dict)
+    # test_dict = {
+    #     "ABC": "EFG",
+    #     "HI": {"JK": "HK"},
+    #     "volTage": 10,
+    #     "A": {"B": {"C": {"D": 7}}},
+    #     "78": 12,
+    #     "12A": "abc",
+    # }
+    # opt_dict = {"12A": "ABC", "CTH": "KTH"}
 
-    # interval = [[1, 0.1, 3]]
-
-    # print(interval_2_points(interval))
+    # argument_checker(test_dict, ["ABC"], optional_config=opt_dict)
 
     # conf = {"type": "chalmers", "abc": "123", "petg": 111}
     # opt = {"petg": 222, "PPP": "ASDASD"}
