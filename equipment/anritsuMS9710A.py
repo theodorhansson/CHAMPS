@@ -85,50 +85,41 @@ class SpectrumAnalyzer:
         self.instrument.write(GPIB_write)
 
     def get_sample_points(self):
-        GPIB_write = ":SMPL?"
-        n_points = self.instrument.write(GPIB_write)
+        GPIB_write = "DQA ?"
+        n_points = self.instrument.query(GPIB_write)
         return n_points
 
     def set_ref_level_dBm(self, level: float):
-        # Sets the reference level. [in LOG] (Unit: dBm), ***.*: -90.0 to 20.0 (0.1 step)
-        GPIB_write = ":REFL" + str(level)
+        # Sets the reference level. [in LOG] (Unit: dBm), ***.***: -190.000 to 50.000 (0.1 step)
+        GPIB_write = "MKD " + str(level) + " DBM"
         self.instrument.write(GPIB_write)
 
     def get_ref_level(self):
-        GPIB_write = ":REFL?"
-        n_points = self.instrument.write(GPIB_write)
+        GPIB_write = "MKD ?"
+        n_points = self.instrument.query(GPIB_write)
         return n_points
 
     def set_sensitivity(self, sensitivity_id: str):
-        # Avaliable sensitivities:
-        # SNHD: SENS NORM RANGE HOLD
-        # SNAT: SENS NORM RANGE AUTO
-        # SMID: SENS MID
-        # SHI1: SENS HIGH1
-        # SHI2: SENS HIGH2
-        # SHI3: SENS HIGH3
-        GPIB_write = ":" + sensitivity_id
-        self.instrument.write(GPIB_write)
+        pass
 
     def get_sensitivity(self):
-        GPIB_write = ":SENS?"
-        sensitivity = self.instrument.write(GPIB_write)
-        return sensitivity
+        return ""
 
     def set_wavelength_span_nm(self, span: float):
         # Sets the span. (Unit_ nm), ****.*: 0, 0.5 to 1200.0 (0.1 step)
-        GPIB_write = ":SPAN" + str(round(span, 1))
+        GPIB_write = "SPN " + str(round(span, 1))
         self.instrument.write(GPIB_write)
 
     def get_wavelength_span(self):
-        GPIB_write = ":SPAN?"
-        span = self.instrument.write(GPIB_write)
+        GPIB_write = "SPN ?"
+        span = self.instrument.query(GPIB_write)
         return span
 
     def get_wavelength_data_A(self, range: str = ""):
-        # Trace A wavelength data **** : 1 to 20001, "R1-R20001" when range ommitted
-        GPIB_write = ":WDATA" + range
-        wavelength_data = self.instrument.write(GPIB_write)
+        # Outputs ASCII measurement data equivalent to the number of sampling points from memory A.
+        # NOTE: Range option not supported
+        GPIB_write = "DMA ?"
+        wavelength_data = self.instrument.query(GPIB_write)
         return wavelength_data
 
     def set_single_span(self):
