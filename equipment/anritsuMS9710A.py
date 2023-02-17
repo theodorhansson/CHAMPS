@@ -4,10 +4,9 @@ from utils import argument_checker, optional_arguments_merge
 _required_arguments = ["gpib_address", "type"]
 _optional_arguments = {"reference_level": -40, "display_level_scale": 10}
 
-# Many comments in methods from "AQ6317B OPTICAL SPECTRUM ANALYZER INSTRUCTION MANUAL", ANDO ELECTRIC 2000
-### Read manual page 384 for commands ###
+# Many comments in methods from "MS9710B Optical Spectrum Analyzer Remote Control Operation Manual", ANRITSU 2007
+### Read manual page 139, 261 for commands ###
 
-# NOTE: GPIB1 is used for controlling unit, GPIB2 is used for controlling other units.
 # TODO: Better typecheck?
 
 
@@ -39,55 +38,62 @@ class SpectrumAnalyzer:
         # Exit instrument
         self.instrument.close()
 
-    def set_avg_factor(self, avg_factor: int):
-        # Sets the number of averaging times for measurement, ****: 1 to 1000 (1 step)
-        GPIB_write = ":AVG" + str(avg_factor)
+    def set_avg_factor(self, avg_factor: int | str):
+        # Sets the number of points for point averaging.
+        # Data range 2<= n <= 1000, or "OFF"
+        GPIB_write = ":AVT " + str(avg_factor)
         self.instrument.write(GPIB_write)
 
     def get_avg_factor(self):
-        GPIB_write = ":AVG?"
-        avg = self.instrument.write(GPIB_write)
+        GPIB_write = ":AVT?"
+        avg = self.instrument.query(GPIB_write)
         return avg
 
     def set_center_wavelength_nm(self, center_wl: float):
-        # Sets the center wavelength (Unit: nm), ****.**: 600.00 to 1750.00 (0.01 step)
-        GPIB_write = ":CTRWL" + str(round(center_wl, 2))
+        # Sets a center wavelength. The unit is always nm.
+        # Input value down to the second decimal place. Data range: 600 <= n <= 1750
+        GPIB_write = ":CNT " + str(round(center_wl, 2))
         self.instrument.write(GPIB_write)
 
     def get_center_wavelength_nm(self):
-        GPIB_write = ":CTRWL?"
-        center_wl = self.instrument.write(GPIB_write)
+        GPIB_write = ":CNT?"
+        center_wl = self.instrument.query(GPIB_write)
         return center_wl
 
-    def set_level_scale(self, scale: float):
-        # Sets the scale of the level axis, **.*: 0.1 to 10.0 (0.1 step. Unit: dB/DIV) or LIN (linear scale)
-        GPIB_write = ":LSCL" + str(round(scale, 1))
+    def set_level_scale_dBm(self, level_scale: float):
+        # Selects a log scale as a level scale and sets a scale value
+        # Data range: 0.1 <= level_scale <= 10.0
+        GPIB_write = ":LOG " + str(round(level_scale, 1))
         self.instrument.write(GPIB_write)
 
-    def get_level_scale(self):
-        GPIB_write = ":LSCL?"
-        avg = self.instrument.write(GPIB_write)
-        return avg
+    def get_level_scale(self) -> str:
+        # Returns whether a log or linear scale is set as a level scale.
+        GPIB_write = ":LVS?"
+        scale_type = self.instrument.query(GPIB_write)
+        return scale_type
 
     def set_linear_resolution_nm(self, resolution: float):
-        # Sets the resolution. (Unit: nm), *.**: 0.01 to 2.0 (1-2-5 steps)
-        GPIB_write = ":RESLN" + str(round(resolution, 2))
+        # n indicates measurement resolution. The unit is always nm.
+        # input one of the following values: 1.0, 0.5, 0.2, 0.1, 0.07, 0.05
+        GPIB_write = ":RES " + str(resolution)
         self.instrument.write(GPIB_write)
 
     def get_linear_resolution_nm(self):
-        GPIB_write = ":RESLN?"
+        GPIB_write = ":RES?"
         resolution = self.instrument.write(GPIB_write)
         return resolution
 
     def set_sample_points(self, n_points: int):
-        # Sets the sampling point for measurement. ****: 11 to 20001 (1 step), 0(auto)
-        GPIB_write = ":SMPL" + str(n_points)
-        self.instrument.write(GPIB_write)
+        # # Sets the sampling point for measurement. ****: 11 to 20001 (1 step), 0(auto)
+        # GPIB_write = ":SMPL" + str(n_points)
+        # self.instrument.write(GPIB_write)'
+        pass
 
     def get_sample_points(self):
-        GPIB_write = ":SMPL?"
-        n_points = self.instrument.write(GPIB_write)
-        return n_points
+        # GPIB_write = ":SMPL?"
+        # n_points = self.instrument.write(GPIB_write)
+        # return n_points
+        pass
 
     def set_ref_level_dBm(self, level: float):
         # Sets the reference level. [in LOG] (Unit: dBm), ***.*: -90.0 to 20.0 (0.1 step)
