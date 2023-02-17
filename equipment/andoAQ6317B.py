@@ -46,7 +46,7 @@ class SpectrumAnalyzer:
 
     def get_avg_factor(self):
         GPIB_write = ":AVG?"
-        avg = self.instrument.write(GPIB_write)
+        avg = self.instrument.query(GPIB_write)
         return avg
 
     def set_center_wavelength_nm(self, center_wl: float):
@@ -56,7 +56,7 @@ class SpectrumAnalyzer:
 
     def get_center_wavelength_nm(self):
         GPIB_write = ":CTRWL?"
-        center_wl = self.instrument.write(GPIB_write)
+        center_wl = self.instrument.query(GPIB_write)
         return center_wl
 
     def set_level_scale(self, scale: float | str):
@@ -69,7 +69,7 @@ class SpectrumAnalyzer:
 
     def get_level_scale(self):
         GPIB_write = ":LSCL?"
-        avg = self.instrument.write(GPIB_write)
+        avg = self.instrument.query(GPIB_write)
         return avg
 
     def set_linear_resolution_nm(self, resolution: float):
@@ -79,7 +79,7 @@ class SpectrumAnalyzer:
 
     def get_linear_resolution_nm(self):
         GPIB_write = ":RESLN?"
-        resolution = self.instrument.write(GPIB_write)
+        resolution = self.instrument.query(GPIB_write)
         return resolution
 
     def set_sample_points(self, n_points: int):
@@ -89,7 +89,7 @@ class SpectrumAnalyzer:
 
     def get_sample_points(self):
         GPIB_write = ":SMPL?"
-        n_points = self.instrument.write(GPIB_write)
+        n_points = self.instrument.query(GPIB_write)
         return n_points
 
     def set_ref_level_dBm(self, level: float):
@@ -99,7 +99,7 @@ class SpectrumAnalyzer:
 
     def get_ref_level(self):
         GPIB_write = ":REFL?"
-        n_points = self.instrument.write(GPIB_write)
+        n_points = self.instrument.query(GPIB_write)
         return n_points
 
     def set_sensitivity(self, sensitivity_id: str):
@@ -115,7 +115,7 @@ class SpectrumAnalyzer:
 
     def get_sensitivity(self):
         GPIB_write = ":SENS?"
-        sensitivity = self.instrument.write(GPIB_write)
+        sensitivity = self.instrument.query(GPIB_write)
         return sensitivity
 
     def set_wavelength_span_nm(self, span: float):
@@ -125,13 +125,13 @@ class SpectrumAnalyzer:
 
     def get_wavelength_span(self):
         GPIB_write = ":SPAN?"
-        span = self.instrument.write(GPIB_write)
+        span = self.instrument.query(GPIB_write)
         return span
 
     def get_wavelength_data_A(self, range: str = ""):
         # Trace A wavelength data **** : 1 to 20001, "R1-R20001" when range ommitted
         GPIB_write = ":WDATA" + range
-        wavelength_data = self.instrument.write(GPIB_write)
+        wavelength_data = self.instrument.query(GPIB_write)
         return wavelength_data
 
     def set_single_span(self):
