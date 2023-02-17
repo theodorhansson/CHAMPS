@@ -59,12 +59,9 @@ class SpectrumAnalyzer:
         center_wl = self.instrument.write(GPIB_write)
         return center_wl
 
-    def set_level_scale(self, scale: float | str):
-        # Sets the scale of the level axis, **.*: 0.1 to 10.0 (0.1 step. Unit: dB/DIV) or LIN (linear scale)
-        if type(scale) == str:
-            GPIB_write = ":LSCL" + scale
-        else:
-            GPIB_write = ":LSCL" + str(round(scale, 1))
+    def set_level_scale_dBm(self, scale: float):
+        # Sets the scale of the level axis, **.*: 0.1 to 10.0 (0.1 step. Unit: dB/DIV) [or LIN (linear scale) UNINPLEMENTED]
+        GPIB_write = ":LSCL" + str(round(scale, 1))
         self.instrument.write(GPIB_write)
 
     def get_level_scale(self):
