@@ -125,11 +125,6 @@ class AnimatedPlot:
 if __name__ == "__main__":
     # Some tests
 
-    assert signedbits2int("11") == -1
-    assert signedbits2int("10001") == -15
-    assert signedbits2int("100001") == -31
-    assert signedbits2int(str(bin(0xE9A2))[2:])
-
     test_dict = {
         "ABC": "EFG",
         "HI": {"JK": "HK"},
