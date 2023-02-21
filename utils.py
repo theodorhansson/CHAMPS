@@ -48,7 +48,6 @@ def interval_2_points(specification: list[list]) -> list:
     # Takes in list [[A, x, B],[C, y, D]] and returns a list of points.
     # Output: [[A, A+x, ..., B], [C, C+y, ..., D]]
     # Also accepts single value
-    
 
     if type(specification) == float or type(specification) == int:
         # Handles case where specification is number
@@ -149,10 +148,12 @@ class AnimatedPlot:
         plt.draw()
         plt.pause(0.0001)
 
+
 if __name__ == "__main__":
+    pass
     # Some tests
 
-    #_test_interval_2_points()
+    # _test_interval_2_points()
 
     # test_dict = {
     #     "ABC": "EFG",
