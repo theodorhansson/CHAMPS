@@ -86,6 +86,17 @@ def ramp_current(DC_supply, start, stop, step=10):
         time.sleep(50 * 1e-3)  # 50 ms
 
 
+def signed_bits2int(input: str, endian="big") -> int:
+    if endian == "small":  # Make big endian
+        input = input[::-1]
+
+    output = int(input[1:], 2)  # Select all normal bits and convert to int
+    no_of_bits = len(input)
+    if input[0] == "1":
+        output -= 2 ** (no_of_bits - 1)  # The signed byte represents -2**15 in 16 bits
+    return output
+
+
 class AnimatedPlot:
     # Used to dynamically add datapoints
     def __init__(
@@ -114,6 +125,11 @@ class AnimatedPlot:
 if __name__ == "__main__":
     # Some tests
 
+    assert signedbits2int("11") == -1
+    assert signedbits2int("10001") == -15
+    assert signedbits2int("100001") == -31
+    assert signedbits2int(str(bin(0xE9A2))[2:])
+
     test_dict = {
         "ABC": "EFG",
         "HI": {"JK": "HK"},
@@ -122,9 +138,9 @@ if __name__ == "__main__":
         "78": 12,
         "12A": "abc",
     }
-    opt_dict = {"12A": "ABC", "CTH": "KTH"}
+    # opt_dict = {"12A": "ABC", "CTH": "KTH"}
 
-    argument_checker(test_dict, ["ABC"], optional_config=opt_dict)
+    # argument_checker(test_dict, ["ABC"], optional_config=opt_dict)
 
     # interval = [[1, 0.1, 3]]
 
