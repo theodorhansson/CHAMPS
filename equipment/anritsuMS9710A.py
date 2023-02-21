@@ -122,7 +122,11 @@ class SpectrumAnalyzer:
         span = self.instrument.query(GPIB_write)
         return span
 
-    def get_wavelength_data_A(self, range: str = ""):
+    def get_wavelength_axis(self, range: str = "") -> list[float]:
+        # TODO: not implemented
+        pass
+
+    def get_intensity_data_A(self, range: str = ""):
         # Outputs ASCII measurement data equivalent to the number of sampling points from memory A.
         # NOTE: Range option not supported
         GPIB_write = "DMA?"
@@ -131,13 +135,10 @@ class SpectrumAnalyzer:
         wavelength_data = [float(x) for x in wavelength_data]
         return wavelength_data
 
-    def set_single_span(self):
-        pass
-
     def get_connected_visa_devices(self):
         return self.resource_manager.list_resources()
 
-    def get_sweep_status(self) -> int:
+    def get_sweep_status(self) -> int:  # NOTE: use "MOD" instead
         # Gets the current status of instrument from event register
         # Status codes for anritsu:
         # 0 Busy
