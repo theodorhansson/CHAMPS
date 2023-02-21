@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import time
+import warnings
 
 
 def argument_checker(
@@ -31,10 +32,11 @@ def argument_checker(
         )
 
     elif Extra_parameters != set() and warn_extra:
-        print(f"Warning: Unused parameter {Extra_parameters}{source_func}")
+        #print(f"Warning: Unused parameter {Extra_parameters}{source_func}")
+        warnings.warn(f"Unused parameter {Extra_parameters}{source_func}", UserWarning)
 
     elif Missing_parameters != set():
-        raise Exception(f"Missing parameters {Missing_parameters}{source_func}")
+        raise Exception#(f"Missing parameters {Missing_parameters}{source_func}")
 
 
 def optional_arguments_merge(config: dict = dict(), optional_default=dict()):
@@ -151,25 +153,6 @@ class AnimatedPlot:
 
 if __name__ == "__main__":
     pass
-    # Some tests
-
-    # _test_interval_2_points()
-
-    # test_dict = {
-    #     "ABC": "EFG",
-    #     "HI": {"JK": "HK"},
-    #     "volTage": 10,
-    #     "A": {"B": {"C": {"D": 7}}},
-    #     "78": 12,
-    #     "12A": "abc",
-    # }
-    # opt_dict = {"12A": "ABC", "CTH": "KTH"}
-
-    # argument_checker(test_dict, ["ABC"], optional_config=opt_dict)
-
-    # conf = {"type": "chalmers", "abc": "123", "petg": 111}
-    # opt = {"petg": 222, "PPP": "ASDASD"}
-    # print(optional_arguments_merge(conf, opt))
 
     # plot = AnimatedPlot("A", "B", "C")
     # plot.add_point(1, 2)
