@@ -1,5 +1,6 @@
 import pyvisa
 from utils import argument_checker, optional_arguments_merge
+import time
 
 _required_arguments = ["gpib_address", "type"]
 _optional_arguments = {"reference_level_dbm": -40, "display_level_scale_dbm": 10}
@@ -136,6 +137,34 @@ class SpectrumAnalyzer:
 
     def get_connected_visa_devices(self):
         return self.resource_manager.list_resources()
+
+    def get_sweep_status(self):
+        # Gets the current status of instrument
+        # Status codes for ando:
+        # 0 STOP
+        # 1 SINGLE
+        # 2 REPEAT
+        # 3 AUTO
+
+        GPIB_write = "SWEEP?"
+        status = self.instrument.query(GPIB_write)
+        return int(status)
+
+    def start_single_sweep(self):
+        # Starts a scan in mode "single"
+        GPIB_write = "SGL"
+        self.instrument.write(GPIB_write)
+
+    def do_single_scan(self):
+        # starts single and holds thread until done
+        stop_code = 0
+        stop = None
+
+        # Start measurment and check if finished in loop
+        self.start_single_sweep()
+        while stop != stop_code:
+            time.sleep(0.5)
+            stop = self.get_sweep_status()
 
 
 def test_OSA():
