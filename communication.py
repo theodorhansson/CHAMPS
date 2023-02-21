@@ -22,7 +22,7 @@ class Communication:
         match DC_type:
             case "keithley2400":
                 resource_manager = self.pyvisa_resource_util()
-                return keithley.keithley(config_dict, resource_manager)
+            return keithley2400.keithley2400(config_dict)
 
             case "powercube":
                 return powercube.powercube(config_dict)
@@ -42,8 +42,8 @@ class Communication:
         Power_type = config_dict["type"]
 
         match Power_type:
-            case "int_sphere":
-                return sphere.INT_sphere(config_dict)
+        case "ophir_is6_d_uv":
+            return ophir_IS6_D_UV.INT_sphere(config_dict)
 
             case _:
                 # TODO Change this

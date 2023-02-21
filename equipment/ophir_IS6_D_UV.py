@@ -53,6 +53,7 @@ class INT_sphere:
         self.set_output(True)
 
     def set_min_time(self, min_time: float):
+        # If you want to change min_time later
         self._min_time = min_time
 
     def get_power(self):
@@ -63,6 +64,7 @@ class INT_sphere:
         if len(data[0]) > 0:
             # Extract last power value from datastream
             power = data[0][-1]
+            power = power * 1e3  # W to mW
             return power
         else:
             # print("Not connected/initialized")
