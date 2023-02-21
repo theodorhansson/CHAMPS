@@ -64,6 +64,10 @@ class Communication:
                 resource_manager = self.pyvisa_resource_util()
                 return andoAQ6317B.SpectrumAnalyzer(config_dict, resource_manager)
 
+            case "anritsu_osa":
+                resource_manager = self.pyvisa_resource_util()
+                return anritsuMS9710A.SpectrumAnalyzer(config_dict, resource_manager)
+
             case _:
                 # TODO Change this
                 raise Exception(f"No OSA of type {OSA_type} found.")
