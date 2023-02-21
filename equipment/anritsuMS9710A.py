@@ -126,7 +126,9 @@ class SpectrumAnalyzer:
         # Outputs ASCII measurement data equivalent to the number of sampling points from memory A.
         # NOTE: Range option not supported
         GPIB_write = "DMA?"
-        wavelength_data = self.instrument.query(GPIB_write)
+        datastring = self.instrument.query(GPIB_write)
+        wavelength_data = datastring.split("")
+        wavelength_data = [float(x) for x in wavelength_data]
         return wavelength_data
 
     def set_single_span(self):

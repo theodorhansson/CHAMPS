@@ -126,10 +126,12 @@ class SpectrumAnalyzer:
         span = self.instrument.query(GPIB_write)
         return span
 
-    def get_wavelength_data_A(self, range: str = ""):
+    def get_wavelength_data_A(self, range: str = "") -> list[float]:
         # Trace A wavelength data **** : 1 to 20001, "R1-R20001" when range ommitted
         GPIB_write = "WDATA" + range
-        wavelength_data = self.instrument.query(GPIB_write)
+        datastring = self.instrument.query(GPIB_write)
+        wavelength_data = datastring.split("")
+        wavelength_data = [float(x) for x in wavelength_data]
         return wavelength_data
 
     def set_single_span(self):
