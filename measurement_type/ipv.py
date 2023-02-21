@@ -6,7 +6,6 @@ from utils import (
     optional_arguments_merge,
     ramp_current,
 )
-import numpy as np
 import traceback
 
 
@@ -56,7 +55,7 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
     intervals = IPV_config["current"]
     interval_list = interval_2_points(intervals)
 
-    plot = AnimatedPlot("Current[mA]", "Optical Power [mW]", "IPV")
+    Plot = AnimatedPlot("Current[mA]", "Optical Power [mW]", "IPV")
     Instrument_COM = communication.Communication()
 
     try:
@@ -97,17 +96,17 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
                 Results["voltage"].append(volt)
                 Results["current"].append(current)
                 Results["power"].append(power)
-                plot.add_point(current, power)
+                Plot.add_point(current, power)
                 print("IPV data", volt, current, power)
 
                 # Code to handle rollover functionality
                 if count % plot_update_interval == 0:  # approx 0.5s per measurement
-                    plot.update()
+                    Plot.update()
                 if power > rollover_min:
                     power_max = max(power, power_max)
                 if power < (rollover_threshold * power_max) and rollover_threshold:
                     break
-            plot.update()
+            Plot.update()
 
     except KeyboardInterrupt:
         print("Keyboard interrupt detected, stopping.")

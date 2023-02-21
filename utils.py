@@ -45,9 +45,10 @@ def optional_arguments_merge(config: dict = dict(), optional_default=dict()):
 
 
 def interval_2_points(specification: list[list]) -> list:
-    # Takes in list [[A, x, B],[C, y, D]] and returns a list of all points
-    # in specified intervals where A, B are start and end, and x step size.
+    # Takes in list [[A, x, B],[C, y, D]] and returns a list of points.
+    # Output: [[A, A+x, ..., B], [C, C+y, ..., D]]
     # Also accepts single value
+    
 
     if type(specification) == float or type(specification) == int:
         # Handles case where specification is number
@@ -151,7 +152,7 @@ class AnimatedPlot:
 if __name__ == "__main__":
     # Some tests
 
-    _test_interval_2_points()
+    #_test_interval_2_points()
 
     # test_dict = {
     #     "ABC": "EFG",
