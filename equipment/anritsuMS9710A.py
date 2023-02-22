@@ -1,5 +1,5 @@
 import pyvisa
-from utils import argument_checker, optional_arguments_merge
+from utils import argument_checker, optional_arguments_merge, signed_bits2int
 import time
 
 _required_arguments = ["gpib_address", "type"]
@@ -32,6 +32,10 @@ class SpectrumAnalyzer:
     def open(self):  # TODO: move to __init__?
         # Define instrument with pyvisa
         self.instrument = self.resource_manager.open_resource(self.conn_str)
+
+        # Due to big datatransfers, instrument timeout must be increased
+        self.instrument.timeout = 5000  # ms. TODO: make as small as possible
+
         self.set_ref_level_dBm(self.reference_level_dBm)
         self.set_level_scale_dBm(self.display_level_scale_dBm)
 
@@ -126,13 +130,29 @@ class SpectrumAnalyzer:
         # TODO: not implemented
         pass
 
-    def get_intensity_data_A(self, range: str = ""):
-        # Outputs ASCII measurement data equivalent to the number of sampling points from memory A.
+    def get_intensity_data_A_dBm(self, range: str = ""):
+        # Outputs dB measurement data equivalent to the number of sampling points from memory A.
         # NOTE: Range option not supported
-        GPIB_write = "DMA?"
-        datastring = self.instrument.query(GPIB_write)
-        wavelength_data = datastring.split("")
-        wavelength_data = [float(x) for x in wavelength_data]
+        GPIB_write = "DBA?"
+        self.instrument.write(GPIB_write)
+        try:
+            databytes = self.instrument.read_raw()
+        except:
+            raise Exception("Something went wrong when reading data from Anritsu")
+
+        databytes = databytes[:-2]  # Last two bytes are \r\n, remove them
+
+        # bin()->"0b1101" -> [2:] -> "1101" -> zfill -> "00001101"
+        bytes_as_strs = [bin(byte)[2:].zfill(8) for byte in databytes]
+
+        wavelength_data = []
+        # Every other byte is the start of a short
+        for i in range(0, len(bytes_as_strs), 2):
+            # merge 2 bytes to one short/int16
+            double_byte_str = bytes_as_strs[i] + bytes_as_strs[i + 1]
+            value = signed_bits2int(double_byte_str)
+            value *= 0.01  # 53.87dB is transmitted as 5387
+            wavelength_data.append(value)
         return wavelength_data
 
     def get_connected_visa_devices(self):
@@ -144,7 +164,6 @@ class SpectrumAnalyzer:
         # 0 Busy
         # 2 Finished
 
-        GPIB_write = "ESR2 ?"
         GPIB_write = "ESR2?"
         status = self.instrument.query(GPIB_write)
         return int(status)
@@ -156,7 +175,7 @@ class SpectrumAnalyzer:
 
     def do_single_scan(self):
         # starts single and holds thread until done
-        stop_code = 0b10
+        stop_code = 0b00000010
         stop = None
 
         # Start measurment and check if finished in loop
