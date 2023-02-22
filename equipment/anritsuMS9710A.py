@@ -35,6 +35,8 @@ class SpectrumAnalyzer:
 
         # Due to big datatransfers, instrument timeout must be increased
         self.instrument.timeout = 5000  # ms. TODO: make as small as possible
+        self.instrument.read_termination = "\r\n"
+        self.instrument.write_termination = "\r\n"
 
         self.set_ref_level_dBm(self.reference_level_dBm)
         self.set_level_scale_dBm(self.display_level_scale_dBm)
@@ -130,9 +132,14 @@ class SpectrumAnalyzer:
         # TODO: not implemented
         pass
 
-    def get_intensity_data_A_dBm(self, range: str = ""):
+    def get_intensity_data_A_dBm(self, nm_range: str = ""):
         # Outputs dB measurement data equivalent to the number of sampling points from memory A.
         # NOTE: Range option not supported
+
+        # Sometimes misinterprets bytes in stream as end of message
+        r_term = self.instrument.read_termination
+        self.instrument.read_termination = ""
+
         GPIB_write = "DBA?"
         self.instrument.write(GPIB_write)
         try:
@@ -153,6 +160,8 @@ class SpectrumAnalyzer:
             value = signed_bits2int(double_byte_str)
             value *= 0.01  # 53.87dB is transmitted as 5387
             wavelength_data.append(value)
+
+        self.instrument.read_termination = r_term
         return wavelength_data
 
     def get_connected_visa_devices(self):
