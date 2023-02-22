@@ -145,6 +145,7 @@ class SpectrumAnalyzer:
         # 2 Finished
 
         GPIB_write = "ESR2 ?"
+        GPIB_write = "ESR2?"
         status = self.instrument.query(GPIB_write)
         return int(status)
 
