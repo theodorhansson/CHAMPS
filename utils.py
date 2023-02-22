@@ -32,11 +32,11 @@ def argument_checker(
         )
 
     elif Extra_parameters != set() and warn_extra:
-        #print(f"Warning: Unused parameter {Extra_parameters}{source_func}")
+        # print(f"Warning: Unused parameter {Extra_parameters}{source_func}")
         warnings.warn(f"Unused parameter {Extra_parameters}{source_func}", UserWarning)
 
     elif Missing_parameters != set():
-        raise Exception#(f"Missing parameters {Missing_parameters}{source_func}")
+        raise Exception  # (f"Missing parameters {Missing_parameters}{source_func}")
 
 
 def optional_arguments_merge(config: dict = dict(), optional_default=dict()):
