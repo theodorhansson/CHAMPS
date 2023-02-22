@@ -135,10 +135,10 @@ class SpectrumAnalyzer:
         wavelength_data = [float(x) for x in wavelength_data]
         return wavelength_data
 
-    def get_intensity_data_A(self, range: str = "") -> list[float]:
+    def get_intensity_data_A_dBm(self, nm_range: str = "") -> list[float]:
         # Trace A wavelength data **** : 1 to 20001, "R1-R20001" when range ommitted
         # List of measured intensities
-        GPIB_write = "LDATA" + range
+        GPIB_write = "LDATA" + nm_range
         datastring = self.instrument.query(GPIB_write)
         intensity_data = datastring.split("")
         intensity_data = [float(x) for x in intensity_data]
