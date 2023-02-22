@@ -121,7 +121,7 @@ def signed_bits2int(input: str, endian="big") -> int:
     no_of_bits = len(input)
     if input[0] == "1":
         output -= 2 ** (no_of_bits - 1)  # The signed byte represents -2**15 in 16 bits
-    return output
+    return int(output)
 
 
 class AnimatedPlot:
