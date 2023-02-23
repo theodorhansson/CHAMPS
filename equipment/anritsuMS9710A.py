@@ -145,7 +145,9 @@ class SpectrumAnalyzer:
         try:
             databytes = self.instrument.read_raw()
         except:
-            raise Exception("Something went wrong when reading data from Anritsu")
+            raise Exception(
+                "Something went wrong when reading data from Anritsu. Did you already empty the buffer?"
+            )
 
         databytes = databytes[:-2]  # Last two bytes are \r\n, remove them
 
