@@ -1,6 +1,7 @@
 import pyvisa
 import utils
 import time
+import numpy as np
 
 _required_arguments = ["gpib_address", "type"]
 _optional_arguments = {"reference_level_dbm": -40, "display_level_scale_dbm": 10}
@@ -140,9 +141,8 @@ class SpectrumAnalyzer:
 
         return np.linspace(start, stop, sampelpoints)
 
-    def get_intensity_data_A_dBm(self, nm_range: str = ""):
+    def get_intensity_data_A_dBm(self):
         # Outputs dB measurement data equivalent to the number of sampling points from memory A.
-        # NOTE: Range option not supported
 
         # Sometimes misinterprets bytes in stream as end of message
         r_term = self.instrument.read_termination
@@ -158,21 +158,29 @@ class SpectrumAnalyzer:
             )
 
         databytes = databytes[:-2]  # Last two bytes are \r\n, remove them
+        intensities_dB = np.zeros(len(databytes) / 2)
 
-        # bin()->"0b1101" -> [2:] -> "1101" -> zfill -> "00001101"
-        bytes_as_strs = [bin(byte)[2:].zfill(8) for byte in databytes]
+        for i in range(0, len(databytes)):  # Every two bytes make a pair
+            byte1 = databytes[2 * i]
+            byte2 = databytes[2 * i + 1]
 
-        wavelength_data = []
-        # Every other byte is the start of a short
-        for i in range(0, len(bytes_as_strs), 2):
-            # merge 2 bytes to one short/int16
-            double_byte_str = bytes_as_strs[i] + bytes_as_strs[i + 1]
-            value = signed_bits2int(double_byte_str)
-            value *= 0.01  # 53.87dB is transmitted as 5387
-            wavelength_data.append(value)
+            # This is ugly but superfast!
+            # First bit in b1 is sign, so remove that by a bitwise &.
+            # Then left shift 8 steps to make b1 the first 8 bits of total 16.
+            # Then add b2 to this (puts them in the 8 last bits).
+            # Finally remove the value of *only* the first bit in (b1 << 8), since this
+            # bit is equal to *negative* its normal value.
+
+            # Ex: byte1 = 233 (11101001) , byte2 = 162 (10100010)
+            # 11101001 -> 01101001 -> 01101001 00000000 -> 01101001 10100010 ->
+            # -> 01101001 10100010 minus 10000000 00000000 = -5726
+
+            ans = ((byte1 & 0b01111111) << 8) + byte2 - ((byte1 & 0b10000000) << 8)
+            intensities_dB[i] = ans
+        intensities_dB *= 0.01  # 9832 -> 98.32 dB
 
         self.instrument.read_termination = r_term
-        return wavelength_data
+        return intensities_dB
 
     def get_connected_visa_devices(self):
         return self.resource_manager.list_resources()
