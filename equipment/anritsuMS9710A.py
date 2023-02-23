@@ -158,9 +158,11 @@ class SpectrumAnalyzer:
             )
 
         databytes = databytes[:-2]  # Last two bytes are \r\n, remove them
-        intensities_dB = np.zeros(len(databytes) / 2)
 
-        for i in range(0, len(databytes)):  # Every two bytes make a pair
+        no_of_shorts = int(len(databytes) / 2)  # 2 bytes make a short.
+        intensities_dB = np.zeros(no_of_shorts)
+
+        for i in range(no_of_shorts):
             byte1 = databytes[2 * i]
             byte2 = databytes[2 * i + 1]
 
