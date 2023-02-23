@@ -126,19 +126,19 @@ class SpectrumAnalyzer:
         span = self.instrument.query(GPIB_write)
         return span
 
-    def get_wavelength_axis(self, range: str = "") -> list[float]:
+    def get_wavelength_axis(self) -> list[float]:
         # Trace A (wavelength axis) **** : 1 to 20001, "R1-R20001" when range ommitted
         # List of used wavelengths
-        GPIB_write = "WDATA" + range
+        GPIB_write = "WDATA"
         datastring = self.instrument.query(GPIB_write)
         wavelength_data = datastring.split("")
         wavelength_data = [float(x) for x in wavelength_data]
         return wavelength_data
 
-    def get_intensity_data_A_dBm(self, nm_range: str = "") -> list[float]:
+    def get_intensity_data_A_dBm(self) -> list[float]:
         # Trace A wavelength data **** : 1 to 20001, "R1-R20001" when range ommitted
         # List of measured intensities
-        GPIB_write = "LDATA" + nm_range
+        GPIB_write = "LDATA"
         datastring = self.instrument.query(GPIB_write)
         intensity_data = datastring.split("")
         intensity_data = [float(x) for x in intensity_data]
