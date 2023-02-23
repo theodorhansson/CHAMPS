@@ -188,10 +188,12 @@ class SpectrumAnalyzer:
     def get_sweep_status(self) -> int:  # NOTE: use "MOD" instead
         # Gets the current status of instrument from event register
         # Status codes for anritsu:
-        # 0 Busy
-        # 2 Finished
+        # 0: A spectrum is not being measured.
+        # 1: A spectrum is being measured (single sweep).
+        # 2: A spectrum is being measured (repeat sweep).
+        # 3: Power monitor
 
-        GPIB_write = "ESR2?"
+        GPIB_write = "MOD?"
         status = self.instrument.query(GPIB_write)
         return int(status)
 
@@ -202,7 +204,7 @@ class SpectrumAnalyzer:
 
     def do_single_scan(self):
         # starts single and holds thread until done
-        stop_code = 0b00000010
+        stop_code = 0  # This value indicates finished
         stop = None
 
         # Start measurment and check if finished in loop
@@ -210,9 +212,6 @@ class SpectrumAnalyzer:
         while stop != stop_code:
             time.sleep(0.5)
             stop = self.get_sweep_status()
-
-            # Extract only second digit from binary status
-            stop = stop & stop_code
 
 
 def test_OSA():
