@@ -130,10 +130,15 @@ class SpectrumAnalyzer:
         span = self.instrument.query(GPIB_write)
         return float(span)
 
-    def get_wavelength_axis(self, range: str = "") -> list[float]:
-        # TODO: not implemented
-        # NOTE: probably easiest to calculate from span and center wl
-        pass
+    def get_wavelength_axis(self) -> list[float]:
+
+        span = self.get_wavelength_span()
+        sampelpoints = self.get_sample_points()
+        center = self.get_center_wavelength_nm()
+        start = center - span / 2
+        stop = center + span / 2
+
+        return np.linspace(start, stop, sampelpoints)
 
     def get_intensity_data_A_dBm(self, nm_range: str = ""):
         # Outputs dB measurement data equivalent to the number of sampling points from memory A.
