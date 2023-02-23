@@ -51,7 +51,7 @@ class SpectrumAnalyzer:
         GPIB_write = "AVT " + str(avg_factor)
         self.instrument.write(GPIB_write)
 
-    def get_avg_factor(self):
+    def get_avg_factor(self) -> str:
         GPIB_write = "AVT?"
         avg = self.instrument.query(GPIB_write)
         return avg
@@ -62,13 +62,13 @@ class SpectrumAnalyzer:
         GPIB_write = "CNT " + str(round(center_wl, 2))
         self.instrument.write(GPIB_write)
 
-    def get_center_wavelength_nm(self):
+    def get_center_wavelength_nm(self) -> float:
         GPIB_write = "CNT?"
         center_wl = self.instrument.query(GPIB_write)
-        return center_wl
+        return float(center_wl)
 
     def set_level_scale_dBm(self, level_scale: float):
-        # Selects a log scale as a level scale and sets a scale value
+        # Selects a log scale as a level scale and sets a scale value (dB/div)
         # Data range: 0.1 <= level_scale <= 10.0
         GPIB_write = "LOG " + str(round(level_scale, 1))
         self.instrument.write(GPIB_write)
@@ -85,24 +85,23 @@ class SpectrumAnalyzer:
         GPIB_write = "RES " + str(resolution)
         self.instrument.write(GPIB_write)
 
-    def get_linear_resolution_nm(self):
+    def get_linear_resolution_nm(self) -> float:
         GPIB_write = "RES?"
-        resolution = self.instrument.write(GPIB_write)
-        return resolution
+        resolution = self.instrument.query(GPIB_write)
+        return float(resolution)
 
     def set_sample_points(self, n_points: int):
         # # Sets the sampling point for measurement. ****: 11 to 20001 (1 step), 0(auto)
-        # GPIB_write = ":SMPL" + str(n_points)
-        # self.instrument.write(GPIB_write)'
-        pass
+        # 51, 101, 251, 501, 1001, 2001, 5001
+        GPIB_write = "MPT " + str(n_points)
+        self.instrument.write(GPIB_write)
 
-    def get_sample_points(self):
-        # GPIB_write = ":SMPL?"
-        # n_points = self.instrument.write(GPIB_write)
-        # return n_points
-        pass
+    def get_sample_points(self) -> int:
+        GPIB_write = "MPT?"
+        n_points = self.instrument.query(GPIB_write)
+        return int(n_points)
 
-    def set_ref_level_dBm(self, level: float):
+    def set_ref_level_dBm(self, level: float):  ##TODO: BROKEN
         # Sets the reference level. [in LOG] (Unit: dBm), ***.***: -190.000 to 50.000 (0.1 step)
         GPIB_write = "MKD " + str(level) + " DBM"
         self.instrument.write(GPIB_write)
@@ -123,13 +122,14 @@ class SpectrumAnalyzer:
         GPIB_write = "SPN " + str(round(span, 1))
         self.instrument.write(GPIB_write)
 
-    def get_wavelength_span(self):
+    def get_wavelength_span(self) -> float:
         GPIB_write = "SPN?"
         span = self.instrument.query(GPIB_write)
-        return span
+        return float(span)
 
     def get_wavelength_axis(self, range: str = "") -> list[float]:
         # TODO: not implemented
+        # NOTE: probably easiest to calculate from span and center wl
         pass
 
     def get_intensity_data_A_dBm(self, nm_range: str = ""):
