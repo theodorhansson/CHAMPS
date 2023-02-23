@@ -101,8 +101,11 @@ class SpectrumAnalyzer:
         n_points = self.instrument.query(GPIB_write)
         return int(n_points)
 
-    def set_ref_level_dBm(self, level: float):  ##TODO: BROKEN
+    def set_ref_level_dBm(self, level: float):
+        # TODO: BROKEN
+        # NOTE: Perhaps doesn't need implement?
         # Sets the reference level. [in LOG] (Unit: dBm), ***.***: -190.000 to 50.000 (0.1 step)
+        return
         GPIB_write = "MKD " + str(level) + " DBM"
         self.instrument.write(GPIB_write)
 
