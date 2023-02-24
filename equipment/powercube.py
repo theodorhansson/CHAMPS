@@ -14,6 +14,12 @@ class powercube:
             "Now this stuff is seriously untested. Please reconsider using this file."
         )
 
+    def __enter__(self):
+        self.open()
+
+    def __exit__(self, exception_type, exception_value, exception_traceback):
+        self.close()
+
     def get_voltage(self):
         self.serial_port.write(b"VOUT1?")
         ans = self.serial_port.read(1000)

@@ -30,6 +30,12 @@ class SpectrumAnalyzer:
         else:
             self.resource_manager = pyvisa.ResourceManager()
 
+    def __enter__(self):
+        self.open()
+
+    def __exit__(self, exception_type, exception_value, exception_traceback):
+        self.close()
+
     def open(self):  # TODO: move to __init__?
         # Define instrument with pyvisa
         self.instrument = self.resource_manager.open_resource(self.conn_str)

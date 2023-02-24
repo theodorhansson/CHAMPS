@@ -16,6 +16,14 @@ class keithley2400:
         else:
             self.resource_manager = pyvisa.ResourceManager()
 
+    def __enter__(self):
+        self.open()
+
+    def __exit__(self, exception_type, exception_value, exception_traceback):
+        self.set_current(0)
+        self.set_output(False)
+        self.close()
+
     def get_voltage(self) -> float:
         ans = self.instrument.query(":READ?")
         ans = ans.split(",")[0]  # First item is voltage

@@ -48,6 +48,12 @@ class INT_sphere:
         wavelength = config_dict["wavelength"]
         self.set_wavelength(wavelength)
 
+    def __enter__(self):
+        self.open()
+
+    def __exit__(self, exception_type, exception_value, exception_traceback):
+        self.close()
+
     def open(self):
         # Start output stream
         self.set_output(True)
