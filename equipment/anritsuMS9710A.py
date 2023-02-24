@@ -143,10 +143,10 @@ class SpectrumAnalyzer:
         span = self.get_wavelength_span()
         sampelpoints = self.get_sample_points()
         center = self.get_center_wavelength_nm()
-        start = center - span / 2
-        stop = center + span / 2
+        start = center - (span / 2)
+        stop = center + (span / 2)
 
-        return np.linspace(start, stop, sampelpoints)
+        return list(np.linspace(start, stop, sampelpoints))
 
     def get_intensity_data_A_dBm(self):
         # Outputs dB measurement data equivalent to the number of sampling points from memory A.
@@ -158,7 +158,9 @@ class SpectrumAnalyzer:
         GPIB_write = "DBA?"
         self.instrument.write(GPIB_write)
         try:
+            start = time.time()
             databytes = self.instrument.read_raw()
+            print(f"Binary GPIB-transfer took this long:", time.time() - start, " ms")
         except:
             raise Exception(
                 "Something went wrong when reading data from Anritsu. Did you already empty the buffer?"
@@ -167,7 +169,7 @@ class SpectrumAnalyzer:
         databytes = databytes[:-2]  # Last two bytes are \r\n, remove them
 
         no_of_shorts = int(len(databytes) / 2)  # 2 bytes make a short.
-        intensities_dB = np.zeros(no_of_shorts)
+        intensities_dB = []
 
         for i in range(no_of_shorts):
             byte1 = databytes[2 * i]
@@ -185,8 +187,8 @@ class SpectrumAnalyzer:
             # -> 01101001 10100010 minus 10000000 00000000 = -5726
 
             ans = ((byte1 & 0b01111111) << 8) + byte2 - ((byte1 & 0b10000000) << 8)
-            intensities_dB[i] = ans
-        intensities_dB *= 0.01  # 9832 -> 98.32 dB
+            ans *= 0.01  # 9832 -> 98.32 dB
+            intensities_dB.append(ans)
 
         self.instrument.read_termination = r_term
         return intensities_dB
