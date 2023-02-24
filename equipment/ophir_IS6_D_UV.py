@@ -34,9 +34,9 @@ class INT_sphere:
         DeviceList = self._OphirCOM.ScanUSB()
         try:
             Device = DeviceList[0]
-        except Exception as e:
+        except:
             print("You don't seem to have an Integrating Sphere connected")
-            raise e
+            raise Exception
         self._DeviceHandle = self._OphirCOM.OpenUSBDevice(Device)
         self._min_time = config_dict["min_measure_time"]
 
