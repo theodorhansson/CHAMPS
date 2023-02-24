@@ -2,6 +2,7 @@ import communication
 import utils
 import numpy as np
 import traceback
+import sys
 
 _DC_name_key = "dc_unit"
 _OSA_name_key = "osa_unit"
@@ -65,7 +66,7 @@ def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
     except:
         traceback.print_exc()
         print("Something went wrong when getting and opening the resources")
-        exit()
+        sys.exit()
 
     try:
         with OSA_unit_obj as OSA_unit, DC_unit_obj as DC_unit:
