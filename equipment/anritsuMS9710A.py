@@ -206,7 +206,7 @@ class SpectrumAnalyzer:
         status = self.instrument.query(GPIB_write)
         return int(status)
 
-    def start_single_sweep(self):
+    def _start_single_sweep(self):
         # Starts a scan in mode "single"
         GPIB_write = "SSI"
         self.instrument.write(GPIB_write)
@@ -217,7 +217,7 @@ class SpectrumAnalyzer:
         stop = None
 
         # Start measurment and check if finished in loop
-        self.start_single_sweep()
+        self._start_single_sweep()
         while stop != stop_code:
             time.sleep(0.5)
             stop = self.get_sweep_status()
