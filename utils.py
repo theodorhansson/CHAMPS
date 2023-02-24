@@ -124,6 +124,23 @@ def signed_bits2int(input: str, endian="big") -> int:
     return int(output)
 
 
+def dict_2_lower(indict: dict) -> dict:
+    # Recursive dict to lower function
+    out_dict = dict()
+    for key in indict:
+        value = indict[key]
+        out_key = key.lower() if type(key) == str else key
+
+        if type(value) == dict:
+            temp = dict_2_lower(value)
+            out_dict[out_key] = temp
+
+        else:
+            out_value = value.lower() if type(value) == str else value
+            out_dict[out_key] = out_value
+    return out_dict
+
+
 class AnimatedPlot:
     # Used to dynamically add datapoints
     def __init__(

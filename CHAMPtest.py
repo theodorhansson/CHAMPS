@@ -23,7 +23,7 @@ class PhotonicTest(unittest.TestCase):
             "12a": "abc",
         }
 
-        lower_dict = main.dict_2_lower(test_dict)
+        lower_dict = utils.dict_2_lower(test_dict)
         self.assertEqual(lower_dict, correct_dict)
 
     def test_signed_bits2int(self):
@@ -76,12 +76,14 @@ class PhotonicTest(unittest.TestCase):
         config = {"value1": 2, "value2": 4}
         utils.argument_checker(config, required, optional)
 
-
-    def _test_optional_arguments_merge(self): # TODO: finish me
+    def _test_optional_arguments_merge(self):  # TODO: finish me
         conf = {"type": "chalmers", "abc": "123", "petg": 111}
         opt = {"petg": 222, "PPP": "ASDASD"}
 
-        config = {"value1" : 1, "value2": 1, }
+        config = {
+            "value1": 1,
+            "value2": 1,
+        }
 
         print(optional_arguments_merge(conf, opt))
 
