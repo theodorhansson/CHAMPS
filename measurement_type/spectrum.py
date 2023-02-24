@@ -14,7 +14,7 @@ _required_arguments = [
     "center_wavelength",
     "linear_resolution",
     "wavelength_span",
-    "sampel_points",
+    "sample_points",
 ]
 _optional_arguments = {"avg_factor": 5, "sensitivity": "SHI1"}
 
