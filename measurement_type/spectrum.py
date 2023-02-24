@@ -103,7 +103,6 @@ def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
                     Results["wavelengths"].append(wavelength_axis)
                     # plot.add_point(current, power)
                     # print("IPV data", volt, current, power)
-        utils.ramp_current(DC_unit, DC_unit.get_current(), 0)
     except KeyboardInterrupt:
         print("Keyboard interrupt detected, stopping.")
     except:
