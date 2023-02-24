@@ -16,6 +16,7 @@ class powercube:
 
     def __enter__(self):
         self.open()
+        return self
 
     def __exit__(self, exception_type, exception_value, exception_traceback):
         self.close()
