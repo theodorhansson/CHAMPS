@@ -75,11 +75,11 @@ def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
     DC_unit.set_output(True)
 
     OSA_unit.set_center_wavelength_nm(spectrum_config["center_wavelength"])
-    OSA_unit.set_wavelength_span_nm(spectrum_config["span"])
+    OSA_unit.set_wavelength_span_nm(spectrum_config["wavelength_span"])
     OSA_unit.set_sensitivity(spectrum_config["sensitivity"])
     OSA_unit.set_linear_resolution_nm(spectrum_config["linear_resolution"])
     OSA_unit.set_avg_factor(spectrum_config["avg_factor"])
-    OSA_unit.set_sample_points(spectrum_config["sampel_points"])
+    OSA_unit.set_sample_points(spectrum_config["sample_points"])
 
     try:
         prev_end_current = 0
