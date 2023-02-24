@@ -8,12 +8,11 @@ _OSA_name_key = "osa_unit"
 _required_arguments = [
     "type",
     "dc_unit",
-    "osa",
     "current",
     "v_max",
     "save_folder",
     "center_wavelength",
-    "linear_resoultion",
+    "linear_resolution",
     "Wavelength_span",
 ]
 _optional_arguments = {

@@ -89,4 +89,5 @@ def test():
     del com
 
 
-test()
+if __name__ == "__main__":
+    test()

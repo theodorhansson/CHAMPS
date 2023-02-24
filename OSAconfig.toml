@@ -4,10 +4,10 @@ Save_folder = "c:/LABDATA"
 DC_unit = "keithley2400"    #Refers to the [] below only
 OSA_unit = "ando"           #Refers to the [] below only
 V_max = 5
-Current = [[0.001, 0.0001, 0.005], [0.005, 0.0005, 0.015]]  # [min, step, max]
+Current = [[1, 0.1, 5], [5, 0.5, 15]]  # [min, step, max]
 
 Center_wavelength = 850 #nm
-linear_resoultion = 0.1 #nm
+linear_resolution = 0.1 #nm
 Wavelength_span = 20 #nm
 avg_factor = 10
 sensitivity = "SHI1"
