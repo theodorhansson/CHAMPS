@@ -13,12 +13,10 @@ _required_arguments = [
     "save_folder",
     "center_wavelength",
     "linear_resolution",
-    "Wavelength_span",
+    "wavelength_span",
+    "sampel_points",
 ]
-_optional_arguments = {
-    "sampel_points": 0,
-    "avg_factor": 5,
-}
+_optional_arguments = {"avg_factor": 5, "sensitivity": "SHI1"}
 
 
 def init(config: dict):
