@@ -42,7 +42,7 @@ class SpectrumAnalyzer:
         self.instrument = self.resource_manager.open_resource(self.conn_str)
 
         # Due to big datatransfers, instrument timeout must be increased
-        self.instrument.timeout = 5000  # ms. TODO: make as small as possible
+        self.instrument.timeout = 2000  # ms. It takes 1s for 5001 samples
         self.instrument.read_termination = "\r\n"
         self.instrument.write_termination = "\r\n"
 
@@ -165,9 +165,7 @@ class SpectrumAnalyzer:
         GPIB_write = "DBA?"
         self.instrument.write(GPIB_write)
         try:
-            start = time.time()
             databytes = self.instrument.read_raw()
-            print(f"Binary GPIB-transfer took this long:", time.time() - start, " ms")
         except:
             raise Exception(
                 "Something went wrong when reading data from Anritsu. Did you already empty the buffer?"
