@@ -2,7 +2,7 @@
 Type = "spectrum"
 Save_folder = "c:/LABDATA"
 DC_unit = "keithley2400"    #Refers to the [] below only
-OSA_unit = "ando"           #Refers to the [] below only
+OSA_unit = "anritsu"           #Refers to the [] below only
 V_max = 5
 Current = [[1, 0.1, 5], [5, 0.5, 15]]  # [min, step, max]
 
@@ -10,7 +10,8 @@ Center_wavelength = 850 #nm
 linear_resolution = 0.1 #nm
 Wavelength_span = 20 #nm
 avg_factor = 10
-sensitivity = "SHI1"
+sample_points = 501
+#sensitivity = "SHI1"   #Only affects ando
 
 [keithley2400]  
 type = "keithley2400"   # The specific type of unit
@@ -28,6 +29,9 @@ display_level_scale_dbm = 10
 
 [anritsu]
 type = "anritsu_osa"
-GPIB_address = 20
+GPIB_address = 8
 reference_level_dbm = -40
 display_level_scale_dbm = 10
+# Anritsu-specific:
+# Resolution: 1.0, 0.5, 0.2, 0.1, 0.07, 0.05 (nm)
+# Sampel points:  51, 101, 251, 501, 1001, 2001, 5001
