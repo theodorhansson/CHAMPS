@@ -20,14 +20,27 @@ def main(config_path):
 
     # Extract results from dict and put in list
     resultarray = []
-    result_headers = []
-    for key in result_dict.keys():
-        result_headers.append(key)
-        resultarray.append(result_dict[key])  # One data type per row
+    keys = result_dict.keys()
+    no_of_points = len(result_dict[keys[0]])  # How many rows there are
 
-    # Change to numpy array
-    resultarray = np.array(resultarray)
-    resultarray = np.transpose(resultarray)  # One data type per column
+    for i in range(no_of_points):
+        row = []
+        for key in keys:
+            item = result_dict[key][i]
+
+            if type(item) is list:
+                row += item
+            else:
+                row.append(item)
+        resultarray.append(row)
+
+    result_headers = []
+    for key in keys:
+        data = result_dict[key][0]
+        if type(data) is list:
+            length = f"( {len(data)})"
+
+        result_headers.append(key + f"({length})")
 
     # Logic on where to save file
     save_folder = config_lower["measurement"]["save_folder"]
