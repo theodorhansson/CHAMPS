@@ -97,11 +97,13 @@ def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
 
                 volt = DC_unit.get_voltage()
                 current = DC_unit.get_current()
-                spectrum = OSA_unit.get_wavelength_data_A()  # TODO: units? Type?
+                OSA_unit.do_single_scan()
+                spectrum = OSA_unit.get_intensity_data_A_dBm()  # TODO: units? Type?
+                wavelength_axis = OSA_unit.get_wavelength_axis()
 
                 Results["voltage"].append(volt)
                 Results["current"].append(current)
-                Results["spectrum"].append(spectrum)
+                Results["spectrum"].append([spectrum, wavelength_axis])
                 # plot.add_point(current, power)
                 # print("IPV data", volt, current, power)
 
