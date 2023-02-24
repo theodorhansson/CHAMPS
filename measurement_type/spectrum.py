@@ -61,7 +61,7 @@ def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
     try:
         OSA_unit = Instrument_COM.get_OSA(OSA_config)
         DC_unit = Instrument_COM.get_DCsupply(DC_config)
-        Results = {"voltage": [], "current": [], "spectrum": []}
+        Results = {"voltage": [], "current": [], "intensities": [], "wavelengths": []}
 
         OSA_unit.open()
         DC_unit.open()
@@ -100,7 +100,8 @@ def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
 
                 Results["voltage"].append(volt)
                 Results["current"].append(current)
-                Results["spectrum"].append([spectrum, wavelength_axis])
+                Results["intensities"].append(spectrum)
+                Results["wavelengths"].append(wavelength_axis)
                 # plot.add_point(current, power)
                 # print("IPV data", volt, current, power)
 
