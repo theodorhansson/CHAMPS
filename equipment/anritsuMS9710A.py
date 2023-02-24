@@ -41,10 +41,17 @@ class SpectrumAnalyzer:
 
         self.set_ref_level_dBm(self.reference_level_dBm)
         self.set_level_scale_dBm(self.display_level_scale_dBm)
+        self.set_time()
 
     def close(self):
         # Exit instrument
         self.instrument.close()
+
+    def set_time(self):
+        date = time.strftime(rf"%y,%m,%d")
+        clock = time.strftime(rf"%H,%M")
+        self.instrument.write("DATE " + date)
+        self.instrument.write("TIME " + clock)
 
     def set_avg_factor(self, avg_factor: int | str):
         # Sets the number of points for point averaging.
