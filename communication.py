@@ -1,6 +1,6 @@
 from equipment import *
 import pyvisa
-from utils import argument_checker
+import utils
 
 _required_arguments = ["type"]
 
@@ -10,7 +10,7 @@ class Communication:
         pass
 
     def get_DCsupply(self, config_dict: dict):
-        argument_checker(
+        utils.argument_checker(
             config_dict,
             _required_arguments,
             warn_extra=False,
@@ -32,7 +32,7 @@ class Communication:
                 raise Exception(f"No DC-unit of type {DC_type} found.")
 
     def get_PowerUnit(self, config_dict: dict):
-        argument_checker(
+        utils.argument_checker(
             config_dict,
             _required_arguments,
             warn_extra=False,
@@ -50,7 +50,7 @@ class Communication:
                 raise Exception(f"No Power unit of type {Power_type} found.")
 
     def get_OSA(self, config_dict: dict):
-        argument_checker(
+        utils.argument_checker(
             config_dict,
             _required_arguments,
             warn_extra=False,

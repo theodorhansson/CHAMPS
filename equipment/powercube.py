@@ -1,12 +1,14 @@
 import serial
-from utils import argument_checker
+import utils
 
 _required_arguments = ["port", "type"]
 
 
 class powercube:
     def __init__(self, config_dict):
-        argument_checker(config_dict, _required_arguments, source_func="powercube")
+        utils.argument_checker(
+            config_dict, _required_arguments, source_func="powercube"
+        )
         self.port = str(config_dict["port"])
         print(
             "Now this stuff is seriously untested. Please reconsider using this file."

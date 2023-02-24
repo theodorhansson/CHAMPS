@@ -1,5 +1,5 @@
 import pyvisa
-from utils import argument_checker, optional_arguments_merge
+import utils
 import time
 
 _required_arguments = ["gpib_address", "type"]
@@ -14,9 +14,9 @@ _optional_arguments = {"reference_level_dbm": -40, "display_level_scale_dbm": 10
 
 class SpectrumAnalyzer:
     def __init__(self, config_dict: dict, resource_manager: object = None):
-        argument_checker(config_dict, _required_arguments, _optional_arguments)
+        utils.argument_checker(config_dict, _required_arguments, _optional_arguments)
 
-        config_dict = optional_arguments_merge(config_dict, _optional_arguments)
+        config_dict = utils.optional_arguments_merge(config_dict, _optional_arguments)
         self.address = str(config_dict["gpib_address"])
         self.interface_ID = "GPIB0"
         self.conn_str = self.interface_ID + "::" + self.address

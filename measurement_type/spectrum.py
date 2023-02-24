@@ -1,11 +1,5 @@
 import communication
-from utils import (
-    argument_checker,
-    AnimatedPlot,
-    interval_2_points,
-    optional_arguments_merge,
-    ramp_current,
-)
+import utils
 import numpy as np
 import traceback
 
@@ -33,13 +27,15 @@ def init(config: dict):
     spectrum_config = config["measurement"]
     spectrum_name = spectrum_config["type"]
     # Check and merge optional arguments
-    argument_checker(
+    utils.argument_checker(
         spectrum_config,
         _required_arguments,
         _optional_arguments,
         source_func="Spectrum init",
     )
-    spectrum_config_opt = optional_arguments_merge(spectrum_config, _optional_arguments)
+    spectrum_config_opt = utils.optional_arguments_merge(
+        spectrum_config, _optional_arguments
+    )
 
     # Used for getting instrument objects
     DC_name = spectrum_config[_DC_name_key]
@@ -60,7 +56,7 @@ def init(config: dict):
 def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
     V_max = spectrum_config["v_max"]
     current_intervals = spectrum_config["current"]
-    current_interval_list = interval_2_points(current_intervals)
+    current_interval_list = utils.interval_2_points(current_intervals)
 
     # plot = AnimatedPlot("Current[A]", "Optical Power [W]", "IPV") TODO: keep?
     Instrument_COM = communication.Communication()
@@ -93,7 +89,7 @@ def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
 
         for interval in current_interval_list:
             start_current = interval[0]
-            ramp_current(DC_unit, prev_end_current, start_current)
+            utils.ramp_current(DC_unit, prev_end_current, start_current)
             prev_end_current = interval[-1]
 
             for set_current in interval:
@@ -115,7 +111,7 @@ def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
         traceback.print_exc()
     finally:
         # Tries to shut down instruments
-        ramp_current(DC_unit, DC_unit.get_current(), 0)
+        utils.ramp_current(DC_unit, DC_unit.get_current(), 0)
         DC_unit.set_current(0)
         DC_unit.set_output(False)
         DC_unit.close()

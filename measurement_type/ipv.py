@@ -1,11 +1,5 @@
 import communication
-from utils import (
-    argument_checker,
-    AnimatedPlot,
-    interval_2_points,
-    optional_arguments_merge,
-    ramp_current,
-)
+import utils
 import traceback
 
 
@@ -27,10 +21,10 @@ def init(config: dict):
     IPV_config = config["measurement"]
     IPV_name = IPV_config["type"]
     # Check and merge optional arguments
-    argument_checker(
+    utils.argument_checker(
         IPV_config, _required_arguments, _optional_arguments, source_func="IPV init"
     )
-    IPV_config_opt = optional_arguments_merge(IPV_config, _optional_arguments)
+    IPV_config_opt = utils.optional_arguments_merge(IPV_config, _optional_arguments)
 
     # Used for getting instrument objects and their names
     DC_name = IPV_config[_DC_name_key]
@@ -53,9 +47,9 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
     rollover_threshold = IPV_config["rollover_threshold"]
     rollover_min = IPV_config["rollover_min"]
     intervals = IPV_config["current"]
-    interval_list = interval_2_points(intervals)
+    interval_list = utils.interval_2_points(intervals)
 
-    Plot = AnimatedPlot("Current[mA]", "Optical Power [mW]", "IPV")
+    Plot = utils.AnimatedPlot("Current[mA]", "Optical Power [mW]", "IPV")
     Instrument_COM = communication.Communication()
 
     try:
@@ -84,7 +78,7 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
             # Code to ramp current between intervals
             power_max = 0
             start_current = interval[0]
-            ramp_current(DC_unit, prev_end_current, start_current)
+            utils.ramp_current(DC_unit, prev_end_current, start_current)
             prev_end_current = interval[-1]
 
             for count, set_current in enumerate(interval):
@@ -115,7 +109,7 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
         traceback.print_exc()
     finally:
         # Safely shut down instrument, even if error is detected
-        ramp_current(DC_unit, DC_unit.get_current(), 0)
+        utils.ramp_current(DC_unit, DC_unit.get_current(), 0)
         DC_unit.set_current(0)
         DC_unit.set_output(False)
         DC_unit.close()

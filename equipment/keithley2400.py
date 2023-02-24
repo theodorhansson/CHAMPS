@@ -1,12 +1,12 @@
 import pyvisa
-from utils import argument_checker
+import utils
 
 _required_arguments = ["gpib_address", "type"]
 
 
 class keithley2400:
     def __init__(self, config_dict: dict, resource_manager: object = None):
-        argument_checker(config_dict, _required_arguments, source_func="keithley")
+        utils.argument_checker(config_dict, _required_arguments, source_func="keithley")
         self.address = str(config_dict["gpib_address"])
         self.interface = "GPIB0"
 

@@ -1,6 +1,6 @@
 import win32com.client
 import time
-from utils import argument_checker
+import utils
 
 # OBS: en datastream ger en konstant växande lista med värden
 # Based on python example from Ophir
@@ -29,7 +29,7 @@ _required_arguments = ["range", "min_measure_time", "wavelength", "type"]
 
 class INT_sphere:
     def __init__(self, config_dict: dict):
-        argument_checker(config_dict, _required_arguments, source_func="sphere")
+        utils.argument_checker(config_dict, _required_arguments, source_func="sphere")
         self._OphirCOM = win32com.client.Dispatch("OphirLMMeasurement.CoLMMeasurement")
         DeviceList = self._OphirCOM.ScanUSB()
         try:
