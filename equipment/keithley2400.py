@@ -31,6 +31,27 @@ class keithley2400:
         self.set_output(False)
         self.close()
 
+    def open(self):  # TODO: Rename to open_current?
+        # Define where instrument is
+        conn_str = self.interface + "::" + self.address  # like GPIB0::24
+
+        # Open and create instrument class
+        rm = pyvisa.ResourceManager()
+        self.instrument = rm.open_resource(conn_str)
+
+        # Initialize current mode
+        self.instrument.write(":SOURCE:FUNCTION CURRENT")
+        self.instrument.write(":SOURCE:CURRENT:MODE FIXED")
+        self.instrument.write(":SOURCE:CURRENT:RANGE:AUTO 1")
+
+        # Sets what the display shall show
+        self.instrument.write(":SENSE:FUNCTION 'VOLT'")
+
+        self.instrument.write(":SENSE:VOLT:RANGE:AUTO 1")
+
+    def close(self):
+        self.instrument.close()
+
     def get_voltage(self) -> float:
         ans = self.instrument.query(":READ?")
         ans = ans.split(",")[0]  # First item is voltage
@@ -62,27 +83,6 @@ class keithley2400:
             print("")
 
         self.instrument.write(":OUTPUT " + str(int(state)))
-
-    def open(self):  # TODO: Rename to open_current?
-        # Define where instrument is
-        conn_str = self.interface + "::" + self.address  # like GPIB0::24
-
-        # Open and create instrument class
-        rm = pyvisa.ResourceManager()
-        self.instrument = rm.open_resource(conn_str)
-
-        # Initialize current mode
-        self.instrument.write(":SOURCE:FUNCTION CURRENT")
-        self.instrument.write(":SOURCE:CURRENT:MODE FIXED")
-        self.instrument.write(":SOURCE:CURRENT:RANGE:AUTO 1")
-
-        # Sets what the display shall show
-        self.instrument.write(":SENSE:FUNCTION 'VOLT'")
-
-        self.instrument.write(":SENSE:VOLT:RANGE:AUTO 1")
-
-    def close(self):
-        self.instrument.close()
 
 
 def performance_test():
