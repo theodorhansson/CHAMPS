@@ -114,17 +114,6 @@ def ramp_current(DC_supply, start, stop, step=10):
         time.sleep(50 * 1e-3)  # 50 ms
 
 
-def signed_bits2int(input: str, endian="big") -> int:
-    if endian == "small":  # Make big endian
-        input = input[::-1]
-
-    output = int(input[1:], 2)  # Select all normal bits and convert to int
-    no_of_bits = len(input)
-    if input[0] == "1":
-        output -= 2 ** (no_of_bits - 1)  # The signed byte represents -2**15 in 16 bits
-    return int(output)
-
-
 def dict_2_lower(indict: dict) -> dict:
     # Recursive dict to lower function
     out_dict = dict()
