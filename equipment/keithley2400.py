@@ -39,6 +39,14 @@ class keithley2400:
         rm = pyvisa.ResourceManager()
         self.instrument = rm.open_resource(conn_str)
 
+        connected_devices = rm.list_resources()
+        connected_devices = (device.lower() for device in connected_devices)
+        if conn_str.lower() not in connected_devices:
+            print(f"List of connected GPIB devices: {connected_devices}")
+            raise ConnectionError(
+                f"Keitley2400 connection failed using address {conn_str}."
+            )
+
         # Initialize current mode
         self.instrument.write(":SOURCE:FUNCTION CURRENT")
         self.instrument.write(":SOURCE:CURRENT:MODE FIXED")
