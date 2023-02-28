@@ -3,13 +3,13 @@
 [measurement]
 Type = "ipv"
 Save_folder = "c:/LABDATA"
-DC_unit = "keithley2400"    #Refers to the [] below only
+DC_unit = "keithley2400"    # Refers to the [] below only
 P_unit = "INT_sphere"
 V_max = 5
 Rollover_threshold = 0  # Stops measurement when power < rollover_threshold * maxpower
 Rollover_min = 0        # Doesn't do rollover check on power values lower than this
-Current = [[1, 0.1, 5], [5, 0.5, 15]]  #mA [min, step, max]
-Plot_interval = 20  #Update plot every nth measurement
+Current = [[1, 0.1, 5], [5, 0.5, 15]]  # mA [min, step, max]
+Plot_interval = 20      # Update plot every nth measurement
 
 [keithley2400]  
 type = "keithley2400"   # The specific type of unit
@@ -18,7 +18,7 @@ GPIB_address = "24"
 [INT_sphere]
 type = "ophir_IS6_D_UV"
 Range = 2
-Min_measure_time = 0.2  #How long to wait between new data to arrive from sphere
+Min_measure_time = 0.2  # How long to wait between new data to arrive from sphere
 Wavelength = 5
 
 [powercube]
