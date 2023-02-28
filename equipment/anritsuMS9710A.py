@@ -1,7 +1,9 @@
 import pyvisa
-import utils
+
+# import utils
 import time
 import numpy as np
+import math
 
 _required_arguments = ["gpib_address", "type"]
 _optional_arguments = {"reference_level_dbm": -40, "display_level_scale_dbm": 10}
@@ -108,6 +110,7 @@ class SpectrumAnalyzer:
     def set_sample_points(self, n_points: int):
         # # Sets the sampling point for measurement. ****: 11 to 20001 (1 step), 0(auto)
         # 51, 101, 251, 501, 1001, 2001, 5001
+
         GPIB_write = "MPT " + str(n_points)
         self.instrument.write(GPIB_write)
 
@@ -230,6 +233,48 @@ class SpectrumAnalyzer:
             stop = self.get_sweep_status()
 
 
+def closest_matcher(
+    data: float,
+    accepted_vals: list,
+    round_type: str = "up",
+    msg: str = "",
+):
+    # Function checks if value is accepted, and tries to round it if possible
+
+    if msg:
+        # Set message if not empty
+        msg = " in " + msg
+
+    max_val = max(accepted_vals)
+    if data > max_val:
+        # If data bigger than all accepted
+        print(f"Warning: {data} larger than accepted{msg}, using {max_val} instead.")
+        return max_val
+
+    elif data not in accepted_vals:
+        # If not in list, round up to closest value in list
+
+        match round_type.lower():
+            case "up":
+                custom_key = lambda x: math.inf if x - data < 0 else x - data
+            case "down":
+                custom_key = lambda x: math.inf if x - data > 0 else data - x
+            case "regularly":
+                custom_key = lambda x: x - data
+            case _:
+                raise Exception(
+                    f"closest_matcher unknown round_type {round_type}{msg} detected."
+                )
+        data_old = data
+        data = min(accepted_vals, key=custom_key)
+        print(
+            f"Warning: {data_old} not accepted{msg}, rounding {round_type} to {data}."
+        )
+        return data
+    else:
+        return data
+
+
 def test_OSA():
     test_config = {"gpib_address": 12, "type": "jiopfjio"}
 
@@ -243,5 +288,14 @@ def test_OSA():
     OSA.close()
 
 
+def test_jioasd():
+    accepted_val = [51, 101, 251, 501, 1001, 2001, 5001]
+    n_points = 551
+
+    A = closest_matcher(n_points, accepted_val, msg="hej hej", round_type="regularly")
+    print(A)
+
+
 if __name__ == "__main__":
-    test_OSA()
+    # test_OSA()
+    test_jioasd()
