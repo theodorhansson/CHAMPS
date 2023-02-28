@@ -69,7 +69,7 @@ def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
         sys.exit()
 
     try:
-        with OSA_unit_obj as OSA_unit, DC_unit_obj as DC_unit:
+        with OSA_unit_obj(OSA_config) as OSA_unit, DC_unit_obj(DC_config) as DC_unit:
 
             DC_unit.set_current(0.0)
             DC_unit.set_voltage_limit(V_max)
