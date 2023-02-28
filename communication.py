@@ -21,11 +21,10 @@ class Communication:
         DC_type = config_dict["type"]
         match DC_type:
             case "keithley2400":
-                resource_manager = self.pyvisa_resource_util()
-                return keithley2400.keithley2400(config_dict, resource_manager)
+                return keithley2400.keithley2400
 
             case "powercube":
-                return powercube.powercube(config_dict)
+                return powercube.powercube
 
             case _:
                 # TODO Change this
@@ -43,7 +42,7 @@ class Communication:
 
         match Power_type:
             case "ophir_is6_d_uv":
-                return ophir_IS6_D_UV.INT_sphere(config_dict)
+                return ophir_IS6_D_UV.INT_sphere
 
             case _:
                 # TODO Change this
@@ -62,11 +61,11 @@ class Communication:
         match OSA_type:
             case "ando_osa":
                 resource_manager = self.pyvisa_resource_util()
-                return andoAQ6317B.SpectrumAnalyzer(config_dict, resource_manager)
+                return andoAQ6317B.SpectrumAnalyzer
 
             case "anritsu_osa":
                 resource_manager = self.pyvisa_resource_util()
-                return anritsuMS9710A.SpectrumAnalyzer(config_dict, resource_manager)
+                return anritsuMS9710A.SpectrumAnalyzer
 
             case _:
                 # TODO Change this
