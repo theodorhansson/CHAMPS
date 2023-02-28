@@ -13,7 +13,12 @@ _required_arguments = [
     "v_max",
     "save_folder",
 ]
-_optional_arguments = {"rollover_threshold": 0, "rollover_min": 0, "plot_interval": 20}
+_optional_arguments = {
+    "rollover_threshold": 0,
+    "rollover_min": 0,
+    "plot_interval": 20,
+    "verbose_printing": False,
+}
 
 
 def init(config: dict):
@@ -46,6 +51,7 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
     rollover_threshold = IPV_config["rollover_threshold"]
     rollover_min = IPV_config["rollover_min"]
     intervals = IPV_config["current"]
+    verbose_printing = IPV_config["verbose_printing"]
     interval_list = utils.interval_2_points(intervals)
 
     # Create result dict
@@ -91,7 +97,9 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
                     Results["power"].append(power)
 
                     Plot.add_point(current, power)
-                    print("IPV data", volt, current, power)
+
+                    if verbose_printing & 1:
+                        print("IPV data", volt, current, power)
 
                     # Only plot sometimes
                     if loop_count % plot_update_interval == 0:

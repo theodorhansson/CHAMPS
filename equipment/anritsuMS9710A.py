@@ -4,7 +4,11 @@ import time
 import numpy as np
 
 _required_arguments = ["gpib_address", "type"]
-_optional_arguments = {"reference_level_dbm": -40, "display_level_scale_dbm": 10}
+_optional_arguments = {
+    "reference_level_dbm": -40,
+    "display_level_scale_dbm": 10,
+    "verbose_printing": False,
+}
 
 # Many comments in methods from "MS9710B Optical Spectrum Analyzer Remote Control Operation Manual", ANRITSU 2007
 ### Read manual page 139, 261 for commands ###
@@ -13,14 +17,14 @@ _optional_arguments = {"reference_level_dbm": -40, "display_level_scale_dbm": 10
 class SpectrumAnalyzer:
     def __init__(self, config_dict: dict, resource_manager: object = None):
         utils.argument_checker(config_dict, _required_arguments, _optional_arguments)
-
         config_dict = utils.optional_arguments_merge(config_dict, _optional_arguments)
+
         self.address = str(config_dict["gpib_address"])
         self.interface_ID = "GPIB0"
         self.conn_str = self.interface_ID + "::" + self.address
-
         self.reference_level_dBm = config_dict["reference_level_dbm"]
         self.display_level_scale_dBm = config_dict["display_level_scale_dbm"]
+        self.verbose_printing = config_dict["verbose_printing"]
 
         # Use parent resource manager if exists
         if resource_manager != None:

@@ -25,11 +25,17 @@ import utils
 
 
 _required_arguments = ["range", "min_measure_time", "wavelength", "type"]
+_optional_arguments = {"verbose_printing": False}
 
 
 class INT_sphere:
     def __init__(self, config_dict: dict):
-        utils.argument_checker(config_dict, _required_arguments, source_func="sphere")
+        utils.argument_checker(
+            config_dict, _required_arguments, _optional_arguments, source_func="sphere"
+        )
+        config_dict = utils.optional_arguments_merge(config_dict, _optional_arguments)
+        self.verbose_printing = config_dict["verbose_printing"]
+
         self._OphirCOM = win32com.client.Dispatch("OphirLMMeasurement.CoLMMeasurement")
         DeviceList = self._OphirCOM.ScanUSB()
         try:
@@ -137,21 +143,22 @@ class INT_sphere:
         self._OphirCOM.StopAllStreams()
         self._OphirCOM.CloseAll()
 
-    def test(self):
-        self._OphirCOM.StartStream(self._DeviceHandle, 0)
-        for _ in range(10):
-            time.sleep(0.2)  # wait a little for data
-            data = self._OphirCOM.GetData(self._DeviceHandle, 0)
-            if (
-                len(data[0]) > 0
-            ):  # if any data available, print the first one from the batch
-                print(
-                    "Reading = {0}, TimeStamp = {1}, Status = {2} ".format(
-                        data[0][0], data[1][0], data[2][0]
-                    )
+
+def test(sphere_obj):
+    sphere_obj._OphirCOM.StartStream(sphere_obj._DeviceHandle, 0)
+    for _ in range(10):
+        time.sleep(0.2)  # wait a little for data
+        data = sphere_obj._OphirCOM.GetData(sphere_obj._DeviceHandle, 0)
+        if (
+            len(data[0]) > 0
+        ):  # if any data available, print the first one from the batch
+            print(
+                "Reading = {0}, TimeStamp = {1}, Status = {2} ".format(
+                    data[0][0], data[1][0], data[2][0]
                 )
-            else:
-                print("no data")
+            )
+        else:
+            print("no data")
 
 
 def sphere_tests():

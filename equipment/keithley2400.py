@@ -2,13 +2,17 @@ import pyvisa
 import utils
 
 _required_arguments = ["gpib_address", "type"]
+_optional_arguments = {"verbose_printing": False}
 
 
 class keithley2400:
     def __init__(self, config_dict: dict, resource_manager: object = None):
         utils.argument_checker(config_dict, _required_arguments, source_func="keithley")
+        config_dict = utils.optional_arguments_merge(config_dict, _optional_arguments)
+
         self.address = str(config_dict["gpib_address"])
         self.interface = "GPIB0"
+        self.verbose_printing = config_dict["verbose_printing"]
 
         # Use parent resource manager if exists
         if resource_manager != None:
@@ -53,6 +57,10 @@ class keithley2400:
         return data  # [volt, mA]
 
     def set_output(self, state: bool):
+
+        if self.verbose_printing >= 1:
+            print("")
+
         self.instrument.write(":OUTPUT " + str(int(state)))
 
     def open(self):  # TODO: Rename to open_current?

@@ -18,7 +18,11 @@ _required_arguments = [
     "wavelength_span",
     "sample_points",
 ]
-_optional_arguments = {"avg_factor": 5, "sensitivity": "SHI1"}
+_optional_arguments = {
+    "avg_factor": 5,
+    "sensitivity": "SHI1",
+    "verbose_printing": False,
+}
 
 
 def init(config: dict):
@@ -55,10 +59,18 @@ def init(config: dict):
 def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
     V_max = spectrum_config["v_max"]
     current_intervals = spectrum_config["current"]
+    verbose_printing = spectrum_config["verbose_printing"]
     current_interval_list = utils.interval_2_points(current_intervals)
     Results = {
         "header": "Current [mA], Voltage [V], Wavelengths [nm], Intensities [dB]"
     }
+
+    # # Send verbose_printing to instruments
+    # verbose_printing = spectrum_config["verbose_printing"]
+    # # Sets value in instrument if not specified
+    # for instru_dict in [DC_config, OSA_config]:
+    #     if not instru_dict.has_key("verbose_printing"):
+    #         instru_dict["verbose_printing"] = verbose_printing
 
     # Try to fetch the objects
     try:
@@ -111,8 +123,15 @@ def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
                     Results[loop_count]["voltage"] = volt
                     Results[loop_count]["current"] = current
                     Results[loop_count]["intensities"] = spectrum
-                    Results[loop_count]["wavelengths"] = wavelength_axis
+                    Results[loop_count]["wavelength_axis"] = wavelength_axis
                     loop_count += 1
+
+                    if verbose_printing & 1:
+                        print("volt", volt)
+                        print("current", current)
+                    elif verbose_printing & 2:
+                        print("spectrum\n", spectrum)
+                        print("wavelength_axis\n", wavelength_axis)
 
     except KeyboardInterrupt:
         print("Keyboard interrupt detected, stopping.")
