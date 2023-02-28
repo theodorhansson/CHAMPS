@@ -37,7 +37,7 @@ class INT_sphere:
         self.verbose_printing = config_dict["verbose_printing"]
 
         if self.verbose_printing & 4 + 8:
-            print("Initialzing IS6-D-UV")
+            print("__init__() in IS6-D-UV")
 
         self._OphirCOM = win32com.client.Dispatch("OphirLMMeasurement.CoLMMeasurement")
         DeviceList = self._OphirCOM.ScanUSB()
@@ -126,7 +126,7 @@ class INT_sphere:
     def get_ranges(self):
         # Return the possible ranges
         if self.verbose_printing & 8:
-            print(f"get_range() in IS6-D-UV")
+            print("get_range() in IS6-D-UV")
 
         ranges = self._OphirCOM.GetRanges(self._DeviceHandle, 0)
         return ranges
@@ -135,7 +135,7 @@ class INT_sphere:
         # Returns possible ranges
         # ((current index),('940', '300',...))
         if self.verbose_printing & 8:
-            print(f"get_wavelengths() in IS6-D-UV")
+            print("get_wavelengths() in IS6-D-UV")
 
         wavelengths = self._OphirCOM.GetWavelengths(self._DeviceHandle, 0)
         return wavelengths
@@ -178,14 +178,14 @@ class INT_sphere:
     def get_device_list(self):
         # Get list of connected devices
         if self.verbose_printing & 8:
-            print(f"get_device_list() in IS6-D-UV")
+            print("get_device_list() in IS6-D-UV")
 
         return self._OphirCOM.ScanUSB()
 
     def get_device_handle(self):
         # Get name of current device_handle
         if self.verbose_printing & 8:
-            print(f"get_device_handle() in IS6-D-UV")
+            print("get_device_handle() in IS6-D-UV")
 
         return self._DeviceHandle
 
