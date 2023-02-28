@@ -20,7 +20,7 @@ def main(config_path):
 
     # Extract results from dict and put in list
     resultarray = []
-    keys = result_dict.keys()
+    keys = list(result_dict.keys())
     no_of_points = len(result_dict[keys[0]])  # How many rows there are
 
     for i in range(no_of_points):
@@ -37,8 +37,10 @@ def main(config_path):
     result_headers = []
     for key in keys:
         data = result_dict[key][0]
+
+        length = ""
         if type(data) is list:
-            length = f"( {len(data)})"
+            length = f"({len(data)})"
 
         result_headers.append(key + f"({length})")
 
