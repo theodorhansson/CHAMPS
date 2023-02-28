@@ -35,8 +35,8 @@ class INT_sphere:
         try:
             Device = DeviceList[0]
         except:
-            print("You don't seem to have an Integrating Sphere connected")
-            raise Exception
+            # print("You don't seem to have an Integrating Sphere connected")
+            raise ConnectionError("Integrating Sphere connection failed.")
         self._DeviceHandle = self._OphirCOM.OpenUSBDevice(Device)
         self._min_time = config_dict["min_measure_time"]
 
@@ -75,7 +75,7 @@ class INT_sphere:
             return power
         else:
             # print("Not connected/initialized")
-            print("Get_power_none", data)
+            # print("Get_power_none", data)
             return None  # TODO Decide what value should be here
 
     def set_range(self, newRange: int):
@@ -114,12 +114,13 @@ class INT_sphere:
             # Wait for instrument to start
             for _ in range(10):
                 data = self.get_power()
-                print(data)
+                # print(data)
                 if data != None:
                     break
                 else:
                     # Wait for start
                     time.sleep(0.4)
+            print("ophir IS6-D-UV enabled")
         else:
             self._OphirCOM.StopStream(self._DeviceHandle, 0)
 

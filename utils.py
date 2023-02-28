@@ -51,7 +51,7 @@ def optional_arguments_merge(config: dict = dict(), optional_default=dict()):
 def interval_2_points(specification: list[list]) -> list:
     # Takes in list [[A, x, B],[C, y, D]] and returns a list of points.
     # Output: [[A, A+x, ..., B], [C, C+y, ..., D]]
-    # Also accepts single value
+    # Also accepts single value and appends it to the list
 
     if type(specification) == float or type(specification) == int:
         # Handles case where specification is number
