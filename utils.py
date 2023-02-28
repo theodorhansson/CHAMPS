@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 import warnings
+import math
 
 
 def argument_checker(
@@ -163,6 +164,48 @@ def create_save_list(result_dict: dict) -> tuple[list[list], str]:
     header_string = " ".join(result_headers)
 
     return result_matrix, header_string
+
+
+def closest_matcher(
+    data: float,
+    accepted_vals: list,
+    round_type: str = "up",
+    msg: str = "",
+):
+    # Function checks if value is accepted, and tries to round it if possible
+
+    if msg:
+        # Set message if not empty
+        msg = " in " + msg
+
+    max_val = max(accepted_vals)
+    if data > max_val:
+        # If data bigger than all accepted
+        print(f"Warning: {data} larger than accepted{msg}, using {max_val} instead.")
+        return max_val
+
+    elif data not in accepted_vals:
+        # If not in list, round up to closest value in list
+
+        match round_type.lower():
+            case "up":
+                custom_key = lambda x: math.inf if x - data < 0 else x - data
+            case "down":
+                custom_key = lambda x: math.inf if x - data > 0 else data - x
+            case "regularly":
+                custom_key = lambda x: x - data
+            case _:
+                raise Exception(
+                    f"closest_matcher unknown round_type {round_type}{msg} detected."
+                )
+        data_old = data
+        data = min(accepted_vals, key=custom_key)
+        print(
+            f"Warning: {data_old} not accepted{msg}, rounding {round_type} to {data}."
+        )
+        return data
+    else:
+        return data
 
 
 class AnimatedPlot:
