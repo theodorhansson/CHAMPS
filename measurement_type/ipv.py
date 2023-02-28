@@ -41,7 +41,6 @@ def init(config: dict):
 
 def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
     # The main IPV function
-
     V_max = IPV_config["v_max"]
     plot_update_interval = IPV_config["plot_interval"]
     rollover_threshold = IPV_config["rollover_threshold"]
@@ -49,13 +48,20 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
     intervals = IPV_config["current"]
     interval_list = utils.interval_2_points(intervals)
 
+    # Create result dict
+    Results = {
+        "header": "Current[mA], Optical Power [mW], Voltage [V]",
+        "voltage": [],
+        "current": [],
+        "power": [],
+    }
+
     Plot = utils.AnimatedPlot("Current[mA]", "Optical Power [mW]", "IPV")
     Instrument_COM = communication.Communication()
 
     # Gets isntruments
     P_unit_obj = Instrument_COM.get_PowerUnit(P_config)
     DC_unit_obj = Instrument_COM.get_DCsupply(DC_config)
-    Results = {"voltage": [], "current": [], "power": []}
 
     with P_unit_obj(P_config) as P_unit, DC_unit_obj(DC_config) as DC_unit:
         try:
@@ -64,10 +70,9 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
             DC_unit.set_voltage_limit(V_max)
             DC_unit.set_output(True)
 
-            # The main measurement loop
-
             prev_end_current = 0
 
+            # The main measurement loop
             for interval in interval_list:
                 # Code to ramp current between intervals
                 power_max = 0
@@ -75,7 +80,7 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
                 utils.ramp_current(DC_unit, prev_end_current, start_current)
                 prev_end_current = interval[-1]
 
-                for count, set_current in enumerate(interval):
+                for loop_count, set_current in enumerate(interval):
                     DC_unit.set_current(set_current)
 
                     volt, current = DC_unit.get_voltage_and_current()
@@ -84,12 +89,15 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
                     Results["voltage"].append(volt)
                     Results["current"].append(current)
                     Results["power"].append(power)
+
                     Plot.add_point(current, power)
                     print("IPV data", volt, current, power)
 
-                    # Code to handle rollover functionality
-                    if count % plot_update_interval == 0:  # approx 0.5s per measurement
+                    # Only plot sometimes
+                    if loop_count % plot_update_interval == 0:
+                        # approx 0.5s per measurement
                         Plot.update()
+                    # Code to handle rollover functionality
                     if power > rollover_min:
                         power_max = max(power, power_max)
                     if power < (rollover_threshold * power_max) and rollover_threshold:

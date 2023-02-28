@@ -4,6 +4,7 @@ import numpy as np
 import time
 import tomli_w
 import utils
+import json
 
 default_conf_path = "config.toml"
 
@@ -20,9 +21,6 @@ def main(config_path):
     # Begin the measurement!
     result_dict, used_config = measurement_init(config_lower)
 
-    # Extract results from dict and put in list(of lists)
-    result_matrix, header_string = utils.create_save_list(result_dict)
-
     # Logic on where to save file
     save_folder = config_lower["measurement"]["save_folder"]
     if save_folder[-1:] != "/":
@@ -31,8 +29,9 @@ def main(config_path):
     timestamp = time.strftime(rf"%Y%m%d-%H%M%S")  # get the current time in nice format
     save_file = save_folder + meas_name + "-" + timestamp
 
-    # Save the data
-    np.savetxt(save_file + ".txt", result_matrix, header=header_string)
+    # Save the data as json
+    with open(save_file + ".json", "w") as export_file:
+        json.dump(result_dict, export_file)
 
     # Save the config
     with open(save_file + ".toml", "wb") as f:

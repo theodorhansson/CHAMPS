@@ -55,7 +55,7 @@ def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
     V_max = spectrum_config["v_max"]
     current_intervals = spectrum_config["current"]
     current_interval_list = utils.interval_2_points(current_intervals)
-    Results = {"voltage": [], "current": [], "intensities": [], "wavelengths": []}
+    Results = {"header": "UNIT-info?"}
 
     # Try to fetch the objects
     try:
@@ -84,6 +84,7 @@ def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
             OSA_unit.set_sample_points(spectrum_config["sample_points"])
 
             prev_end_current = 0  # For first ramp up
+            loop_count = 0  # The number of
 
             for interval in current_interval_list:
                 # Ramp current between intervals
@@ -102,10 +103,13 @@ def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
                     spectrum = OSA_unit.get_intensity_data_A_dBm()  # TODO: units? Type?
                     wavelength_axis = OSA_unit.get_wavelength_axis()
 
-                    Results["voltage"].append(volt)
-                    Results["current"].append(current)
-                    Results["intensities"].append(spectrum)
-                    Results["wavelengths"].append(wavelength_axis)
+                    # Save the data in a dict
+                    Results[loop_count] = dict()
+                    Results[loop_count]["voltage"] = volt
+                    Results[loop_count]["current"] = current
+                    Results[loop_count]["intensities"] = spectrum
+                    Results[loop_count]["wavelengths"] = wavelength_axis
+                    loop_count += 1
 
     except KeyboardInterrupt:
         print("Keyboard interrupt detected, stopping.")
