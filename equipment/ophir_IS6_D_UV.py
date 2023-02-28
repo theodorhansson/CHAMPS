@@ -34,28 +34,14 @@ class INT_sphere:
             config_dict, _required_arguments, _optional_arguments, source_func="sphere"
         )
         config_dict = utils.optional_arguments_merge(config_dict, _optional_arguments)
+
+        self._min_time = config_dict["min_measure_time"]
+        self.range = config_dict["range"]
+        self.wavelength = config_dict["wavelength"]
         self.verbose_printing = config_dict["verbose_printing"]
 
         if self.verbose_printing & 4 + 8:
             print("__init__() in IS6-D-UV")
-
-        self._OphirCOM = win32com.client.Dispatch("OphirLMMeasurement.CoLMMeasurement")
-        DeviceList = self._OphirCOM.ScanUSB()
-        try:
-            Device = DeviceList[0]
-        except:
-            # print("You don't seem to have an Integrating Sphere connected")
-            raise ConnectionError("Integrating Sphere connection failed.")
-        self._DeviceHandle = self._OphirCOM.OpenUSBDevice(Device)
-        self._min_time = config_dict["min_measure_time"]
-
-        # Set the default range
-        default_range = config_dict["range"]
-        self.set_range(default_range)
-
-        # Set sensivitve wavelength
-        wavelength = config_dict["wavelength"]
-        self.set_wavelength(wavelength)
 
     def __enter__(self):
         if self.verbose_printing & 8:
@@ -72,10 +58,23 @@ class INT_sphere:
         self.close()
 
     def open(self):
-        # Start output stream
         if self.verbose_printing & 8:
             print("open() in IS6-D-UV")
 
+        self._OphirCOM = win32com.client.Dispatch("OphirLMMeasurement.CoLMMeasurement")
+        DeviceList = self._OphirCOM.ScanUSB()
+        try:
+            Device = DeviceList[0]
+        except:
+            # print("You don't seem to have an Integrating Sphere connected")
+            raise ConnectionError("Integrating Sphere connection failed.")
+        self._DeviceHandle = self._OphirCOM.OpenUSBDevice(Device)
+
+        # Set the default range
+        self.set_range(self.range)
+        # Set sensivitve wavelength
+        self.set_wavelength(self.wavelength)
+        # Start output stream
         self.set_output(True)
 
     def close(self):
