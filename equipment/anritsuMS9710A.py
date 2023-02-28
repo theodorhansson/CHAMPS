@@ -109,8 +109,7 @@ class SpectrumAnalyzer:
 
     def set_sample_points(self, n_points: int):
         # # Sets the sampling point for measurement. ****: 11 to 20001 (1 step), 0(auto)
-        # 51, 101, 251, 501, 1001, 2001, 5001
-
+        # 251, 501, 1001, 2001, 5001
         GPIB_write = "MPT " + str(n_points)
         self.instrument.write(GPIB_write)
 

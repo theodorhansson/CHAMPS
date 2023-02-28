@@ -1,5 +1,4 @@
 from equipment import *
-import pyvisa
 import utils
 
 _required_arguments = ["type"]
@@ -60,11 +59,9 @@ class Communication:
 
         match OSA_type:
             case "ando_osa":
-                resource_manager = self.pyvisa_resource_util()
                 return andoAQ6317B.SpectrumAnalyzer
 
             case "anritsu_osa":
-                resource_manager = self.pyvisa_resource_util()
                 return anritsuMS9710A.SpectrumAnalyzer
 
             case _:
@@ -74,19 +71,6 @@ class Communication:
     def get_Beam(self):
         pass
 
-    def pyvisa_resource_util(self):
-        # Checks if self.resource_manager exists, if not create it.
-        if not hasattr(self, "resource_manager"):
-            self.resource_manager = pyvisa.ResourceManager()
-        return self.resource_manager
-
-
-def test():
-    com = Communication()
-    print(com.pyvisa_resource_util())
-    print(com.pyvisa_resource_util())
-    del com
-
 
 if __name__ == "__main__":
-    test()
+    pass

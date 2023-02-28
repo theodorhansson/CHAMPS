@@ -34,4 +34,4 @@ reference_level_dbm = -40
 display_level_scale_dbm = 10
 # Anritsu-specific:
 # Resolution: 1.0, 0.5, 0.2, 0.1, 0.07, 0.05 (nm)
-# Sample points:  51, 101, 251, 501, 1001, 2001, 5001
+# Sample points: 251, 501, 1001, 2001, 5001

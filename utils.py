@@ -12,6 +12,7 @@ def argument_checker(
     source_func="",
 ):
     # Behavior:
+    # Checks if supplied dict contains required keys
     # If extra parameter is found, warn user but continue program
     # If parameter missing, raise exception
 
@@ -111,17 +112,6 @@ def ramp_current(DC_supply, start, stop, step=10):
     for current in current_steps:
         DC_supply.set_current(current)
         time.sleep(50 * 1e-3)  # 50 ms
-
-
-def signed_bits2int(input: str, endian="big") -> int:
-    if endian == "small":  # Make big endian
-        input = input[::-1]
-
-    output = int(input[1:], 2)  # Select all normal bits and convert to int
-    no_of_bits = len(input)
-    if input[0] == "1":
-        output -= 2 ** (no_of_bits - 1)  # The signed byte represents -2**15 in 16 bits
-    return int(output)
 
 
 def dict_2_lower(indict: dict) -> dict:
