@@ -56,7 +56,9 @@ def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
     V_max = spectrum_config["v_max"]
     current_intervals = spectrum_config["current"]
     current_interval_list = utils.interval_2_points(current_intervals)
-    Results = {"header": "UNIT-info?"}
+    Results = {
+        "header": "Current [mA], Voltage [V], Wavelengths [nm], Intensities [dB]"
+    }
 
     # Try to fetch the objects
     try:
