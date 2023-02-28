@@ -126,10 +126,10 @@ def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
                     Results[loop_count]["wavelength_axis"] = wavelength_axis
                     loop_count += 1
 
-                    if verbose_printing & 1:
+                    if verbose_printing & 1 + 2:
                         print("volt", volt)
                         print("current", current)
-                    elif verbose_printing & 2:
+                    if verbose_printing & 2:
                         print("spectrum\n", spectrum)
                         print("wavelength_axis\n", wavelength_axis)
 
