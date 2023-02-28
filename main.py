@@ -18,42 +18,19 @@ def main(config_path):
     measurement_init = identify_measurement_type(meas_name)
     result_dict, used_config = measurement_init(config_lower)  # Begin the measurement!
 
-    # Extract results from dict and put in list
-    resultarray = []
-    keys = list(result_dict.keys())
-    no_of_points = len(result_dict[keys[0]])  # How many rows there are
-
-    for i in range(no_of_points):
-        row = []
-        for key in keys:
-            item = result_dict[key][i]
-
-            if type(item) is list:
-                row += item
-            else:
-                row.append(item)
-        resultarray.append(row)
-
-    result_headers = []
-    for key in keys:
-        data = result_dict[key][0]
-
-        length = ""
-        if type(data) is list:
-            length = f"({len(data)})"
-
-        result_headers.append(key + f"({length})")
+    # Extract results from dict and put in list(of lists)
+    result_matrix, header_string = utils.create_save_list(result_dict)
 
     # Logic on where to save file
     save_folder = config_lower["measurement"]["save_folder"]
     if save_folder[-1:] != "/":
         save_folder = save_folder + "/"  # make sure it ends with /
 
-    timestamp = time.strftime(rf"%Y%m%d-%H%M%S")  # get the current time
+    timestamp = time.strftime(rf"%Y%m%d-%H%M%S")  # get the current time in nice format
     save_file = save_folder + meas_name + "-" + timestamp
 
     # Save the data
-    np.savetxt(save_file + ".txt", resultarray, header=" ".join(result_headers))
+    np.savetxt(save_file + ".txt", result_matrix, header=header_string)
 
     # Save the config
     with open(save_file + ".toml", "wb") as f:

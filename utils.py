@@ -141,6 +141,36 @@ def dict_2_lower(indict: dict) -> dict:
     return out_dict
 
 
+def create_save_list(result_dict: dict) -> tuple[list[list], str]:
+    result_matrix = []
+    keys = list(result_dict.keys())
+    no_of_points = len(result_dict[keys[0]])  # How many rows there are
+
+    for i in range(no_of_points):
+        row = []
+        for key in keys:
+            item = result_dict[key][i]
+
+            if type(item) is list:
+                row += item
+            else:
+                row.append(item)
+        result_matrix.append(row)
+
+    result_headers = []
+    for key in keys:
+        data = result_dict[key][0]
+
+        length = ""
+        if type(data) is list:
+            length = f"({len(data)})"
+
+        result_headers.append(key + f"({length})")
+    header_string = " ".join(result_headers)
+
+    return result_matrix, header_string
+
+
 class AnimatedPlot:
     # Used to dynamically add datapoints
     def __init__(
