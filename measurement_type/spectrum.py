@@ -57,8 +57,7 @@ def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
     current_interval_list = utils.interval_2_points(current_intervals)
     Results = {"voltage": [], "current": [], "intensities": [], "wavelengths": []}
 
-    # plot = AnimatedPlot("Current[A]", "Optical Power [W]", "IPV") TODO: keep?
-
+    # Try to fetch the objects
     try:
         Instrument_COM = communication.Communication()
         OSA_unit_obj = Instrument_COM.get_OSA(OSA_config)
@@ -71,10 +70,12 @@ def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
     try:
         with OSA_unit_obj(OSA_config) as OSA_unit, DC_unit_obj(DC_config) as DC_unit:
 
+            # Some initial settings for DC_unit
             DC_unit.set_current(0.0)
             DC_unit.set_voltage_limit(V_max)
             DC_unit.set_output(True)
 
+            # Some initial settings for OSA_unit
             OSA_unit.set_center_wavelength_nm(spectrum_config["center_wavelength"])
             OSA_unit.set_wavelength_span_nm(spectrum_config["wavelength_span"])
             OSA_unit.set_sensitivity(spectrum_config["sensitivity"])
@@ -82,18 +83,21 @@ def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
             OSA_unit.set_avg_factor(spectrum_config["avg_factor"])
             OSA_unit.set_sample_points(spectrum_config["sample_points"])
 
-            prev_end_current = 0
+            prev_end_current = 0  # For first ramp up
 
             for interval in current_interval_list:
+                # Ramp current between intervals
                 start_current = interval[0]
                 utils.ramp_current(DC_unit, prev_end_current, start_current)
                 prev_end_current = interval[-1]
 
                 for set_current in interval:
+                    # Set bias current
                     DC_unit.set_current(set_current)
-
                     volt = DC_unit.get_voltage()
                     current = DC_unit.get_current()
+
+                    # Start OSA and get data
                     OSA_unit.do_single_scan()
                     spectrum = OSA_unit.get_intensity_data_A_dBm()  # TODO: units? Type?
                     wavelength_axis = OSA_unit.get_wavelength_axis()
@@ -102,14 +106,10 @@ def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
                     Results["current"].append(current)
                     Results["intensities"].append(spectrum)
                     Results["wavelengths"].append(wavelength_axis)
-                    # plot.add_point(current, power)
-                    # print("IPV data", volt, current, power)
+
     except KeyboardInterrupt:
         print("Keyboard interrupt detected, stopping.")
     except:
         traceback.print_exc()
-
-    # print("Spectrum measurements done. Keeping plot alive for your convenience.")
-    # plot.keep_open()
 
     return Results

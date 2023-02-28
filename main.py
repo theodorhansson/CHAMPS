@@ -15,8 +15,10 @@ def main(config_path):
     config_lower = utils.dict_2_lower(config)  # sanitize the config dict
     meas_name = config_lower["measurement"]["type"]
 
+    # Get the measurement object
     measurement_init = identify_measurement_type(meas_name)
-    result_dict, used_config = measurement_init(config_lower)  # Begin the measurement!
+    # Begin the measurement!
+    result_dict, used_config = measurement_init(config_lower)
 
     # Extract results from dict and put in list(of lists)
     result_matrix, header_string = utils.create_save_list(result_dict)

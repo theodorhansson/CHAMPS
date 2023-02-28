@@ -179,13 +179,13 @@ def closest_matcher(
         msg = " in " + msg
 
     max_val = max(accepted_vals)
+    # If data bigger than all accepted
     if data > max_val:
-        # If data bigger than all accepted
         print(f"Warning: {data} larger than accepted{msg}, using {max_val} instead.")
         return max_val
 
+    # If not in list, round up to closest value in list
     elif data not in accepted_vals:
-        # If not in list, round up to closest value in list
 
         match round_type.lower():
             case "up":
@@ -204,6 +204,7 @@ def closest_matcher(
             f"Warning: {data_old} not accepted{msg}, rounding {round_type} to {data}."
         )
         return data
+    # Return the same if nothing changed
     else:
         return data
 
