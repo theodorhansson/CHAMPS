@@ -9,6 +9,7 @@ _OSA_name_key = "osa_unit"
 _required_arguments = [
     "type",
     "dc_unit",
+    "osa_unit",
     "current",
     "v_max",
     "save_folder",
