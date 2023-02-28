@@ -146,6 +146,10 @@ def create_save_list(result_dict: dict) -> tuple[list[list], str]:
     keys = list(result_dict.keys())
     no_of_points = len(result_dict[keys[0]])  # How many rows there are
 
+    if no_of_points == 0:
+        print("No data to save. Probably Ctrl+C too early.")
+        return [], ""  # Probably bad error behavior
+
     for i in range(no_of_points):
         row = []
         for key in keys:
@@ -163,9 +167,9 @@ def create_save_list(result_dict: dict) -> tuple[list[list], str]:
 
         length = ""
         if type(data) is list:
-            length = f"({len(data)})"
+            length = "(" + str(len(data)) + ")"
 
-        result_headers.append(key + f"({length})")
+        result_headers.append(key + length)
     header_string = " ".join(result_headers)
 
     return result_matrix, header_string
