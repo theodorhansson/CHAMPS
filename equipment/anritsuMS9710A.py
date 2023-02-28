@@ -9,8 +9,6 @@ _optional_arguments = {"reference_level_dbm": -40, "display_level_scale_dbm": 10
 # Many comments in methods from "MS9710B Optical Spectrum Analyzer Remote Control Operation Manual", ANRITSU 2007
 ### Read manual page 139, 261 for commands ###
 
-# TODO: Better typecheck?
-
 
 class SpectrumAnalyzer:
     def __init__(self, config_dict: dict, resource_manager: object = None):
