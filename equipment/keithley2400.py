@@ -21,7 +21,7 @@ class keithley2400:
         return self
 
     def __exit__(self, exception_type, exception_value, exception_traceback):
-        utils.ramp_current(self.DC_unit, self.DC_unit.get_current(), 0)
+        utils.ramp_current(self, self.get_current(), 0)
         self.set_current(0)
 
         self.set_output(False)
