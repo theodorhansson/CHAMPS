@@ -179,8 +179,15 @@ def closest_matcher(
         msg = " in " + msg
 
     max_val = max(accepted_vals)
+
+    # If exact mode enabled, rasie exception if not in set
+    if round_type.lower() == "exact" and data not in accepted_vals:
+        raise Exception(
+            f"{data} not a valid value{msg}. Please pick among {accepted_vals}."
+        )
+
     # If data bigger than all accepted
-    if data > max_val:
+    elif data > max_val:
         print(f"Warning: {data} larger than accepted{msg}, using {max_val} instead.")
         return max_val
 
@@ -204,6 +211,7 @@ def closest_matcher(
             f"Warning: {data_old} not accepted{msg}, rounding {round_type} to {data}."
         )
         return data
+
     # Return the same if nothing changed
     else:
         return data

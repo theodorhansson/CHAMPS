@@ -80,6 +80,11 @@ class INT_sphere:
 
     def set_range(self, newRange: int):
         # Set the measurement-range for the sphere
+        accepted_ranges = [0, 1, 2, 3, 4, 5, 6, 7]
+        newRange = utils.closest_matcher(
+            newRange, accepted_ranges, round_type="exact", msg="IS6-D-UV ranges"
+        )
+
         self._OphirCOM.SetRange(self._DeviceHandle, 0, int(newRange))
 
     def get_ranges(self):
@@ -94,6 +99,12 @@ class INT_sphere:
         return wavelengths
 
     def set_wavelength(self, newWavelength: int):
+        # Set the wavelength calibration
+        accepted_wl = [0, 1, 2, 3, 4, 5]
+        newWavelength = utils.closest_matcher(
+            newWavelength, accepted_wl, round_type="exact", msg="IS6-D-UV wavelength"
+        )
+
         self._OphirCOM.SetWavelength(self._DeviceHandle, 0, int(newWavelength))
 
     def set_output(self, state: bool):
