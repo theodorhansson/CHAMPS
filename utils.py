@@ -12,6 +12,7 @@ def argument_checker(
     source_func="",
 ):
     # Behavior:
+    # Checks if supplied dict contains required keys
     # If extra parameter is found, warn user but continue program
     # If parameter missing, raise exception
 
