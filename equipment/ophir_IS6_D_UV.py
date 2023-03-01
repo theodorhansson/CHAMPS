@@ -110,17 +110,17 @@ class INT_sphere:
             # print("Get_power_none", data)
             return None  # TODO Decide what value should be here
 
-    def set_range(self, newRange: int):
+    def set_range(self, new_range: int):
         # Set the measurement-range for the sphere
         if self.verbose_printing & 8:
-            print(f"set_range() in IS6-D-UV: setting to {newRange}")
+            print(f"set_range() in IS6-D-UV: setting to {new_range}")
 
         accepted_ranges = [0, 1, 2, 3, 4, 5, 6, 7]
-        newRange = utils.closest_matcher(
-            newRange, accepted_ranges, round_type="exact", msg="IS6-D-UV ranges"
+        new_range = utils.closest_matcher(
+            new_range, accepted_ranges, round_type="exact", msg="IS6-D-UV ranges"
         )
 
-        self._OphirCOM.SetRange(self._DeviceHandle, 0, int(newRange))
+        self._OphirCOM.SetRange(self._DeviceHandle, 0, int(new_range))
 
     def get_ranges(self):
         # Return the possible ranges
@@ -139,17 +139,17 @@ class INT_sphere:
         wavelengths = self._OphirCOM.GetWavelengths(self._DeviceHandle, 0)
         return wavelengths
 
-    def set_wavelength(self, newWavelength: int):
+    def set_wavelength(self, new_wave_length: int):
         # Set the wavelength calibration
         if self.verbose_printing & 8:
-            print(f"set_wavelength() in IS6-D-UV: setting to {newWavelength}")
+            print(f"set_wavelength() in IS6-D-UV: setting to {new_wave_length}")
 
         accepted_wl = [0, 1, 2, 3, 4, 5]
-        newWavelength = utils.closest_matcher(
-            newWavelength, accepted_wl, round_type="exact", msg="IS6-D-UV wavelength"
+        new_wave_length = utils.closest_matcher(
+            new_wave_length, accepted_wl, round_type="exact", msg="IS6-D-UV wavelength"
         )
 
-        self._OphirCOM.SetWavelength(self._DeviceHandle, 0, int(newWavelength))
+        self._OphirCOM.SetWavelength(self._DeviceHandle, 0, int(new_wave_length))
 
     def set_output(self, state: bool):
         # Toggles reading from sphere
