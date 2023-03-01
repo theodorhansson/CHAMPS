@@ -21,7 +21,7 @@ _required_arguments = [
 _optional_arguments = {
     "avg_factor": 5,
     "sensitivity": "SHI1",
-    "verbose_printing": False,
+    "verbose_printing": 0,
 }
 
 

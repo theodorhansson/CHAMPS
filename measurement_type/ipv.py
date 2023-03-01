@@ -17,7 +17,7 @@ _optional_arguments = {
     "rollover_threshold": 0,
     "rollover_min": 0,
     "plot_interval": 20,
-    "verbose_printing": False,
+    "verbose_printing": 0,
 }
 
 

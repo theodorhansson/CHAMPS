@@ -2,7 +2,7 @@ import pyvisa
 import utils
 
 _required_arguments = ["gpib_address", "type"]
-_optional_arguments = {"verbose_printing": False}
+_optional_arguments = {"verbose_printing": 0}
 
 
 class keithley2400:

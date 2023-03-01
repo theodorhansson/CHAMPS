@@ -6,7 +6,7 @@ _required_arguments = ["gpib_address", "type"]
 _optional_arguments = {
     "reference_level_dbm": -40,
     "display_level_scale_dbm": 10,
-    "verbose_printing": False,
+    "verbose_printing": 0,
 }
 
 # Many comments in methods from "AQ6317B OPTICAL SPECTRUM ANALYZER INSTRUCTION MANUAL", ANDO ELECTRIC 2000

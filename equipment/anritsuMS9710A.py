@@ -7,7 +7,7 @@ _required_arguments = ["gpib_address", "type"]
 _optional_arguments = {
     "reference_level_dbm": -40,
     "display_level_scale_dbm": 10,
-    "verbose_printing": False,
+    "verbose_printing": 0,
 }
 
 # Many comments in methods from "MS9710B Optical Spectrum Analyzer Remote Control Operation Manual", ANRITSU 2007

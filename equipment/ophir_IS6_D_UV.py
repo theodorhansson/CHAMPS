@@ -25,7 +25,7 @@ import utils
 
 
 _required_arguments = ["range", "min_measure_time", "wavelength", "type"]
-_optional_arguments = {"verbose_printing": False}
+_optional_arguments = {"verbose_printing": 0}
 
 
 class INT_sphere:

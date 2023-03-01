@@ -2,7 +2,7 @@ import serial
 import utils
 
 _required_arguments = ["port", "type"]
-_optional_arguments = {"verbose_printing": False}
+_optional_arguments = {"verbose_printing": 0}
 
 
 class powercube:
