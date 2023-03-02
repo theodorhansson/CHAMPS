@@ -111,9 +111,9 @@ class keithley2400:
         # Toggle kethley output on/off
         if self.verbose & 4 + 8:
             if state:
-                print("set_output() in IS6-D-UV: Enabling")
+                print("set_output() in keithley2400: Enabling")
             else:
-                print("set_output() in IS6-D-UV: Disabling")
+                print("set_output() in keithley2400: Disabling")
 
         self.instrument.write(":OUTPUT " + str(int(state)))
 
