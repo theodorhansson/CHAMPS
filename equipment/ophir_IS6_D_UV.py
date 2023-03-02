@@ -38,28 +38,25 @@ class INT_sphere:
         self._min_time = config_dict["min_measure_time"]
         self.range = config_dict["range"]
         self.wavelength = config_dict["wavelength"]
-        self.verbose_printing = config_dict["verbose_printing"]
+        self.verbose = config_dict["verbose_printing"]
 
-        if self.verbose_printing & 4 + 8:
-            print("__init__() in IS6-D-UV")
+        print("__init__() in IS6-D-UV") if self.verbose & 4 + 8 else None
 
     def __enter__(self):
-        if self.verbose_printing & 8:
-            print("__enter__() in IS6-D-UV")
-        self.open()
+        print("__enter__() in IS6-D-UV") if self.verbose & 8 else None
 
+        self.open()
         return self
 
     def __exit__(self, exception_type, exception_value, exception_traceback):
-        if self.verbose_printing & 8:
+        if self.verbose & 8:
             print("__exit__() in IS6-D-UV")
             print(f"{exception_type=}, {exception_value=}, {exception_traceback=}")
 
         self.close()
 
     def open(self):
-        if self.verbose_printing & 8:
-            print("open() in IS6-D-UV")
+        print("open() in IS6-D-UV") if self.verbose & 8 else None
 
         self._OphirCOM = win32com.client.Dispatch("OphirLMMeasurement.CoLMMeasurement")
         DeviceList = self._OphirCOM.ScanUSB()
@@ -79,23 +76,21 @@ class INT_sphere:
 
     def close(self):
         # Stops and disconnects all OphirCOM
-        if self.verbose_printing & 8:
-            print("close() in IS6-D-UV")
+        print("close() in IS6-D-UV") if self.verbose & 8 else None
 
         self._OphirCOM.StopAllStreams()
         self._OphirCOM.CloseAll()
 
     def set_min_time(self, min_time: float):
         # If you want to change min_time later
-        if self.verbose_printing & 8:
+        if self.verbose & 8:
             print(f"set_min_time() in sphere: setting to {min_time}")
 
         self._min_time = min_time
 
     def get_power(self):
         # Get reading from int. sphere
-        if self.verbose_printing & 8:
-            print("get_power() in IS6-D-UV")
+        print("get_power() in IS6-D-UV") if self.verbose & 8 else None
 
         time.sleep(self._min_time)
         data = self._OphirCOM.GetData(self._DeviceHandle, 0)
@@ -112,7 +107,7 @@ class INT_sphere:
 
     def set_range(self, new_range: int):
         # Set the measurement-range for the sphere
-        if self.verbose_printing & 8:
+        if self.verbose & 8:
             print(f"set_range() in IS6-D-UV: setting to {new_range}")
 
         accepted_ranges = [0, 1, 2, 3, 4, 5, 6, 7]
@@ -124,8 +119,7 @@ class INT_sphere:
 
     def get_ranges(self):
         # Return the possible ranges
-        if self.verbose_printing & 8:
-            print("get_range() in IS6-D-UV")
+        print("get_range() in IS6-D-UV") if self.verbose & 8 else None
 
         ranges = self._OphirCOM.GetRanges(self._DeviceHandle, 0)
         return ranges
@@ -133,15 +127,14 @@ class INT_sphere:
     def get_wavelengths(self):
         # Returns possible ranges
         # ((current index),('940', '300',...))
-        if self.verbose_printing & 8:
-            print("get_wavelengths() in IS6-D-UV")
+        print("get_wavelengths() in IS6-D-UV") if self.verbose & 8 else None
 
         wavelengths = self._OphirCOM.GetWavelengths(self._DeviceHandle, 0)
         return wavelengths
 
     def set_wavelength(self, new_wave_length: int):
         # Set the wavelength calibration
-        if self.verbose_printing & 8:
+        if self.verbose & 8:
             print(f"set_wavelength() in IS6-D-UV: setting to {new_wave_length}")
 
         accepted_wl = [0, 1, 2, 3, 4, 5]
@@ -154,7 +147,7 @@ class INT_sphere:
     def set_output(self, state: bool):
         # Toggles reading from sphere
 
-        if self.verbose_printing & 4 + 8:
+        if self.verbose & 4 + 8:
             if state:
                 print("set_output() in IS6-D-UV: Enabling")
             else:
@@ -176,15 +169,13 @@ class INT_sphere:
 
     def get_device_list(self):
         # Get list of connected devices
-        if self.verbose_printing & 8:
-            print("get_device_list() in IS6-D-UV")
+        print("get_device_list() in IS6-D-UV") if self.verbose & 8 else None
 
         return self._OphirCOM.ScanUSB()
 
     def get_device_handle(self):
         # Get name of current device_handle
-        if self.verbose_printing & 8:
-            print("get_device_handle() in IS6-D-UV")
+        print("get_device_handle() in IS6-D-UV") if self.verbose & 8 else None
 
         return self._DeviceHandle
 
