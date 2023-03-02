@@ -71,10 +71,11 @@ class keithley2400:
         self.instrument.close()
 
     def get_voltage(self) -> float:
-        print("get_voltage() in keithley2400") if self.verbose & 8 else None
-
         ans = self.instrument.query(":READ?")
         ans = ans.split(",")[0]  # First item is voltage
+
+        if self.verbose & 8:
+            print(f"get_voltage() in keithley2400: value {ans}")
         return float(ans)
 
     def set_voltage_limit(self, volts: float):
@@ -91,20 +92,22 @@ class keithley2400:
         self.instrument.write(":SOURCE:CURRENT " + str(current))
 
     def get_current(self) -> float:
-        print("get_current() in keithley2400") if self.verbose & 8 else None
-
         ans = self.instrument.query(":READ?")
         current = ans.split(",")[1]  # Second item is current
         current = float(current) * 1e3  # A to mA
+
+        if self.verbose & 8:
+            print(f"get_current() in sphere: value {current}")
         return current
 
     def get_voltage_and_current(self) -> list[float]:
-        print("get_voltage_and_current() in keithley2400") if self.verbose & 8 else None
-
         ans = self.instrument.query(":READ?")
         data = ans.split(",")[0:2]  # [volt, current, unknown, unknown]
         data = [float(x) for x in data]
         data[1] = data[1] * 1e3  # A to mA
+
+        if self.verbose & 8:
+            print(f"get_voltage_and_current() in keithley2400: values {data}")
         return data  # [volt, mA]
 
     def set_output(self, state: bool):
