@@ -4,7 +4,7 @@ The IPV routine measures Current, Optical Power and Voltage. To make it work you
 Items marked with {M} are mandatory, {O} optional.
 
 
-```toml
+```TOML
 #Std units: mA, V, mW, nm
 .[measurement]
 Type = "ipv"
