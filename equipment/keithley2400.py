@@ -20,11 +20,18 @@ class keithley2400:
         else:
             self.resource_manager = pyvisa.ResourceManager()
 
+        print("__init__() in keithley2400") if self.verbose & 4 + 8 else None
+
     def __enter__(self):
+        print("__enter__() in keithley2400") if self.verbose & 8 else None
         self.open()
         return self
 
     def __exit__(self, exception_type, exception_value, exception_traceback):
+        if self.verbose & 8:
+            print("__exit__() in keithley2400")
+            print(f"{exception_type=}, {exception_value=}, {exception_traceback=}")
+
         utils.ramp_current(self, self.get_current(), 0)
         self.set_current(0)
 
@@ -33,6 +40,8 @@ class keithley2400:
 
     def open(self):  # TODO: Rename to open_current?
         # Define where instrument is
+        print("enter() in keithley2400") if self.verbose & 8 else None
+
         conn_str = self.interface + "::" + self.address  # like GPIB0::24
 
         # # Error check
@@ -58,27 +67,40 @@ class keithley2400:
         self.instrument.write(":SENSE:VOLT:RANGE:AUTO 1")
 
     def close(self):
+        print("close() in keithley2400") if self.verbose & 8 else None
         self.instrument.close()
 
     def get_voltage(self) -> float:
+        print("get_voltage() in keithley2400") if self.verbose & 8 else None
+
         ans = self.instrument.query(":READ?")
         ans = ans.split(",")[0]  # First item is voltage
         return float(ans)
 
     def set_voltage_limit(self, volts: float):
+        if self.verbose & 8:
+            print(f"set_voltage_limit() in sphere: setting to {volts}")
+
         self.instrument.write(":SENSE:VOLTAGE:DC:PROTECTION " + str(volts))
 
     def set_current(self, current: float):
+        if self.verbose & 8:
+            print(f"set_current() in sphere: setting to {current}")
+
         current = current * 1e-3  # mA to A
         self.instrument.write(":SOURCE:CURRENT " + str(current))
 
     def get_current(self) -> float:
+        print("get_current() in keithley2400") if self.verbose & 8 else None
+
         ans = self.instrument.query(":READ?")
         current = ans.split(",")[1]  # Second item is current
         current = float(current) * 1e3  # A to mA
         return current
 
     def get_voltage_and_current(self) -> list[float]:
+        print("get_voltage_and_current() in keithley2400") if self.verbose & 8 else None
+
         ans = self.instrument.query(":READ?")
         data = ans.split(",")[0:2]  # [volt, current, unknown, unknown]
         data = [float(x) for x in data]
