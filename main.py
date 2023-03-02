@@ -10,11 +10,18 @@ default_conf_path = "config.toml"
 
 
 def main(config_path):
+    # Open the config file
     with open(config_path, "rb") as f:
         config = tomllib.load(f)
-
     config_lower = utils.dict_2_lower(config)  # sanitize the config dict
     meas_name = config_lower["measurement"]["type"]
+
+    # Code for printing
+    if config_lower["measurement"].has_key("verbose_printing"):
+        verbose = config_lower["measurement"]["verbose_printing"]
+    else:
+        verbose = 0
+    print(f"Reading config {config_path} from disk") if verbose & 16 else None
 
     # Get the measurement object
     measurement_init = identify_measurement_type(meas_name)
@@ -30,12 +37,16 @@ def main(config_path):
     save_file = save_folder + meas_name + "-" + timestamp
 
     # Save the data as json
-    with open(save_file + ".json", "w") as export_file:
+    data_save_name = save_file + ".json"
+    with open(data_save_name, "w") as export_file:
         json.dump(result_dict, export_file)
+    print(f"Saving data file {data_save_name} to disk.") if verbose & 16 else None
 
     # Save the config
-    with open(save_file + ".toml", "wb") as f:
+    config_save_name = save_file + ".toml"
+    with open(config_save_name + ".toml", "wb") as f:
         tomli_w.dump(used_config, f)
+    print(f"Saving config file {config_save_name} to disk.") if verbose & 16 else None
 
 
 def identify_measurement_type(measurement: str):
