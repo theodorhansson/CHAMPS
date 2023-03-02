@@ -67,7 +67,7 @@ def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
 
     # Send verbose_printing to instruments if not specified
     for instru_dict in [DC_config, OSA_config]:
-        if not instru_dict.has_key("verbose_printing"):
+        if "verbose_printing" not in instru_dict.keys():
             instru_dict["verbose_printing"] = verbose
 
     # Try to fetch the objects
