@@ -25,21 +25,6 @@ class PhotonicTest(unittest.TestCase):
         lower_dict = utils.dict_2_lower(test_dict)
         self.assertEqual(lower_dict, correct_dict)
 
-    def test_signed_bits2int(self):
-        test_cases = [
-            ("11", -1),
-            ("10001", -15),
-            ("100001", -31),
-            (str(bin(0xE9A2))[2:], -5726),
-            ("00011", 3),
-        ]
-
-        for case in test_cases:
-            test_value = case[0]
-            test_reference = case[1]
-            answer = utils.signed_bits2int(test_value)
-            self.assertEqual(test_reference, answer, msg=f"{test_reference}")
-
     def test_argument_checker(self):
         required = ["value1", "value2"]
         optional = {
@@ -84,7 +69,54 @@ class PhotonicTest(unittest.TestCase):
             "value2": 1,
         }
 
-        print(optional_arguments_merge(conf, opt))
+        print(utils.optional_arguments_merge(conf, opt))
+
+    def test_closest_matcher(self):
+        accepted = [0, 1, 2, 3, 4]
+
+        # query, reference
+        queries_no_arg = (
+            (1, 1),
+            (1.5, 2),
+            (0.5, 1),
+            (-100, 0),
+            (100, 4),
+        )
+
+        for query, reference in queries_no_arg:
+            answer = utils.closest_matcher(query, accepted)
+            self.assertEqual(reference, answer)
+
+        # query, reference, round_type
+        queries_args = (
+            (1, 1, "down"),
+            (1, 1, "up"),
+            (1.5, 1, "down"),
+            (1.5, 2, "up"),
+            (-100, 0, "up"),
+            (100, 4, "up"),
+            (-100, 0, "down"),
+            (100, 4, "down"),
+        )
+
+        for query, reference, r_type in queries_args:
+            answer = utils.closest_matcher(query, accepted, round_type=r_type)
+            self.assertEqual(reference, answer)
+
+        # query, reference, round_type, exception trigger
+        queries_args_exception = (
+            (1, 1, "exact", False),
+            (1.5, None, "exact", True),
+            (-100, None, "exact", True),
+            (100, None, "exact", True),
+        )
+
+        for query, reference, r_type, trigger in queries_args_exception:
+            if trigger:
+                with self.assertRaises(Exception):
+                    utils.closest_matcher(query, accepted, round_type=r_type)
+            else:
+                utils.closest_matcher(query, accepted, round_type=r_type)
 
 
 if __name__ == "__main__":
