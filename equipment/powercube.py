@@ -14,7 +14,7 @@ class powercube:
             source_func="powercube",
         )
         config_dict = utils.optional_arguments_merge(config_dict, _optional_arguments)
-        self.verbose_printing = config_dict["verbose_printing"]
+        self.verbose = config_dict["verbose_printing"]
 
         self.port = str(config_dict["port"])
         print(

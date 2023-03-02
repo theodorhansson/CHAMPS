@@ -51,7 +51,7 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
     rollover_threshold = IPV_config["rollover_threshold"]
     rollover_min = IPV_config["rollover_min"]
     intervals = IPV_config["current"]
-    verbose_printing = IPV_config["verbose_printing"]
+    verbose = IPV_config["verbose_printing"]
     interval_list = utils.interval_2_points(intervals)
 
     # Create result dict
@@ -65,7 +65,7 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
     # Send verbose_printing to instruments if not specified
     for instru_dict in [DC_config, P_config]:
         if not instru_dict.has_key("verbose_printing"):
-            instru_dict["verbose_printing"] = verbose_printing
+            instru_dict["verbose_printing"] = verbose
 
     Plot = utils.AnimatedPlot("Current[mA]", "Optical Power [mW]", "IPV")
     Instrument_COM = communication.Communication()
@@ -103,7 +103,7 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
 
                     Plot.add_point(current, power)
 
-                    if verbose_printing & 1:
+                    if verbose & 1:
                         print("IPV data", volt, current, power)
 
                     # Only plot sometimes

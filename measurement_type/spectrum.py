@@ -59,7 +59,7 @@ def init(config: dict):
 def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
     V_max = spectrum_config["v_max"]
     current_intervals = spectrum_config["current"]
-    verbose_printing = spectrum_config["verbose_printing"]
+    verbose = spectrum_config["verbose_printing"]
     current_interval_list = utils.interval_2_points(current_intervals)
     Results = {
         "header": "Current [mA], Voltage [V], Wavelengths [nm], Intensities [dB]"
@@ -68,7 +68,7 @@ def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
     # Send verbose_printing to instruments if not specified
     for instru_dict in [DC_config, OSA_config]:
         if not instru_dict.has_key("verbose_printing"):
-            instru_dict["verbose_printing"] = verbose_printing
+            instru_dict["verbose_printing"] = verbose
 
     # Try to fetch the objects
     try:
@@ -124,10 +124,10 @@ def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
                     Results[loop_count]["wavelength_axis"] = wavelength_axis
                     loop_count += 1
 
-                    if verbose_printing & 1 + 2:
+                    if verbose & 1 + 2:
                         print("volt", volt)
                         print("current", current)
-                    if verbose_printing & 2:
+                    if verbose & 2:
                         print("spectrum\n", spectrum)
                         print("wavelength_axis\n", wavelength_axis)
 

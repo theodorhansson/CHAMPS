@@ -12,7 +12,7 @@ class keithley2400:
 
         self.address = str(config_dict["gpib_address"])
         self.interface = "GPIB0"
-        self.verbose_printing = config_dict["verbose_printing"]
+        self.verbose = config_dict["verbose_printing"]
 
         # Use parent resource manager if exists
         if resource_manager != None:
@@ -86,9 +86,12 @@ class keithley2400:
         return data  # [volt, mA]
 
     def set_output(self, state: bool):
-
-        if self.verbose_printing >= 1:
-            print("")
+        # Toggle kethley output on/off
+        if self.verbose & 4 + 8:
+            if state:
+                print("set_output() in IS6-D-UV: Enabling")
+            else:
+                print("set_output() in IS6-D-UV: Disabling")
 
         self.instrument.write(":OUTPUT " + str(int(state)))
 

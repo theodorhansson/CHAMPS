@@ -26,7 +26,7 @@ class SpectrumAnalyzer:
         self.conn_str = self.interface_ID + "::" + self.address
         self.reference_level_dBm = config_dict["reference_level_dbm"]
         self.display_level_scale_dBm = config_dict["display_level_scale_dbm"]
-        self.verbose_printing = config_dict["verbose_printing"]
+        self.verbose = config_dict["verbose_printing"]
 
         # Use parent resource manager if exists
         if resource_manager != None:
