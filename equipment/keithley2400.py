@@ -35,14 +35,14 @@ class keithley2400:
         # Define where instrument is
         conn_str = self.interface + "::" + self.address  # like GPIB0::24
 
-        # Error check
-        connected_devices = self.resource_manager.list_resources()
-        connected_devices = [device.lower() for device in connected_devices]
-        if conn_str.lower() + "::instr" not in connected_devices:
-            print(f"List of connected GPIB devices: {connected_devices}")
-            raise ConnectionError(
-                f"Keitley2400 connection failed using address {conn_str}."
-            )
+        # # Error check
+        # connected_devices = self.resource_manager.list_resources()
+        # connected_devices = [device.lower() for device in connected_devices]
+        # if conn_str.lower() + "::instr" not in connected_devices:
+        #     print(f"List of connected GPIB devices: {connected_devices}")
+        #     raise ConnectionError(
+        #         f"Keitley2400 connection failed using address {conn_str}."
+        #     )
 
         # Open and create instrument class
         self.instrument = self.resource_manager.open_resource(conn_str)
