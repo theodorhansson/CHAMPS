@@ -186,6 +186,12 @@ def performance_test():
     Keith.set_output(False)
     Keith.close()
 
+def manual_reset():
+    config = {"gpib_address": 24, "type": "jipsdf"}
+    Keith = keithley2400(config)
+    Keith.open()
+    Keith.close()
+
 
 if __name__ == "__main__":
-    performance_test()
+    manual_reset()
