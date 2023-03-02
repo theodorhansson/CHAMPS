@@ -32,14 +32,22 @@ class SpectrumAnalyzer:
         else:
             self.resource_manager = pyvisa.ResourceManager()
 
+        print("__init__() in anritsuMS9710A") if self.verbose & 4 + 8 else None
+
     def __enter__(self):
+        print("__enter__() in anritsuMS9710A") if self.verbose & 8 else None
         self.open()
         return self
 
     def __exit__(self, exception_type, exception_value, exception_traceback):
+        if self.verbose & 8:
+            print("__exit__() in anritsuMS9710A")
+            print(f"{exception_type=}, {exception_value=}, {exception_traceback=}")
         self.close()
 
     def open(self):  # TODO: move to __init__?
+        print("open() in anritsuMS9710A") if self.verbose & 4 + 8 else None
+
         # Define instrument with pyvisa
         self.instrument = self.resource_manager.open_resource(self.conn_str)
 
@@ -54,6 +62,7 @@ class SpectrumAnalyzer:
 
     def close(self):
         # Exit instrument
+        print("close() in anritsuMS9710A") if self.verbose & 4 + 8 else None
         self.instrument.close()
 
     def set_time(self):
@@ -62,31 +71,51 @@ class SpectrumAnalyzer:
         self.instrument.write("DATE " + date)
         self.instrument.write("TIME " + clock)
 
+        if self.verbose & 8:
+            print(f"set_time() in anritsuMS9710A: setting to {date}, {clock}")
+
     def set_avg_factor(self, avg_factor: int | str):
         # Sets the number of points for point averaging.
         # Data range 2<= n <= 1000, or "OFF"
+        if self.verbose & 8:
+            print(f"set_avg_factor() in anritsuMS9710A: setting to {avg_factor}")
+
         GPIB_write = "AVT " + str(avg_factor)
         self.instrument.write(GPIB_write)
 
     def get_avg_factor(self) -> str:
         GPIB_write = "AVT?"
         avg = self.instrument.query(GPIB_write)
+
+        if self.verbose & 8:
+            print(f"get_avg_factor() in anritsuMS9710A: value {avg}")
         return avg
 
     def set_center_wavelength_nm(self, center_wl: float):
         # Sets a center wavelength. The unit is always nm.
         # Input value down to the second decimal place. Data range: 600 <= n <= 1750
+        if self.verbose & 8:
+            print(
+                f"set_center_wavelength_nm() in anritsuMS9710A: setting to {center_wl}"
+            )
+
         GPIB_write = "CNT " + str(round(center_wl, 2))
         self.instrument.write(GPIB_write)
 
     def get_center_wavelength_nm(self) -> float:
         GPIB_write = "CNT?"
         center_wl = self.instrument.query(GPIB_write)
+
+        if self.verbose & 8:
+            print(f"get_center_wavelength_nm() in anritsuMS9710A: value {center_wl}")
         return float(center_wl)
 
     def set_level_scale_dBm(self, level_scale: float):
         # Selects a log scale as a level scale and sets a scale value (dB/div)
         # Data range: 0.1 <= level_scale <= 10.0
+        if self.verbose & 8:
+            print(f"set_level_scale_dBm() in anritsuMS9710A: setting to {level_scale}")
+
         GPIB_write = "LOG " + str(round(level_scale, 1))
         self.instrument.write(GPIB_write)
 
@@ -94,6 +123,9 @@ class SpectrumAnalyzer:
         # Returns whether a log or linear scale is set as a level scale.
         GPIB_write = "LVS?"
         scale_type = self.instrument.query(GPIB_write)
+
+        if self.verbose & 8:
+            print(f"get_level_scale() in anritsuMS9710A: value {scale_type}")
         return scale_type
 
     def set_linear_resolution_nm(self, resolution: float):
@@ -102,13 +134,22 @@ class SpectrumAnalyzer:
 
         accepted_vals = [1.0, 0.5, 0.2, 0.1, 0.07, 0.05]
         resolution = utils.closest_matcher(resolution, accepted_vals)
-
         GPIB_write = "RES " + str(resolution)
         self.instrument.write(GPIB_write)
+
+        if self.verbose & 8:
+            print(
+                f"set_linear_resolution_nm() in anritsuMS9710A: setting to {resolution}"
+            )
 
     def get_linear_resolution_nm(self) -> float:
         GPIB_write = "RES?"
         resolution = self.instrument.query(GPIB_write)
+
+        if self.verbose & 8:
+            print(
+                f"get_linear_resolution_nm() in anritsuMS9710A: setting to {resolution}"
+            )
         return float(resolution)
 
     def set_sample_points(self, n_points: int):
@@ -117,13 +158,18 @@ class SpectrumAnalyzer:
 
         accepted_vals = [251, 501, 1001, 2001, 5001]
         n_points = utils.closest_matcher(n_points, accepted_vals)
-
         GPIB_write = "MPT " + str(n_points)
         self.instrument.write(GPIB_write)
+
+        if self.verbose & 8:
+            print(f"set_sample_points() in anritsuMS9710A: setting to {n_points}")
 
     def get_sample_points(self) -> int:
         GPIB_write = "MPT?"
         n_points = self.instrument.query(GPIB_write)
+
+        if self.verbose & 8:
+            print(f"get_sample_points() in anritsuMS9710A: setting to {n_points}")
         return int(n_points)
 
     def set_ref_level_dBm(self, level: float):
@@ -136,32 +182,46 @@ class SpectrumAnalyzer:
 
     def get_ref_level(self):
         GPIB_write = "MKD?"
-        n_points = self.instrument.query(GPIB_write)
-        return n_points
+        ref_level = self.instrument.query(GPIB_write)
+
+        if self.verbose & 8:
+            print(f"get_ref_level() in anritsuMS9710A: setting to {ref_level}")
+        return ref_level
 
     def set_sensitivity(self, sensitivity_id: str):
         pass
 
     def get_sensitivity(self):
-        return ""
+        return None
 
     def set_wavelength_span_nm(self, span: float):
         # Sets the span. (Unit_ nm), ****.*: 0, 0.5 to 1200.0 (0.1 step)
+        if self.verbose & 8:
+            print(f"set_wavelength_span_nm() in anritsuMS9710A: setting to {span}")
+
         GPIB_write = "SPN " + str(round(span, 1))
         self.instrument.write(GPIB_write)
 
     def get_wavelength_span(self) -> float:
         GPIB_write = "SPN?"
         span = self.instrument.query(GPIB_write)
+        if self.verbose & 8:
+            print(f"get_wavelength_span() in anritsuMS9710A: setting to {span}")
         return float(span)
 
     def get_wavelength_axis(self) -> list[float]:
-
         span = self.get_wavelength_span()
         samplepoints = self.get_sample_points()
         center = self.get_center_wavelength_nm()
         start = center - (span / 2)
         stop = center + (span / 2)
+
+        wavelength_axis = list(np.linspace(start, stop, samplepoints))
+        data_size = len(wavelength_axis)
+        if self.verbose & 8:
+            print(
+                f"get_wavelength_axis() in anritsuMS9710A: recieved list with {data_size} elements"
+            )
 
         return list(np.linspace(start, stop, samplepoints))
 
@@ -204,12 +264,22 @@ class SpectrumAnalyzer:
             ans = ((byte1 & 0b01111111) << 8) + byte2 - ((byte1 & 0b10000000) << 8)
             ans *= 0.01  # 9832 -> 98.32 dB
             intensities_dB.append(ans)
-
         self.instrument.read_termination = r_term
+
+        data_size = len(intensities_dB)
+        if self.verbose & 8:
+            print(
+                f"get_intensity_data_A_dBm() in anritsuMS9710A: recieved list with {data_size} elements"
+            )
         return intensities_dB
 
     def get_connected_visa_devices(self):
-        return self.resource_manager.list_resources()
+        resources = self.resource_manager.list_resources()
+        if self.verbose & 8:
+            print(
+                f"get_connected_visa_devices() in anritsuMS9710A: connected devices {resources}"
+            )
+        return resources
 
     def get_sweep_status(self) -> int:  # NOTE: use "MOD" instead
         # Gets the current status of instrument from event register
@@ -221,15 +291,23 @@ class SpectrumAnalyzer:
 
         GPIB_write = "MOD?"
         status = self.instrument.query(GPIB_write)
+
+        if self.verbose & 8:
+            print(f"get_sweep_status() in anritsuMS9710A: current status {status}")
         return int(status)
 
     def _start_single_sweep(self):
         # Starts a scan in mode "single"
+        if self.verbose & 8:
+            print(f"_start_single_sweep() in anritsuMS9710A")
+
         GPIB_write = "SSI"
         self.instrument.write(GPIB_write)
 
     def do_single_scan(self):
         # starts single and holds thread until done
+        print(f"do_single_scan() in anritsuMS9710A") if self.verbose & 4 + 8 else None
+
         stop_code = 0  # This value indicates finished
         stop = None
 
