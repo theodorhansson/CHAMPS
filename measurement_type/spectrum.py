@@ -65,12 +65,12 @@ def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
         "header": "Current [mA], Voltage [V], Wavelengths [nm], Intensities [dB]"
     }
 
-    # # Send verbose_printing to instruments
-    # verbose_printing = spectrum_config["verbose_printing"]
-    # # Sets value in instrument if not specified
-    # for instru_dict in [DC_config, OSA_config]:
-    #     if not instru_dict.has_key("verbose_printing"):
-    #         instru_dict["verbose_printing"] = verbose_printing
+    # Send verbose_printing to instruments
+    verbose_printing = spectrum_config["verbose_printing"]
+    # Sets value in instrument if not specified
+    for instru_dict in [DC_config, OSA_config]:
+        if not instru_dict.has_key("verbose_printing"):
+            instru_dict["verbose_printing"] = verbose_printing
 
     # Try to fetch the objects
     try:
