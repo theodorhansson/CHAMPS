@@ -6,7 +6,7 @@ First you need to get all the dependencies. Install this by running
 ``` python
 pip install requirements.txt -r
 ```
-Then the easiest way to get started is by using the default config files, eg for [IPV](IPVconfig.toml) or [Spectrum](OSAconf.toml) measurements. Specify the params you want to use in the file and then run 
+Then the easiest way to get started is by using the default config files, eg for [IPV](../IPVconfig.toml) or [Spectrum](../OSAconf.toml) measurements. Specify the params you want to use in the file and then run 
 ```python
 python main.py your_config.toml
 ```
