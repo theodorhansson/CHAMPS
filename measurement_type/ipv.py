@@ -62,9 +62,7 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
         "power": [],
     }
 
-    # Send verbose_printing to instruments
-    verbose_printing = IPV_config["verbose_printing"]
-    # Sets value in instrument if not specified
+    # Send verbose_printing to instruments if not specified
     for instru_dict in [DC_config, P_config]:
         if not instru_dict.has_key("verbose_printing"):
             instru_dict["verbose_printing"] = verbose_printing
