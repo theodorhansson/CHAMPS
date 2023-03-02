@@ -168,6 +168,9 @@ cython_debug/
 *.zip
 *.tar.gz
 
+# MD-editing
+.obsidian/
+
 #Dev files
 OphirComCP.py
 playground.py
