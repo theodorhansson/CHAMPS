@@ -6,7 +6,7 @@ First you need to get all the dependencies. Install this by running
 ``` python
 pip install requirements.txt -r
 ```
-Then the easiest way to get started is by using the default config files, eg for [IPV](../IPVconfig.toml) or [Spectrum](../OSAconf.toml) measurements. Specify the params you want to use in the file and then run 
+Please not that this requires at least Python 3.11. Then the easiest way to get started is by using the default config files, eg for [IPV](../IPVconfig.toml) or [Spectrum](../OSAconf.toml) measurements. Specify the params you want to use in the file and then run 
 ```python
 python main.py your_config.toml
 ```
@@ -15,7 +15,7 @@ from the terminal.
 When done, close the figure and look for your saved data!
 
 # Further reading
-Take a look at the different measurement types or the instruments themselves. If you're brave you might even want to develop your own routines!
+Take a look at the configs for different measurement types ([IPV](../IPVconfig.toml), [Spectrum](../OSAconf.toml)) or the instruments themselves. If you're brave you might even want to develop your own routines!
 
 
 
