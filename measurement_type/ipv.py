@@ -19,7 +19,7 @@ _optional_arguments = {
     "plot_interval": 20,
     "verbose_printing": 0,
     "keep_plot": False,
-    "offset_background": 10,
+    "offset_background": 0,
 }
 
 
