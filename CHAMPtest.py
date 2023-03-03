@@ -118,6 +118,66 @@ class PhotonicTest(unittest.TestCase):
             else:
                 utils.closest_matcher(query, accepted, round_type=r_type)
 
+    def test_interval_2_points(self):
+        # specification, points/result
+        case_list = (
+            ([[0, 1, 10]], [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]),
+            ([0, 1, 10], [[0], [1], [10]]),
+            (
+                [0, 1, 10, [0, 1, 10]],
+                [[0], [1], [10], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]],
+            ),
+            (
+                [[0, 0.9, 10]],
+                [[0, 0.9, 1.8, 2.7, 3.6, 4.5, 5.4, 6.3, 7.2, 8.1, 9, 9.9, 10]],
+            ),
+            (
+                [[0, 0.9, 10], 69],
+                [[0, 0.9, 1.8, 2.7, 3.6, 4.5, 5.4, 6.3, 7.2, 8.1, 9, 9.9, 10], [69]],
+            ),
+            (
+                [69, [0, 0.9, 10]],
+                [[69], [0, 0.9, 1.8, 2.7, 3.6, 4.5, 5.4, 6.3, 7.2, 8.1, 9, 9.9, 10]],
+            ),
+            (1, [[1]]),
+            ([[0, 1, "10"]], [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]),
+            ([0, 1, "10"], [[0], [1], [10]]),
+        )
+
+        for case in case_list:
+            query = case[0]
+            reference = case[1]
+            answer = list(utils.interval_2_points(query))
+
+            self.assertEqual(answer, reference, msg=f"{case=}")
+
+        case_list_exception = (
+            None,
+            [[1]],
+            [[1, 2]],
+            [[1, 2, 3, 4]],
+            [],
+            [[1, 2, "sup bro"]],
+        )
+
+        for exc_case in case_list_exception:
+            with self.assertRaises(TypeError):
+                self.test_interval_2_points(exc_case)
+
+    def test_number_recaster(self):
+        cases = (
+            (1, 1),
+            ("1", 1),
+            ([1, "2"], [1, 2]),
+            ((1, "2"), (1, 2)),
+        )
+
+        for case in cases:
+            query = case[0]
+            reference = case[1]
+            answer = utils.list_number_recaster(query)
+            self.assertEqual(reference, answer)
+
 
 if __name__ == "__main__":
     unittest.main()

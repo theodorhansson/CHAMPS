@@ -48,61 +48,87 @@ def optional_arguments_merge(config: dict = dict(), optional_default=dict()):
     return out_dict
 
 
+def list_number_recaster(input: list | float) -> list | float:
+    # Recursivly tries to convert strings to floats in a list
+    # [1, "2"] -> [1, 2]
+    if type(input) == float or type(input) == int:
+        output = input
+    elif type(input) == str:
+        output = float(input)
+    elif type(input) == list or type(input) == tuple:
+        output = []
+        for element in input:
+            output.append(list_number_recaster(element))
+
+        # Recast to tuple if input
+        if type(input) == tuple:
+            output = tuple(output)
+
+    return output
+
+
 def interval_2_points(specification: list[list]) -> list:
-    # Takes in list [[A, x, B],[C, y, D]] and returns a list of points.
-    # Output: [[A, A+x, ..., B], [C, C+y, ..., D]]
-    # Also accepts single value and appends it to the list
+    # Takes in list [[A, x, B], [C, y, D], P] and returns a list of points.
+    # Output: [[A, A+x, ..., B], [C, C+y, ..., D], [P]]
+    # Also accepts single point outside of list P -> [[P]]
+
+    # Convert strings to floats if possible
+    specification = list_number_recaster(specification)
 
     if type(specification) == float or type(specification) == int:
         # Handles case where specification is number
         out_list = [[specification]]
         return out_list
-
-    elif (
-        type(specification[0]) == float
-        or type(specification[0]) == int
-        and len(specification) == 1
-    ):
-        # Handles case where specification is number in list
-        out_list = [[specification[0]]]
-        return out_list
-
-    elif type(specification[0]) != list:
-        # print(f"Warning: Interval specification {specification} not list of lists.")
-        if len(specification) == 3:
-            # print("Attempting inteval fix.")
-            # Fix error not list of list, by putting in list
-            specification = [specification]
-        else:
-            raise Exception(
-                f"Interval specification {specification} not list and not length 3."
-            )
+    elif type(specification) != list:
+        raise TypeError(
+            f"Interval specification {specification} neither list nor number"
+        )
 
     points = []
-    for pairs in specification:
-        if type(pairs) != list:
-            # Checks if sublist is list
-            raise Exception(f"Interval sub-specification {pairs} not list")
-        elif len(pairs) != 3:
-            # Check if every sub-interval specified correct
-            raise Exception(f"Interval sub-specification {pairs} not length 3.")
+    for sub_specification in specification:
+        if type(sub_specification) == float or type(sub_specification) == int:
+            sub_interval = [sub_specification]
+        elif type(sub_specification) == list:
+            if len(sub_specification) != 3:
+                # Check if every sub-interval specified correct
+                raise TypeError(
+                    f"Interval sub-specification {sub_specification} not length 3."
+                )
 
-        start = pairs[0]
-        delta = pairs[1]
-        end = pairs[2]
+            # Extract the values
+            start = sub_specification[0]
+            delta = sub_specification[1]
+            end = sub_specification[2]
 
-        if abs(start - end) <= delta:
-            # Handles case where points are closer then shortest distance
-            sub_interval = np.array([start, end])
+            for value in (start, delta, end):
+                # Check if they are valid type
+                if type(value) != float and type(value) != int:
+                    raise TypeError(
+                        f"Interval sub-specification {sub_specification} component {value} not number"
+                    )
+
+            if start == end:
+                # If start and end are same point, don't create duplicate
+                sub_interval = [start]
+            elif abs(start - end) <= delta:
+                # If points are too close, add them anyways
+                sub_interval = [start, end]
+            else:
+                # Create arranged list if nothing special
+                sub_interval = list(np.arange(start, end, delta))
+
+            # Post-processing
+            if end not in sub_interval:
+                # Add end point if not in specification
+                sub_interval.append(end)
+
         else:
-            sub_interval = np.arange(start, end, delta)
+            raise TypeError(
+                f"Interval sub-specification {sub_specification} in specification {specification} neither list nor number"
+            )
 
-        if end not in sub_interval:
-            # Adds end point if not in interavl
-            sub_interval = np.append(sub_interval, end)
-
+        # Add sub_interval to point result
         points.append(sub_interval)
-
     return points
 
 
