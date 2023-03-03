@@ -136,4 +136,5 @@ def spectrum_main(spectrum_config: dict, DC_config: dict, OSA_config: dict):
     except:
         traceback.print_exc()
 
+    print("Spectrum measurements done.")
     return Results
