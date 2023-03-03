@@ -205,6 +205,7 @@ def closest_matcher(
         msg = " in " + msg
 
     max_val = max(accepted_vals)
+    min_val = min(accepted_vals)
 
     # If exact mode enabled, rasie exception if not in set
     if round_type.lower() == "exact" and data not in accepted_vals:
@@ -216,6 +217,9 @@ def closest_matcher(
     elif data > max_val:
         print(f"Warning: {data} larger than accepted{msg}, using {max_val} instead.")
         return max_val
+    elif data < min_val:
+        print(f"Warning: {data} smaller than accepted{msg}, using {min_val} instead.")
+        return min_val
 
     # If not in list, round up to closest value in list
     elif data not in accepted_vals:
@@ -226,7 +230,7 @@ def closest_matcher(
             case "down":
                 custom_key = lambda x: math.inf if x - data > 0 else data - x
             case "regularly":
-                custom_key = lambda x: x - data
+                custom_key = lambda x: abs(x - data)
             case _:
                 raise Exception(
                     f"closest_matcher unknown round_type {round_type}{msg} detected."

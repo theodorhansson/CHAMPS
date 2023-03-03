@@ -97,11 +97,15 @@ class PhotonicTest(unittest.TestCase):
             (100, 4, "up"),
             (-100, 0, "down"),
             (100, 4, "down"),
+            (0.1, 0, "regularly"),
+            (0.9, 1, "regularly"),
+            (-100, 0, "regularly"),
+            (100, 4, "regularly"),
         )
 
         for query, reference, r_type in queries_args:
             answer = utils.closest_matcher(query, accepted, round_type=r_type)
-            self.assertEqual(reference, answer)
+            self.assertEqual(reference, answer, msg=(reference, answer))
 
         # query, reference, round_type, exception trigger
         queries_args_exception = (
