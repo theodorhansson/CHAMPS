@@ -1,5 +1,6 @@
 import pyvisa
 import utils
+import time
 
 _required_arguments = ["gpib_address", "type"]
 _optional_arguments = {"verbose_printing": 0}
@@ -33,6 +34,7 @@ class keithley2400:
         return self
 
     def __exit__(self, exception_type, exception_value, exception_traceback):
+        time.sleep(0.1)  # Short wait in case of exception
         if self.verbose & 8:
             print("__exit__() in keithley2400")
             print(f"{exception_type=}, {exception_value=}, {exception_traceback=}")
