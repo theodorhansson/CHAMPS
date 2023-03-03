@@ -1,4 +1,4 @@
-[Table of contents](../table_of_contents.md)
+[Table of contents](../readme.md)
 # General configs
 ## Save_folder: string {M}
 Contains the path to a folder in which the data from your measurements will be saved

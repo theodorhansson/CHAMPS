@@ -1,1 +1,1 @@
-[Table of contents](../table_of_contents.md)
+[Table of contents](../readme.md)

@@ -1,4 +1,4 @@
-[Table of contents](../table_of_contents.md)
+[Table of contents](../readme.md)
 # Ophir IS6-D-UV
 The equipment class that controls the Ophir IS6-D-UV integrating sphere.
 Items marked with {M} are mandatory, {O} optional.

@@ -1,4 +1,4 @@
-[Table of contents](../table_of_contents.md)
+[Table of contents](../readme.md)
 # Keithley2400
 The equipment class that controls the Keithley 2400 SourceMeter.
 Items marked with {M} are mandatory, {O} optional.

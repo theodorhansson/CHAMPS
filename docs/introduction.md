@@ -1,4 +1,4 @@
-[Table of contents](table_of_contents.md)
+[Table of contents](readme.md)
 # Introduction
 CHAMPS aims to provide a simple and modular experience for lab measurements. This is accomplished through a [TOML config file](https://toml.io) and easy writing of your own instrument wrappers and new measurement routines. 
 
