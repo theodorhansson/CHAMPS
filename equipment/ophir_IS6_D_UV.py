@@ -59,13 +59,13 @@ class INT_sphere:
         print("open() in IS6-D-UV") if self.verbose & 8 else None
 
         self._OphirCOM = win32com.client.Dispatch("OphirLMMeasurement.CoLMMeasurement")
-        DeviceList = self._OphirCOM.ScanUSB()
+        device_list = self._OphirCOM.ScanUSB()
         try:
-            Device = DeviceList[0]
+            device = device_list[0]
         except:
             # print("You don't seem to have an Integrating Sphere connected")
             raise ConnectionError("Integrating Sphere connection failed.")
-        self._DeviceHandle = self._OphirCOM.OpenUSBDevice(Device)
+        self._device_handle = self._OphirCOM.OpenUSBDevice(device)
 
         # Set the default range
         self.set_range(self.range)
@@ -92,7 +92,7 @@ class INT_sphere:
         # Get reading from int. sphere
 
         time.sleep(self._min_time)
-        data = self._OphirCOM.GetData(self._DeviceHandle, 0)
+        data = self._OphirCOM.GetData(self._device_handle, 0)
         # Checks if there is any data
         if len(data[0]) > 0:
             # Extract last power value from datastream
@@ -117,11 +117,11 @@ class INT_sphere:
             new_range, accepted_ranges, round_type="exact", msg="IS6-D-UV ranges"
         )
 
-        self._OphirCOM.SetRange(self._DeviceHandle, 0, int(new_range))
+        self._OphirCOM.SetRange(self._device_handle, 0, int(new_range))
 
     def get_ranges(self):
         # Return the possible ranges
-        ranges = self._OphirCOM.GetRanges(self._DeviceHandle, 0)
+        ranges = self._OphirCOM.GetRanges(self._device_handle, 0)
 
         if self.verbose & 8:
             print(f"get_ranges() in IS6-D-UV: value {ranges}")
@@ -130,7 +130,7 @@ class INT_sphere:
     def get_wavelengths(self):
         # Returns possible ranges
         # ((current index),('940', '300',...))
-        wavelengths = self._OphirCOM.GetWavelengths(self._DeviceHandle, 0)
+        wavelengths = self._OphirCOM.GetWavelengths(self._device_handle, 0)
 
         if self.verbose & 8:
             print(f"get_wavelengths() in IS6-D-UV: value {wavelengths}")
@@ -146,7 +146,7 @@ class INT_sphere:
             new_wave_length, accepted_wl, round_type="exact", msg="IS6-D-UV wavelength"
         )
 
-        self._OphirCOM.SetWavelength(self._DeviceHandle, 0, int(new_wave_length))
+        self._OphirCOM.SetWavelength(self._device_handle, 0, int(new_wave_length))
 
     def set_output(self, state: bool):
         # Toggles reading from sphere
@@ -158,7 +158,7 @@ class INT_sphere:
                 print("set_output() in IS6-D-UV: Disabling")
 
         if state:
-            self._OphirCOM.StartStream(self._DeviceHandle, 0)
+            self._OphirCOM.StartStream(self._device_handle, 0)
             # Wait for instrument to start
             for _ in range(10):
                 data = self.get_power()
@@ -169,7 +169,7 @@ class INT_sphere:
                     # Wait for start
                     time.sleep(0.4)
         else:
-            self._OphirCOM.StopStream(self._DeviceHandle, 0)
+            self._OphirCOM.StopStream(self._device_handle, 0)
 
     def get_device_list(self):
         # Get list of connected devices
@@ -182,7 +182,7 @@ class INT_sphere:
     def get_device_handle(self):
         # Get name of current device_handle
 
-        device_handle = self._DeviceHandle
+        device_handle = self._device_handle
         if self.verbose & 8:
             print(f"get_device_handle() in IS6-D-UV: devices {device_handle}")
         return device_handle
