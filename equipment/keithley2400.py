@@ -7,7 +7,12 @@ _optional_arguments = {"verbose_printing": 0}
 
 class keithley2400:
     def __init__(self, config_dict: dict, resource_manager: object = None):
-        utils.argument_checker(config_dict, _required_arguments, source_func="keithley")
+        utils.argument_checker(
+            config_dict,
+            _required_arguments,
+            _optional_arguments,
+            source_func="keithley",
+        )
         config_dict = utils.optional_arguments_merge(config_dict, _optional_arguments)
 
         self.address = str(config_dict["gpib_address"])

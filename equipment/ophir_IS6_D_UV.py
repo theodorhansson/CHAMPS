@@ -90,7 +90,6 @@ class INT_sphere:
 
     def get_power(self):
         # Get reading from int. sphere
-        print("get_power() in IS6-D-UV") if self.verbose & 8 else None
 
         time.sleep(self._min_time)
         data = self._OphirCOM.GetData(self._DeviceHandle, 0)
@@ -99,11 +98,14 @@ class INT_sphere:
             # Extract last power value from datastream
             power = data[0][-1]
             power = power * 1e3  # W to mW
-            return power
         else:
             # print("Not connected/initialized")
             # print("Get_power_none", data)
-            return None  # TODO Decide what value should be here
+            power = None  # TODO Decide what value should be here
+
+        if self.verbose & 8:
+            print(f"get_power() in IS6-D-UV: value {power}")
+        return power
 
     def set_range(self, new_range: int):
         # Set the measurement-range for the sphere
@@ -119,17 +121,19 @@ class INT_sphere:
 
     def get_ranges(self):
         # Return the possible ranges
-        print("get_range() in IS6-D-UV") if self.verbose & 8 else None
-
         ranges = self._OphirCOM.GetRanges(self._DeviceHandle, 0)
+
+        if self.verbose & 8:
+            print(f"get_ranges() in IS6-D-UV: value {ranges}")
         return ranges
 
     def get_wavelengths(self):
         # Returns possible ranges
         # ((current index),('940', '300',...))
-        print("get_wavelengths() in IS6-D-UV") if self.verbose & 8 else None
-
         wavelengths = self._OphirCOM.GetWavelengths(self._DeviceHandle, 0)
+
+        if self.verbose & 8:
+            print(f"get_wavelengths() in IS6-D-UV: value {wavelengths}")
         return wavelengths
 
     def set_wavelength(self, new_wave_length: int):
@@ -169,15 +173,19 @@ class INT_sphere:
 
     def get_device_list(self):
         # Get list of connected devices
-        print("get_device_list() in IS6-D-UV") if self.verbose & 8 else None
+        devices = self._OphirCOM.ScanUSB()
 
-        return self._OphirCOM.ScanUSB()
+        if self.verbose & 8:
+            print(f"get_device_list() in IS6-D-UV: devices {devices}")
+        return devices
 
     def get_device_handle(self):
         # Get name of current device_handle
-        print("get_device_handle() in IS6-D-UV") if self.verbose & 8 else None
 
-        return self._DeviceHandle
+        device_handle = self._DeviceHandle
+        if self.verbose & 8:
+            print(f"get_device_handle() in IS6-D-UV: devices {device_handle}")
+        return device_handle
 
 
 def test(sphere_obj):
