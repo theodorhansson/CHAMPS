@@ -1,3 +1,4 @@
+#Std units: mA, V, mW, nm
 [measurement]
 Type = "spectrum"
 Save_folder = "c:/LABDATA"
@@ -7,8 +8,8 @@ V_max = 5
 Current = [[1, 0.1, 5], [5, 0.5, 15]]  # [min, step, max]
 
 Center_wavelength = 850 #nm
-linear_resolution = 0.1 #nm
 Wavelength_span = 20 #nm
+linear_resolution = 0.1 #nm
 sample_points = 501
 
 # Optional
