@@ -18,6 +18,7 @@ Current = [[1, 0.1, 5], [5, 0.5, 15]]  # mA [min, step, max]
 # Optional arguments
 Rollover_threshold = 0  # Stops measurement when power < rollover_threshold * maxpower
 Rollover_min = 0        # Doesn't do rollover check on power values lower than this
+Offset_background = 10  # Number of times to measure background and offset
 Plot_interval = 20      # Update plot every nth measurement
 Keep_plot = 0           # To keep plot after measurement is done
 Verbose_printing = 0    # Flag for printing
@@ -65,6 +66,10 @@ This specifies a percentage of the maximum measured power where the measurement 
 **Default: 0 (disabled)**
 This specifies a minimum power (in mW) that are ignored by the rollover functionality. All recorded values lower than this are ignored when looking for the maximum. Using this is preferred when low input values are noisy, eq for the measurement (0, 0, 0.01, *0.05*, 0.1, 0.2, 0.3, ...) where the small dip to 0.05 stops the measurement, even though it's just noise and you want to continue.
 
+## Offset_background: int {O}
+**Default: 0 (disabled)**
+Specifies the amount of times (if any) you measure the background optical power before turning on the LED. If you do this, the average of the results will be subtracted from all subsequent measurements yielding only the optical power generated from the device under test (DUT). 
+
 ## Plot_interval: int {O}
 **Default: 20**
 This specifies how often the plot should be updated. Due to slow rendering a larger interval will make the measurements go faster since less time is spent redrawing the plot.
@@ -72,3 +77,6 @@ This specifies how often the plot should be updated. Due to slow rendering a lar
 ## Keep_plot: bool | int {O}
 **Default: False**
 Decides whether the IPV plot shall be kept alive after measurement is done or not. Usually it's enough to only see it during the measurements.
+
+## Verbose_printing: int {O}
+See [general](general.md). 

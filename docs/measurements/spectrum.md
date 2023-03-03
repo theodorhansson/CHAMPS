@@ -81,3 +81,6 @@ This specifies the pointwise averaging amount, ie how many times a point will be
 ## Sensitivity: string {O}
 **default: SHI1**
 Sets the sensitivity of the OSA. For those who don't have a sensitivity you can just use the default as the command wont be sent to the OSA if it doesn't have the setting.
+
+## Verbose_printing: int {O}
+See [general](general.md). 
