@@ -53,7 +53,7 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
     rollover_min = IPV_config["rollover_min"]
     intervals = IPV_config["current"]
     verbose = IPV_config["verbose_printing"]
-    keep_alive = IPV_config["keep_alive"]
+    keep_plot = IPV_config["keep_plot"]
     interval_list = utils.interval_2_points(intervals)
 
     # Create result dict
@@ -126,10 +126,10 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
             traceback.print_exc()
 
     # To hold plot open when measurement done
-    if keep_alive:
+    if keep_plot:
         print("IPV measurements done. Keeping plot alive for your convenience.")
         Plot.keep_open()
     else:
-        print("IPV measurements done. Vaporizing  plot!")
+        print("IPV measurements done. Vaporizing plot!")
 
     return Results
