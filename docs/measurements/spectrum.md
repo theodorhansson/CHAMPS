@@ -18,10 +18,12 @@ Current = [[1, 0.1, 5], [5, 0.5, 15]]  # [min, step, max]
 Center_wavelength = 850 #nm
 Wavelength_span = 20 #nm
 Linear_resolution = 0.1 #nm
-avg_factor = 10
 sample_points = 501
 
+# Optional
+avg_factor = 10
 sensitivity = "SHI1"   # Only affects ando
+verbose_printing = 0
 ```
 ## measurement {M}
 The measurement dict contains all info for your specific measurement. It must always be present!
@@ -30,7 +32,7 @@ The measurement dict contains all info for your specific measurement. It must al
 Contains the name of the measurement types. In this case wa want a spectrum measurement.
 
 ## Save_folder: string {M}
-Contains the path to a folder in which the data from your measurements will be saved
+See [general](general.md). 
 
 ## DC_unit: string {M}
 Contains a direct reference to the TOML-key for the configuration of your DC unit/current source of choice, eg
@@ -53,10 +55,10 @@ P_unit = "Anritsu_OSA_without_filters"
 ```
 
 ## V_max: float {M}
-This will set the compliance voltage on the current source to this value
+See [general](general.md). 
 
 ## Current: list(list(float)) {M}
-Contains the intervals where you want so measure in the form of (min, step, max). Eg (0.1, 0.1, 0.5) will produce a linspace like (0.1, 0.2, 0.3, 0.4, 0.5). The last point is guaranteed to be in the interval, even if it doesn't fit with the spacing, like for the spec (0.1, 0.15, 0.5), the list is (0.1, 0.25, 0.4, 0.5).
+See [general](general.md). 
 
 ## Center_wavelength: float {M}
 This specifies the center (in nm) of the scanning window of the Optical Spectrum Analyzer.
