@@ -17,7 +17,7 @@ def main(config_path):
     meas_name = config_lower["measurement"]["type"]
 
     # Code for printing
-    if config_lower["measurement"].has_key("verbose_printing"):
+    if "verbose_printing" in config_lower["measurement"].keys():
         verbose = config_lower["measurement"]["verbose_printing"]
     else:
         verbose = 0
