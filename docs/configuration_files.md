@@ -1,3 +1,4 @@
+[Table of contents](table_of_contents.md)
 # Config files
 A config file might look like this:
 ```toml
