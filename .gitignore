@@ -161,11 +161,15 @@ cython_debug/
 
 # Visual Studio Code config files
 .vscode/
+.VSCodeCOunter/
 
 #archives
 *.7z
 *.zip
 *.tar.gz
+
+# MD-editing
+.obsidian/
 
 #Dev files
 OphirComCP.py

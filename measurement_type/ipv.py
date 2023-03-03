@@ -1,14 +1,7 @@
 import communication
-from utils import (
-    argument_checker,
-    AnimatedPlot,
-    interval_2_points,
-    optional_arguments_merge,
-    ramp_current,
-)
-import numpy as np
+import utils
 import traceback
-
+from numpy import average as np_average
 
 _DC_name_key = "dc_unit"
 _P_name_key = "p_unit"
@@ -20,7 +13,14 @@ _required_arguments = [
     "v_max",
     "save_folder",
 ]
-_optional_arguments = {"rollover_threshold": 0, "rollover_min": 0, "plot_interval": 20}
+_optional_arguments = {
+    "rollover_threshold": 0,
+    "rollover_min": 0,
+    "plot_interval": 20,
+    "verbose_printing": 0,
+    "keep_plot": False,
+    "offset_background": 0,
+}
 
 
 def init(config: dict):
@@ -28,10 +28,10 @@ def init(config: dict):
     IPV_config = config["measurement"]
     IPV_name = IPV_config["type"]
     # Check and merge optional arguments
-    argument_checker(
+    utils.argument_checker(
         IPV_config, _required_arguments, _optional_arguments, source_func="IPV init"
     )
-    IPV_config_opt = optional_arguments_merge(IPV_config, _optional_arguments)
+    IPV_config_opt = utils.optional_arguments_merge(IPV_config, _optional_arguments)
 
     # Used for getting instrument objects and their names
     DC_name = IPV_config[_DC_name_key]
@@ -48,80 +48,98 @@ def init(config: dict):
 
 def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
     # The main IPV function
-
     V_max = IPV_config["v_max"]
     plot_update_interval = IPV_config["plot_interval"]
     rollover_threshold = IPV_config["rollover_threshold"]
     rollover_min = IPV_config["rollover_min"]
     intervals = IPV_config["current"]
-    interval_list = interval_2_points(intervals)
+    verbose = IPV_config["verbose_printing"]
+    keep_plot = IPV_config["keep_plot"]
+    offset_background = IPV_config["offset_background"]
+    interval_list = utils.interval_2_points(intervals)
 
-    plot = AnimatedPlot("Current[A]", "Optical Power [W]", "IPV")
+    # Create result dict
+    Results = {
+        "header": "Current[mA], Optical Power [mW], Voltage [V]",
+        "voltage": [],
+        "current": [],
+        "power": [],
+    }
 
-    try:
-        # Attempts to get instruments
-        P_unit = communication.get_PowerUnit(P_config)
-        DC_unit = communication.get_DCsupply(DC_config)
-        Results = {"voltage": [], "current": [], "power": []}
+    # Send verbose_printing to instruments if not specified
+    for instru_dict in [DC_config, P_config]:
+        if "verbose_printing" not in instru_dict.keys():
+            instru_dict["verbose_printing"] = verbose
 
-        P_unit.open()
-        DC_unit.open()
-    except:
-        traceback.print_exc()
-        print("Something went wrong when getting and opening the resources")
-        exit()
+    Plot = utils.AnimatedPlot("Current[mA]", "Optical Power [mW]", "IPV")
+    Instrument_COM = communication.Communication()
 
-    # Set instrument to 0 for safety
-    DC_unit.set_current(0.0)
-    DC_unit.set_voltage_limit(V_max)
-    DC_unit.set_output(True)
+    # Gets isntruments
+    P_unit_obj = Instrument_COM.get_PowerUnit(P_config)
+    DC_unit_obj = Instrument_COM.get_DCsupply(DC_config)
 
-    # The main measurement loop
-    try:
-        prev_end_current = 0
+    with P_unit_obj(P_config) as P_unit, DC_unit_obj(DC_config) as DC_unit:
+        try:
+            # Functionality to offset background noise
+            if offset_background:
+                offset_list = []
+                for _ in range(offset_background):
+                    offset_list.append(P_unit.get_power())
+                offset = np_average(offset_list)
+            else:
+                offset = 0
 
-        for interval in interval_list:
-            # Code to ramp current between intervals
-            power_max = 0
-            start_current = interval[0]
-            ramp_current(DC_unit, prev_end_current, start_current)
-            prev_end_current = interval[-1]
+            # Set instrument to 0 for safety
+            DC_unit.set_current(0.0)
+            DC_unit.set_voltage_limit(V_max)
+            DC_unit.set_output(True)
 
-            for count, set_current in enumerate(interval):
-                DC_unit.set_current(set_current)
+            prev_end_current = 0
+            # The main measurement loop
+            for interval in interval_list:
+                # Code to ramp current between intervals
+                power_max = 0
+                start_current = interval[0]
+                utils.ramp_current(DC_unit, prev_end_current, start_current)
+                prev_end_current = interval[-1]
 
-                volt, current = DC_unit.get_voltage_and_current()
-                power = P_unit.get_power()
+                for loop_count, set_current in enumerate(interval):
+                    DC_unit.set_current(set_current)
 
-                Results["voltage"].append(volt)
-                Results["current"].append(current)
-                Results["power"].append(power)
-                plot.add_point(current, power)
-                print("IPV data", volt, current, power)
+                    volt, current = DC_unit.get_voltage_and_current()
+                    power = P_unit.get_power() - offset
 
-                # Code to handle rollover functionality
-                if count % plot_update_interval == 0:  # approx 0.5s per measurement
-                    plot.update()
-                if power > rollover_min:
-                    power_max = max(power, power_max)
-                if power < (rollover_threshold * power_max) and rollover_threshold:
-                    break
-            plot.update()
+                    Results["voltage"].append(volt)
+                    Results["current"].append(current)
+                    Results["power"].append(power)
 
-    except KeyboardInterrupt:
-        print("Keyboard interrupt detected, stopping.")
-    except:
-        # print error if error isn't catched
-        traceback.print_exc()
-    finally:
-        # Safely shut down instrument, even if error is detected
-        ramp_current(DC_unit, DC_unit.get_current(), 0)
-        DC_unit.set_current(0)
-        DC_unit.set_output(False)
-        DC_unit.close()
-        P_unit.close()
+                    Plot.add_point(current, power)
 
-    print("IPV measurements done. Keeping plot alive for your convenience.")
-    plot.keep_open()
+                    if verbose & 1:
+                        print("IPV data", volt, current, power)
+
+                    # Only plot sometimes
+                    if loop_count % plot_update_interval == 0:
+                        # approx 0.5s per measurement
+                        Plot.update()
+                    # Code to handle rollover functionality
+                    if power > rollover_min:
+                        power_max = max(power, power_max)
+                    if power < (rollover_threshold * power_max) and rollover_threshold:
+                        break
+                Plot.update()
+
+        except KeyboardInterrupt:
+            print("Keyboard interrupt detected, stopping.")
+        except:
+            # print error if error isn't catched
+            traceback.print_exc()
+
+    # To hold plot open when measurement done
+    if keep_plot:
+        print("IPV measurements done. Keeping plot alive for your convenience.")
+        Plot.keep_open()
+    else:
+        print("IPV measurements done. Vaporizing plot!")
 
     return Results

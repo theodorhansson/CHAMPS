@@ -10,3 +10,7 @@ Devs:
 - Sofia Damne
 - Theodor Hansson
 - Gustav Persson
+
+
+# Quick start guide
+You find our documentation [HERE](docs/introduction.md)
