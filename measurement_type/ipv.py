@@ -1,7 +1,7 @@
 import communication
 import utils
 import traceback
-
+from numpy import average as np_average
 
 _DC_name_key = "dc_unit"
 _P_name_key = "p_unit"
@@ -19,6 +19,7 @@ _optional_arguments = {
     "plot_interval": 20,
     "verbose_printing": 0,
     "keep_plot": False,
+    "offset_background": 10,
 }
 
 
@@ -54,6 +55,7 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
     intervals = IPV_config["current"]
     verbose = IPV_config["verbose_printing"]
     keep_plot = IPV_config["keep_plot"]
+    offset_background = IPV_config["offset_background"]
     interval_list = utils.interval_2_points(intervals)
 
     # Create result dict
@@ -78,13 +80,21 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
 
     with P_unit_obj(P_config) as P_unit, DC_unit_obj(DC_config) as DC_unit:
         try:
+            # Functionality to offset background noise
+            if offset_background:
+                offset_list = []
+                for _ in range(offset_background):
+                    offset_list.append(P_unit.get_power())
+                offset = np_average(offset_list)
+            else:
+                offset = 0
+
             # Set instrument to 0 for safety
             DC_unit.set_current(0.0)
             DC_unit.set_voltage_limit(V_max)
             DC_unit.set_output(True)
 
             prev_end_current = 0
-
             # The main measurement loop
             for interval in interval_list:
                 # Code to ramp current between intervals
@@ -97,7 +107,7 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
                     DC_unit.set_current(set_current)
 
                     volt, current = DC_unit.get_voltage_and_current()
-                    power = P_unit.get_power()
+                    power = P_unit.get_power() - offset
 
                     Results["voltage"].append(volt)
                     Results["current"].append(current)
