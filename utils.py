@@ -136,6 +136,10 @@ def ramp_current(DC_supply, start, stop, step=10):
     # Ramps up/down current to/from given values for a supplied DC_unit
     current_steps = np.linspace(start, stop, step)
 
+    # If start and stop are same, skip ramp
+    if start == stop:
+        return None
+
     for current in current_steps:
         DC_supply.set_current(current)
         time.sleep(50 * 1e-3)  # 50 ms
