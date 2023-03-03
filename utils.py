@@ -200,6 +200,10 @@ def closest_matcher(
 ):
     # Function checks if value is accepted, and tries to round it if possible
 
+    # If string, recast to number
+    data = list_number_recaster(data)
+    accepted_vals = list_number_recaster(accepted_vals)
+
     if msg:
         # Set message if not empty
         msg = " in " + msg
