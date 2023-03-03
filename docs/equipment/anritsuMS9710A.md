@@ -1,3 +1,4 @@
+[Table of contents](../table_of_contents.md)
 # anritsuMS9710A
 The equipment class that controls the Anritsu MS9710A Optical Spectrum Analyzer.
 Items marked with {M} are mandatory, {O} optional.

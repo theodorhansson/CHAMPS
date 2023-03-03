@@ -1,3 +1,4 @@
+[Table of contents](../table_of_contents.md)
 # IPV measurements
 The IPV routine measures Optical Power and Voltage for a list of biasing currents. To make it work you need to supply most of the following params in the TOML file:
 

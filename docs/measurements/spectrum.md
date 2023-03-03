@@ -1,3 +1,4 @@
+[Table of contents](../table_of_contents.md)
 # Spectrum measurements
 The Spectrum routine measures the spectrum output for a list of biasing currents. To make it work you need to supply most of the following params in the TOML file:
 
