@@ -87,13 +87,13 @@ class keithley2400:
 
     def set_voltage_limit(self, volts: float):
         if self.verbose & 8:
-            print(f"set_voltage_limit() in sphere: setting to {volts}")
+            print(f"set_voltage_limit() in keithley2400: setting to {volts}")
 
         self.instrument.write(":SENSE:VOLTAGE:DC:PROTECTION " + str(volts))
 
     def set_current(self, current: float):
         if self.verbose & 8:
-            print(f"set_current() in sphere: setting to {current}")
+            print(f"set_current() in keithley2400: setting to {current}")
 
         current = current * 1e-3  # mA to A
         self.instrument.write(":SOURCE:CURRENT " + str(current))
@@ -104,7 +104,7 @@ class keithley2400:
         current = float(current) * 1e3  # A to mA
 
         if self.verbose & 8:
-            print(f"get_current() in sphere: value {current}")
+            print(f"get_current() in keithley2400: value {current}")
         return current
 
     def get_voltage_and_current(self) -> list[float]:
