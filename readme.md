@@ -13,4 +13,4 @@ Devs:
 
 
 # Quick start guide
-You find our documentation [HERE](docs/introduction.mds)
+You find our documentation [HERE](docs/introduction.md)
