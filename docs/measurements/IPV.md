@@ -1,5 +1,5 @@
 # IPV measurements
-The IPV routine measures Current, Optical Power and Voltage. To make it work you need to supply most of the following params in the TOML file:
+The IPV routine measures Optical Power and Voltage for a list of biasing currents. To make it work you need to supply most of the following params in the TOML file:
 
 Items marked with {M} are mandatory, {O} optional.
 

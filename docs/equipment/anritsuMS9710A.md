@@ -34,3 +34,22 @@ Sets a reference value in the display. **NOTE:** Currently broken for Anritsu.
 ## display_level_scale_dbm: float {O}
 **default: 10**
 Sets dBm/div in the display.
+
+## Note to Sample_points: int {M}
+For this device only certain values are allowed:
+	251
+	501
+	1001
+	2001
+	5001
+**Note:** If you supply another value the system will automatically round up to the closest value, or down if you supplied a too large number
+
+## Note to Linear_Resolution: int {M}
+For this device only certain values are allowed:
+	1.0
+	0.5
+	.02
+	.01
+	0.07
+	0.05
+**Note:** If you supply another value the system will automatically round down to the closest value, or down if you supplied a too large number

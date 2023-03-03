@@ -1,5 +1,5 @@
 # Spectrum measurements
-The IPV routine measures Current, Optical Power and Voltage. To make it work you need to supply most of the following params in the TOML file:
+The Spectrum routine measures the spectrum output for a list of biasing currents. To make it work you need to supply most of the following params in the TOML file:
 
 Items marked with {M} are mandatory, {O} optional.
 
@@ -20,7 +20,7 @@ Linear_resolution = 0.1 #nm
 avg_factor = 10
 sample_points = 501
 
-#sensitivity = "SHI1"   # Only affects ando
+sensitivity = "SHI1"   # Only affects ando
 ```
 ## measurement {M}
 The measurement dict contains all info for your specific measurement. It must always be present!
@@ -65,6 +65,11 @@ Sets the width of the scanning window (in nm). A span of 20 nm centered at 850 n
 
 ## Linear_resolution: float {M}
 This specifies the linear resolution of the grating (in nm). It probably means how precise the grating is moved. For resoultion in data, see  *Sample_points*.
+**Note:** Some OSA's only allow specific values. If you supply something incompatible the system will round down to the closest accepted value.
+
+## Sample_points: int {M}
+This specifies the number of sample points you'd like to get. 
+**Note:** Some OSA's only allow specific values. If you supply something incompatible the system will round up to the closest accepted value.
 
 ## avg_factor: float {O}
 **default: 5**

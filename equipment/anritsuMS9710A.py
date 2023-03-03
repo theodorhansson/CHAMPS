@@ -133,7 +133,7 @@ class SpectrumAnalyzer:
         # input one of the following values: 1.0, 0.5, 0.2, 0.1, 0.07, 0.05
 
         accepted_vals = [1.0, 0.5, 0.2, 0.1, 0.07, 0.05]
-        resolution = utils.closest_matcher(resolution, accepted_vals)
+        resolution = utils.closest_matcher(resolution, accepted_vals, round_type="down")
         GPIB_write = "RES " + str(resolution)
         self.instrument.write(GPIB_write)
 
