@@ -1,4 +1,3 @@
-import equipment
 import utils
 
 _required_arguments = ["type"]
@@ -20,9 +19,13 @@ class Communication:
         DC_type = config_dict["type"]
         match DC_type:
             case "keithley2400":
+                import equipment.keithley2400
+
                 return equipment.keithley2400.keithley2400
 
             case "powercube":
+                import equipment.powercube
+
                 return equipment.powercube.powercube
 
             case _:
@@ -41,6 +44,8 @@ class Communication:
 
         match Power_type:
             case "ophir_is6_d_uv":
+                import equipment.ophir_IS6_D_UV
+
                 return equipment.ophir_IS6_D_UV.INT_sphere
 
             case _:
@@ -59,9 +64,13 @@ class Communication:
 
         match OSA_type:
             case "ando_osa":
+                import equipment.andoAQ6317B
+
                 return equipment.andoAQ6317B.SpectrumAnalyzer
 
             case "anritsu_osa":
+                import equipment.anritsuMS9710A
+
                 return equipment.anritsuMS9710A.SpectrumAnalyzer
 
             case _:
@@ -80,6 +89,8 @@ class Communication:
 
         match Beam_type:
             case None:
+                import equipment.Spiricon_BGP_USB_SP928_OSI
+
                 return equipment.Spiricon_BGP_USB_SP928_OSI.BeamCamera
             case _:
                 # TODO Change this
@@ -90,6 +101,8 @@ class Communication:
         def method(*args, **kwargs):
             try:
                 if args[0]["type"] == "do_nothing":
+                    import equipment.do_nothing
+
                     return equipment.do_nothing.DoNothing
             except:
                 pass
@@ -104,6 +117,8 @@ class Communication:
         def method(*args, **kwargs):
             try:
                 if args[0]["type"] == "do_nothing":
+                    import equipment.do_nothing
+
                     return equipment.do_nothing.DoNothing
             except:
                 pass
