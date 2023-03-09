@@ -31,6 +31,7 @@ class BeamCamera:
 
         self.dll_path = config_dict["dll_path"]
         self.verbose = config_dict["verbose_printing"]
+        print("__init__() in Beamgage") if self.verbose & 4 + 8 else None
 
     def open(self):
         clr.AddReference(self.dll_path)
@@ -40,20 +41,23 @@ class BeamCamera:
         self.bg = bg_class.get_AutomatedBeamGage()
 
     def __enter__(self):
-        print("__enter__() in Spiricon camera") if self.verbose & 8 else None
+        print("__enter__() in Beamgage") if self.verbose & 8 else None
         self.open()
         return self
 
     def __exit__(self, exception_type, exception_value, exception_traceback):
         if self.verbose & 8:
-            print("__exit__() in Spiricon camera")
+            print("__exit__() in Beamgage")
             print(f"{exception_type=}, {exception_value=}, {exception_traceback=}")
         self.close()
 
     def close(self):
+        print("close() in Beamgage") if self.verbose & 8 else None
         self.bg.Instance.Shutdown()
 
     def get_frame_data(self) -> list:
+        print("get_frame_data() in Beamgage") if self.verbose & 8 else None
+
         data_NET = self.bg.ResultsPriorityFrame.DoubleData
 
         # If data_NET is something (not None) all good, else raise Exception
@@ -70,6 +74,8 @@ class BeamCamera:
         return list(matrix)
 
     def get_frame_shape(self) -> tuple[int, int]:
+        print("get_frame_shape() in Beamgage") if self.verbose & 8 else None
+
         width = int(self.bg.get_FrameInfoResults().Width)
         height = int(self.bg.get_FrameInfoResults().Height)
         return (height, width)
