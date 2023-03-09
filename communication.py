@@ -88,10 +88,10 @@ class Communication:
         Beam_type = config_dict["type"]
 
         match Beam_type:
-            case None:
-                import equipment.Spiricon_BGP_USB_SP928_OSI
+            case "beamgage":
+                import equipment.beamgage
 
-                return equipment.Spiricon_BGP_USB_SP928_OSI.BeamCamera
+                return equipment.beamgage.BeamCamera
             case _:
                 # TODO Change this
                 raise Exception(f"No Beam of type {Beam_type} found.")
