@@ -1,4 +1,4 @@
-from equipment import *
+import equipment
 import utils
 
 _required_arguments = ["type"]
@@ -20,10 +20,10 @@ class Communication:
         DC_type = config_dict["type"]
         match DC_type:
             case "keithley2400":
-                return keithley2400.keithley2400
+                return equipment.keithley2400.keithley2400
 
             case "powercube":
-                return powercube.powercube
+                return equipment.powercube.powercube
 
             case _:
                 # TODO Change this
@@ -41,7 +41,7 @@ class Communication:
 
         match Power_type:
             case "ophir_is6_d_uv":
-                return ophir_IS6_D_UV.INT_sphere
+                return equipment.ophir_IS6_D_UV.INT_sphere
 
             case _:
                 # TODO Change this
@@ -52,17 +52,17 @@ class Communication:
             config_dict,
             _required_arguments,
             warn_extra=False,
-            source_func="communication, powerunit",
+            source_func="communication, OSA",
         )
         # For measuring spectrum
         OSA_type = config_dict["type"]
 
         match OSA_type:
             case "ando_osa":
-                return andoAQ6317B.SpectrumAnalyzer
+                return equipment.andoAQ6317B.SpectrumAnalyzer
 
             case "anritsu_osa":
-                return anritsuMS9710A.SpectrumAnalyzer
+                return equipment.anritsuMS9710A.SpectrumAnalyzer
 
             case _:
                 # TODO Change this
@@ -80,7 +80,7 @@ class Communication:
 
         match Beam_type:
             case None:
-                return Spiricon_BGP_USB_SP928_OSI.BeamCamera
+                return equipment.Spiricon_BGP_USB_SP928_OSI.BeamCamera
             case _:
                 # TODO Change this
                 raise Exception(f"No Beam of type {Beam_type} found.")
