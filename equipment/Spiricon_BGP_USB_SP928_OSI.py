@@ -64,8 +64,6 @@ class BeamCamera:
         else:
             raise Exception("Beamgage camera didn't respond. Is it connected?")
 
-        data_list = [x for x in data_NET]
-
         shape = self.get_frame_shape()
         matrix = np.array(data_NET)
         matrix = np.reshape(matrix, shape)
