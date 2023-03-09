@@ -18,9 +18,5 @@ namespace Beamgage_python_wrapper
             return bg;
         }
 
-        public double[] get_Data_Double()
-        {
-            return bg.ResultsPriorityFrame.DoubleData;
-        }
     }
 }
