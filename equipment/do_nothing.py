@@ -1,3 +1,5 @@
+import numpy as np
+
 # This class can be used if you want an instrument, but don't have it connected
 
 
@@ -21,3 +23,10 @@ class DoNothing:
                 return None
 
         return method
+
+    def get_voltage_and_current(self, *args, **kwargs):
+        return 1, 1
+
+    def get_frame_data(self, *args, **kwargs):
+        # Returns large random matrix
+        return list(np.random.rand(50, 50))
