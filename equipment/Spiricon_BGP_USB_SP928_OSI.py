@@ -1,5 +1,6 @@
 import clr
 import numpy as np
+import time
 
 # Dumb code to import utils
 try:
@@ -38,8 +39,16 @@ class BeamCamera:
         bg_class = Beamgage_python_wrapper.Beamgage("CHAMPS", True)
         self.bg = bg_class.get_AutomatedBeamGage()
 
+        # If get_frame_data returns something (not None) all good, else raise Exception
+        for i in range(15):
+            if self.get_frame_data():
+                break
+            time.sleep(1)
+        else:
+            raise Exception("Beamgage camera didn't respond. Is it connected?")
+
     def __enter__(self):
-        print("__enter__() in keithley2400") if self.verbose & 8 else None
+        print("__enter__() in Spiricon camera") if self.verbose & 8 else None
         self.open()
         return self
 
