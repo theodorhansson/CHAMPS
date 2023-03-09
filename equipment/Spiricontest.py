@@ -5,12 +5,17 @@ import matplotlib.pyplot as plt
 clr.AddReference("..\\beamgage_drivers\\Beamgage_python_wrapper")
 import Beamgage_python_wrapper
 
-_bg = Beamgage_python_wrapper.Beamgage("FROM_PYTH", True)
-bg = _bg.get_AutomatedBeamGage()
+bg_class = Beamgage_python_wrapper.Beamgage("FROM_PYTH", True)
+bg = bg_class.get_AutomatedBeamGage()
 
 
-res = bg.ResultsPriorityFrame.DoubleData
+res = bg_class.get_Data_Double()
+res_str = bg_class.get_Data_string()
+
+res = [x for x in res]
+
 print(dir(bg))
-print(res)
+print(len(res))
+print(res_str)
 time.sleep(10)
 bg.Instance.Shutdown()
