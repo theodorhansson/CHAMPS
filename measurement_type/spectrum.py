@@ -1,8 +1,17 @@
 import communication
-import utils
 import numpy as np
 import traceback
 import sys
+
+# Dumb code to import utils
+try:
+    import utils
+except:
+    import sys, pathlib
+
+    util_path = str(pathlib.Path(__file__).parent.parent.resolve())
+    sys.path.append(util_path)
+    import utils
 
 _DC_name_key = "dc_unit"
 _OSA_name_key = "osa_unit"

@@ -1,6 +1,15 @@
 import win32com.client
 import time
-import utils
+
+# Dumb code to import utils
+try:
+    import utils
+except:
+    import sys, pathlib
+
+    util_path = str(pathlib.Path(__file__).parent.parent.resolve())
+    sys.path.append(util_path)
+    import utils
 
 # OBS: en datastream ger en konstant växande lista med värden
 # Based on python example from Ophir

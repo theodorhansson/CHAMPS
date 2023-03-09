@@ -1,7 +1,16 @@
 import communication
-import utils
 import traceback
 from numpy import average as np_average
+
+# Dumb code to import utils
+try:
+    import utils
+except:
+    import sys, pathlib
+
+    util_path = str(pathlib.Path(__file__).parent.parent.resolve())
+    sys.path.append(util_path)
+    import utils
 
 _DC_name_key = "dc_unit"
 _P_name_key = "p_unit"

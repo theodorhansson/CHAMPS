@@ -1,5 +1,14 @@
 import serial
-import utils
+
+# Dumb code to import utils
+try:
+    import utils
+except:
+    import sys, pathlib
+
+    util_path = str(pathlib.Path(__file__).parent.parent.resolve())
+    sys.path.append(util_path)
+    import utils
 
 _required_arguments = ["port", "type"]
 _optional_arguments = {"verbose_printing": 0}
