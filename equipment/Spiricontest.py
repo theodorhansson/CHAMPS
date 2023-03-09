@@ -3,7 +3,7 @@ import pythonnet
 import matplotlib.pyplot as plt
 import numpy as np
 
-clr.AddReference("..\\beamgage_drivers\\Beamgage_python_wrapper")
+clr.AddReference("..\\drivers\\beamgage_drivers\\Beamgage_python_wrapper")
 import Beamgage_python_wrapper
 
 bg_class = Beamgage_python_wrapper.Beamgage("FROM_PYTH", True)
