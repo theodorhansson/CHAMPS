@@ -72,7 +72,7 @@ class PhotonicTest(unittest.TestCase):
         print(utils.optional_arguments_merge(conf, opt))
 
     def test_closest_matcher(self):
-        accepted = [0, 1, 2, 3, 4]
+        accepted = [3, 4, 0, 1, 2]
 
         # query, reference
         queries_no_arg = (
