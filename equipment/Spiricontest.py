@@ -1,5 +1,4 @@
-import os, sys, clr, time
-import pythonnet
+import clr, time
 import matplotlib.pyplot as plt
 import numpy as np
 

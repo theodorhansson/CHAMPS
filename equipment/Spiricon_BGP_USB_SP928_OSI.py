@@ -1,19 +1,12 @@
-import pythonnet
-import os, sys, clr
+import clr
 import utils
+import numpy as np
 
-_required_arguments = ["gpib_address", "type"]
+_required_arguments = ["type"]
 _optional_arguments = {
-    "dll_path": "C:\\Program Files\\Spiricon\\BeamGage Professional\\",
+    "dll_path": "..\\drivers\\beamgage_drivers\\Beamgage_python_wrapper",
     "verbose_printing": 0,
 }
-
-_dlls = [
-    "Spiricon.Automation.dll",
-    "Spiricon.BeamGage.Automation.dll",
-    "Spiricon.Interfaces.ConsoleService.dll",
-    "Spiricon.TreePattern.dll",
-]
 
 
 class BeamCamera:
@@ -26,12 +19,40 @@ class BeamCamera:
         )
         config_dict = utils.optional_arguments_merge(config_dict, _optional_arguments)
 
-        dll_path = config_dict["dll_path"]
-        if dll_path[-1] != "\\":
-            dll_path += "\\"
+        self.dll_path = config_dict["dll_path"]
+        self.verbose = config_dict["verbose_printing"]
 
-        for dll in _dlls:
-            clr.AddReference(dll_path + dll)
-        import Spiricon.Automation
+    def open(self):
+        clr.AddReference(self.dll_path)
+        import Beamgage_python_wrapper
 
-    _bg = new AutomatedBeamGage("ClientOne", true);
+        bg_class = Beamgage_python_wrapper.Beamgage("CHAMPS", True)
+        self.bg = bg_class.get_AutomatedBeamGage()
+
+    def __enter__(self):
+        print("__enter__() in keithley2400") if self.verbose & 8 else None
+        self.open()
+        return self
+
+    def __exit__(self, exception_type, exception_value, exception_traceback):
+        if self.verbose & 8:
+            print("__exit__() in Spiricon camera")
+            print(f"{exception_type=}, {exception_value=}, {exception_traceback=}")
+        self.close()
+
+    def close(self):
+        self.bg.Instance.Shutdown()
+
+    def get_frame_data(self) -> list:
+        data_NET = self.bg.ResultsPriorityFrame.DoubleData
+        data_list = [x for x in data_NET]
+
+        shape = self.get_frame_shape()
+        matrix = np.array(data_NET)
+        matrix = np.reshape(matrix, shape)
+        return list(matrix)
+
+    def get_frame_shape(self) -> tuple(int, int):
+        width = int(self.bg.get_FrameInfoResults().Width)
+        height = int(self.bg.get_FrameInfoResults().Height)
+        return (height, width)
