@@ -5,4 +5,5 @@ __all__ = [
     "andoAQ6317B",
     "anritsuMS9710A",
     "Spiricon_BGP_USB_SP928_OSI",
+    "do_nothing",
 ]

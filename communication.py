@@ -85,6 +85,33 @@ class Communication:
                 # TODO Change this
                 raise Exception(f"No Beam of type {Beam_type} found.")
 
+    def __getattr__(self, name):
+        # Returns do_nothing instrument for undefined methods
+        def method(*args, **kwargs):
+            try:
+                if args[0]["type"] == "do_nothing":
+                    return equipment.do_nothing.DoNothing
+            except:
+                pass
+            raise AttributeError(f"Unknown attribute {name} in communication")
+
+        return method
+
+    def __getattribute__(self, name):
+        # Returns do_nothing instrument for defined methods
+        attr = object.__getattribute__(self, name)
+
+        def method(*args, **kwargs):
+            try:
+                if args[0]["type"] == "do_nothing":
+                    return equipment.do_nothing.DoNothing
+            except:
+                pass
+            result = attr(*args, **kwargs)
+            return result
+
+        return method
+
 
 if __name__ == "__main__":
     pass
