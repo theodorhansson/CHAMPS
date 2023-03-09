@@ -65,7 +65,7 @@ def identify_measurement_type(measurement: str):
         case "beam_profile":
             import measurement_type.beam_profile
 
-            return measurement_type.spectrum.init
+            return measurement_type.beam_profile.init
 
         case _:
             # TODO Change this

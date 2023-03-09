@@ -42,23 +42,24 @@ def init(full_config: dict):
         beam_config, _optional_arguments
     )
 
-    # Extract dict and parameter from dict
-    beam_name = full_config[_beam_name_key]
+    # Extract name and parameter from dict
+    beamgage_name = full_config["measurement"][_beam_name_key]
+    beamgage_config = full_config[beamgage_name]
     DC_name = beam_config[_DC_name_key]
     DC_config = full_config[DC_name]
 
-    Results = beam_main(beam_config, DC_config)
+    Results = beam_main(beam_config, DC_config, beamgage_config)
 
     return_dict = {
-        beam_name: spectrum_config_opt,
+        beamgage_name: spectrum_config_opt,
         DC_name: DC_config,
     }
     return Results, return_dict
 
 
-def beam_main(beam_config: dict, DC_config: dict):
+def beam_main(beam_config: dict, DC_config: dict, beamgage_config: dict):
     current_intervals = beam_config["current"]
-    V_max = beam_config["V_max"]
+    V_max = beam_config["v_max"]
     verbose = beam_config["verbose_printing"]
 
     current_interval_list = utils.interval_2_points(current_intervals)
@@ -71,7 +72,7 @@ def beam_main(beam_config: dict, DC_config: dict):
     # Try to fetch the objects
     try:
         Instrument_COM = communication.Communication()
-        beam_unit_obj = Instrument_COM.get_Beam(beam_config)  # Uninitiated objects
+        beam_unit_obj = Instrument_COM.get_Beam(beamgage_config)  # Uninitiated objects
         DC_unit_obj = Instrument_COM.get_DCsupply(DC_config)
     except:
         traceback.print_exc()
