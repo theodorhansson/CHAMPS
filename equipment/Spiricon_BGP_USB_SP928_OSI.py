@@ -39,14 +39,6 @@ class BeamCamera:
         bg_class = Beamgage_python_wrapper.Beamgage("CHAMPS", True)
         self.bg = bg_class.get_AutomatedBeamGage()
 
-        # If get_frame_data returns something (not None) all good, else raise Exception
-        for i in range(15):
-            if self.get_frame_data():
-                break
-            time.sleep(1)
-        else:
-            raise Exception("Beamgage camera didn't respond. Is it connected?")
-
     def __enter__(self):
         print("__enter__() in Spiricon camera") if self.verbose & 8 else None
         self.open()
@@ -63,6 +55,15 @@ class BeamCamera:
 
     def get_frame_data(self) -> list:
         data_NET = self.bg.ResultsPriorityFrame.DoubleData
+
+        # If data_NET is something (not None) all good, else raise Exception
+        for i in range(15):
+            if self.get_frame_data():
+                break
+            time.sleep(1)
+        else:
+            raise Exception("Beamgage camera didn't respond. Is it connected?")
+
         data_list = [x for x in data_NET]
 
         shape = self.get_frame_shape()
