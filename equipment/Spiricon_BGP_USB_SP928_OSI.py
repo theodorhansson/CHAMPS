@@ -69,7 +69,7 @@ class BeamCamera:
         matrix = np.reshape(matrix, shape)
         return list(matrix)
 
-    def get_frame_shape(self) -> tuple(int, int):
+    def get_frame_shape(self) -> tuple[int, int]:
         width = int(self.bg.get_FrameInfoResults().Width)
         height = int(self.bg.get_FrameInfoResults().Height)
         return (height, width)
