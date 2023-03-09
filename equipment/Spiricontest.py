@@ -15,7 +15,12 @@ res = [x for x in res]
 print("len  ", len(res), "\tmax  ", np.max(res))
 
 print("Getting frame info:")
-width = bg.get_FrameInfoResults().Width
-height = bg.get_FrameInfoResults().Height
-time.sleep(2)
+width = int(bg.get_FrameInfoResults().Width)
+height = int(bg.get_FrameInfoResults().Height)
+
+res_arr = np.array[res]
+matrix = np.reshape(res_arr, (height, width))
+plt.imshow(matrix)
+plt.show()
+time.sleep(1)
 # bg.Instance.Shutdown()
