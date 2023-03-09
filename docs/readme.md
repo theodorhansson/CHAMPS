@@ -10,3 +10,7 @@ Equipment
 - [Keithley 2400 Sourcemeter](equipment/keithley2400.md)
 - [Ophir IS6-D-UV integrating Sphere](equipment/ophir_IS6_D_UV.md)
 - [Anritsu MS9710A Oprical Spectrum Analyzer](equipment/anritsuMS9710A.md)
+
+Advanced
+- [Advanced device notes](/advanced/adv_device_notes.md)
+- [Expand the program yourself](/advanced/expanding.md)
