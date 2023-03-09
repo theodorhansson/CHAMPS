@@ -29,4 +29,8 @@ class DoNothing:
 
     def get_frame_data(self, *args, **kwargs):
         # Returns large random matrix
-        return list(np.random.rand(50, 50))
+        image_np = list(np.random.rand(50, 50))
+        image = []
+        for row in image_np:
+            image.append(list(row))
+        return image
