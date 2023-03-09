@@ -68,8 +68,22 @@ class Communication:
                 # TODO Change this
                 raise Exception(f"No OSA of type {OSA_type} found.")
 
-    def get_Beam(self):
-        pass
+    def get_Beam(self, config_dict):
+        utils.argument_checker(
+            config_dict,
+            _required_arguments,
+            warn_extra=False,
+            source_func="communication beam",
+        )
+
+        Beam_type = config_dict["type"]
+
+        match Beam_type:
+            case None:
+                return Spiricon_BGP_USB_SP928_OSI.BeamCamera
+            case _:
+                # TODO Change this
+                raise Exception(f"No Beam of type {Beam_type} found.")
 
 
 if __name__ == "__main__":
