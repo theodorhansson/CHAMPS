@@ -87,9 +87,6 @@ def beam_main(beam_config: dict, DC_config: dict, beamgage_config: dict):
         print("Something went wrong when getting and opening the resources")
         sys.exit()
 
-    if plot_image:
-        Plot = utils.AnimatedPlot(title="Beam profile")
-
     if hold_console:
         input("Configure settings in other software, press any key to continue: ")
 
@@ -105,6 +102,9 @@ def beam_main(beam_config: dict, DC_config: dict, beamgage_config: dict):
 
             if pre_ultracal:
                 beam_unit.calibrate()
+
+            if plot_image:
+                Plot = utils.AnimatedPlot(title="Beam profile")
 
             prev_end_current = 0  # For first ramp up
             loop_count = 0  # The number of
