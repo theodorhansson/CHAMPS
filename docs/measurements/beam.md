@@ -17,9 +17,9 @@ Current = [[1, 0.1, 5], [5, 0.5, 15]]  # [min, step, max]
 
 # Optional
 verbose_printing = 0
-plot_image =  1
+plot_image =  0
 keep_plot = 0
-hold_console = 0  
+hold_console = 1  
 
 [keithley2400]
 type = "keithley2400"   # The specific type of unit
