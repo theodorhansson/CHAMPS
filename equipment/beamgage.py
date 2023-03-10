@@ -62,7 +62,7 @@ class BeamCamera:
         data_pyth = [x for x in data_NET]
         return data_pyth
 
-    def get_frame_data(self) -> list:
+    def get_frame_data(self, retry=True) -> list:
         for i in range(5):
             data_list = self._get_raw_frame_data()
 
@@ -83,7 +83,10 @@ class BeamCamera:
         length = len(matrix)
 
         if length != (shape[0] * shape[1]):  # length = no of pixels = height * width
-            raise Exception("The frame data didn't have the excpected shape.")
+            if retry:  # Try once more to get a good picture, else except
+                return self.get_frame_data(retry=False)
+            else:
+                raise Exception("The frame data didn't have the excpected shape.")
 
         matrix = np.reshape(matrix, shape)
 
