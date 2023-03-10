@@ -69,7 +69,6 @@ def beam_main(beam_config: dict, DC_config: dict, beamgage_config: dict):
     keep_plot = beam_config["keep_plot"]
     hold_console = beam_config["hold_console"]
     verbose = beam_config["verbose_printing"]
-    pre_ultracal = beam_config["pre_ultracal"]
 
     current_interval_list = utils.interval_2_points(current_intervals)
     Results = {"header": "Current [mA], Voltage [V], 'photon' count"}
@@ -102,9 +101,6 @@ def beam_main(beam_config: dict, DC_config: dict, beamgage_config: dict):
                 input(
                     "Configure settings in other software, press any key to continue: "
                 )
-
-            if pre_ultracal:
-                beam_unit.calibrate()
 
             if plot_image:
                 Plot = utils.AnimatedPlot(title="Beam profile")
