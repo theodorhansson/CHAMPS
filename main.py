@@ -36,12 +36,14 @@ def main(config_path):
 
     # Create save folder if it doesn't exist
     if not os.path.isdir(save_folder):
+        print("Woops, your folder doesn't exist. Creating one here: ", save_folder)
         os.mkdir(save_folder)
 
     timestamp = time.strftime(rf"%Y%m%d-%H%M%S")  # get the current time in nice format
     save_file_name = save_folder + meas_name + "-" + timestamp
 
     # Save the data as json
+    print("Starting saving process. This might take a while for large files.")
     data_save_name = save_file_name + ".json"
     with open(data_save_name, "w") as export_file:
         json.dump(result_dict, export_file)
