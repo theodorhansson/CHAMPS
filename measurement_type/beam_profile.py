@@ -28,6 +28,7 @@ _optional_arguments = {
     "plot_image": False,
     "keep_plot": False,
     "hold_console": False,
+    "pre_ultracal": True,
 }
 
 
@@ -67,6 +68,7 @@ def beam_main(beam_config: dict, DC_config: dict, beamgage_config: dict):
     keep_plot = beam_config["keep_plot"]
     hold_console = beam_config["hold_console"]
     verbose = beam_config["verbose_printing"]
+    pre_ultracal = beam_config["pre_ultracal"]
 
     current_interval_list = utils.interval_2_points(current_intervals)
     Results = {"header": "Current [mA], Voltage [V], 'photon' count"}
@@ -93,11 +95,16 @@ def beam_main(beam_config: dict, DC_config: dict, beamgage_config: dict):
 
     # Main measurement loop
     try:
-        with beam_unit_obj(beam_config) as beam_unit, DC_unit_obj(DC_config) as DC_unit:
+        with beam_unit_obj(beamgage_config) as beam_unit, DC_unit_obj(
+            DC_config
+        ) as DC_unit:
             # Some initial settings for DC_unit
             DC_unit.set_current(0.0)
             DC_unit.set_voltage_limit(V_max)
             DC_unit.set_output(True)
+
+            if pre_ultracal:
+                beam_unit.calibrate()
 
             prev_end_current = 0  # For first ramp up
             loop_count = 0  # The number of
