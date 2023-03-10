@@ -16,7 +16,10 @@ V_max = 5
 Current = [[1, 0.1, 5], [5, 0.5, 15]]  # [min, step, max] 
 
 # Optional
-verbose_printing = 0  
+verbose_printing = 0
+plot_image =  1
+keep_plot = 0
+hold_console = 0  
 
 [keithley2400]
 type = "keithley2400"   # The specific type of unit
@@ -62,3 +65,16 @@ See [general](general.md).
 
 ## Verbose_printing: int {O}
 See [general](general.md). 
+
+## Plot_image: bool {O}
+**Default: False**
+Whether to plot the image you got from Beamgage or not.
+
+## Keep_plot: bool {O}
+**Default: False**
+Whether to plot the image you got from Beamgage or not.
+
+## Hold_console: bool {O}
+**Default: True**
+Whether to block console awaiting manual configuration in Beamgage or not. 
+Every measurement a new instance of Beamgage is created and it's in that window most picture settings are done. This option stops the execution of the measurement until you are done making those changes.
