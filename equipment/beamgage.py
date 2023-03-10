@@ -37,7 +37,10 @@ class BeamCamera:
         clr.AddReference(self.dll_path)
         import Beamgage_python_wrapper
 
+        # Gets the DLL wrapper class
         bg_class = Beamgage_python_wrapper.Beamgage("CHAMPS", True)
+
+        # Gets the desired AutomatedBeamGage .NET obj
         self.bg = bg_class.get_AutomatedBeamGage()
 
     def __enter__(self):
@@ -79,3 +82,7 @@ class BeamCamera:
         width = int(self.bg.get_FrameInfoResults().Width)
         height = int(self.bg.get_FrameInfoResults().Height)
         return (height, width)
+
+    def calibrate(self):
+        print("calibrate() in Beamgage") if self.verbose & 8 else None
+        self.bg.Calibration.Ultracal()
