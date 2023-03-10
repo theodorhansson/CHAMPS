@@ -57,24 +57,38 @@ class BeamCamera:
         print("close() in Beamgage") if self.verbose & 8 else None
         self.bg.Instance.Shutdown()
 
-    def get_frame_data(self) -> list:
-
+    def _get_raw_frame_data(self) -> list:
         data_NET = self.bg.ResultsPriorityFrame.DoubleData
+        data_pyth = [x for x in data_NET]
+        return data_pyth
 
-        # If data_NET is something (not None) all good, else raise Exception
-        for i in range(10):
-            if self.get_frame_data():
+    def get_frame_data(self) -> list:
+        for i in range(5):
+            data_list = self._get_raw_frame_data()
+
+            # If NOT none, break loop, else sleep and fetch again
+            if data_list:
                 break
+
+            if self.verbose & 8:
+                print("get_frame_data() in Beamgage: retrying data fetch ", i)
             time.sleep(1)
         else:
             raise Exception("Beamgage camera didn't respond. Is it connected?")
 
         shape = self.get_frame_shape()
-        matrix = np.array(data_NET)
+        matrix = np.array(data_list)
+        min = np.min(matrix)
+        max = np.max(matrix)
+        length = len(matrix)
+
+        if length != (shape[0] * shape[1]):  # length = no of pixels = height * width
+            raise Exception("The frame data didn't have the excpected shape.")
+
         matrix = np.reshape(matrix, shape)
 
         if self.verbose & 8:
-            print(f"get_frame_data() in Beamgage: len {len(data_NET)}, shape {shape}")
+            print(f"get_frame_data() in Beamgage: {length=} {shape=} {min=} {max=}")
 
         return [list(x) for x in matrix]
 
