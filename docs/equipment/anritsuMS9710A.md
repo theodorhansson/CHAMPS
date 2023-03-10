@@ -52,5 +52,4 @@ For this device only certain values are allowed:
 	.02
 	.01
 	0.07
-	0.05
-**Note:** If you supply another value the system will automatically round down to the closest value, or down if you supplied a too large number
+**Note:** If you supply another value the system will automatically round down to the closest value.
