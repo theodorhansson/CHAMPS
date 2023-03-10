@@ -27,8 +27,7 @@ _optional_arguments = {
     "verbose_printing": 0,
     "plot_image": False,
     "keep_plot": False,
-    "hold_console": False,
-    "pre_ultracal": True,
+    "hold_console": True,
 }
 
 
@@ -89,9 +88,6 @@ def beam_main(beam_config: dict, DC_config: dict, beamgage_config: dict):
         print("Something went wrong when getting and opening the resources")
         sys.exit()
 
-    if hold_console:
-        input("Configure settings in other software, press any key to continue: ")
-
     # Main measurement loop
     try:
         with beam_unit_obj(beamgage_config) as beam_unit, DC_unit_obj(
@@ -101,6 +97,11 @@ def beam_main(beam_config: dict, DC_config: dict, beamgage_config: dict):
             DC_unit.set_current(0.0)
             DC_unit.set_voltage_limit(V_max)
             DC_unit.set_output(True)
+
+            if hold_console:
+                input(
+                    "Configure settings in other software, press any key to continue: "
+                )
 
             if pre_ultracal:
                 beam_unit.calibrate()
@@ -149,7 +150,7 @@ def beam_main(beam_config: dict, DC_config: dict, beamgage_config: dict):
         traceback.print_exc()
 
     # To hold plot open when measurement done
-    if keep_plot:
+    if keep_plot and plot_image:
         print("Beam measurements done. Keeping plot alive for your convenience.")
         Plot.keep_open()
     else:
