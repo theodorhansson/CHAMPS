@@ -58,12 +58,11 @@ class BeamCamera:
         self.bg.Instance.Shutdown()
 
     def get_frame_data(self) -> list:
-        print("get_frame_data() in Beamgage") if self.verbose & 8 else None
 
         data_NET = self.bg.ResultsPriorityFrame.DoubleData
 
         # If data_NET is something (not None) all good, else raise Exception
-        for i in range(15):
+        for i in range(10):
             if self.get_frame_data():
                 break
             time.sleep(1)
@@ -73,14 +72,19 @@ class BeamCamera:
         shape = self.get_frame_shape()
         matrix = np.array(data_NET)
         matrix = np.reshape(matrix, shape)
-        return list(matrix)
+
+        if self.verbose & 8:
+            print(f"get_frame_data() in Beamgage: len {len(data_NET)}, shape {shape}")
+
+        return [list(x) for x in matrix]
 
     def get_frame_shape(self) -> tuple[int, int]:
-        print("get_frame_shape() in Beamgage") if self.verbose & 8 else None
-
         width = int(self.bg.get_FrameInfoResults().Width)
         height = int(self.bg.get_FrameInfoResults().Height)
-        return (height, width)
+        ans = (height, width)
+        if self.verbose & 8:
+            print(f"shape() in Beamgage: value {ans}")
+        return ans
 
     def calibrate(self):
         print("calibrate() in Beamgage") if self.verbose & 8 else None
