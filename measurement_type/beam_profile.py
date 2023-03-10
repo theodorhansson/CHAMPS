@@ -25,9 +25,9 @@ _required_arguments = [
 ]
 _optional_arguments = {
     "verbose_printing": 0,
-    "plot_image": False,
-    "keep_plot": False,
-    "hold_console": True,
+    "plot_image": 0,
+    "keep_plot": 0,
+    "hold_console": 1,
 }
 
 
