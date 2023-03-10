@@ -33,29 +33,31 @@ _optional_arguments = {
 
 
 def init(full_config: dict):
-    beam_config = full_config["measurement"]  # Extract dict
+    beam_meas_config = full_config["measurement"]  # Extract dict
 
     # Check and merge optional arguments
     utils.argument_checker(
-        beam_config,
+        beam_meas_config,
         _required_arguments,
         _optional_arguments,
         source_func="Beam init",
     )
-    spectrum_config_opt = utils.optional_arguments_merge(
-        beam_config, _optional_arguments
+    beam_meas_config = utils.optional_arguments_merge(
+        beam_meas_config, _optional_arguments
     )
 
     # Extract name and parameter from dict
+    beam_meas_name = beam_meas_config["type"]
     beamgage_name = full_config["measurement"][_beam_name_key]
     beamgage_config = full_config[beamgage_name]
-    DC_name = beam_config[_DC_name_key]
+    DC_name = beam_meas_config[_DC_name_key]
     DC_config = full_config[DC_name]
 
-    Results = beam_main(beam_config, DC_config, beamgage_config)
+    Results = beam_main(beam_meas_config, DC_config, beamgage_config)
 
     return_dict = {
-        beamgage_name: spectrum_config_opt,
+        beam_meas_name: beam_meas_config,
+        beamgage_name: beamgage_config,
         DC_name: DC_config,
     }
     return Results, return_dict
