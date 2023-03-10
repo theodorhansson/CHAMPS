@@ -1,20 +1,19 @@
 import clr
 import numpy as np
 import time
+import sys, pathlib
 
+root_folder = str(pathlib.Path(__file__).parent.parent.resolve())
 # Dumb code to import utils
 try:
     import utils
 except:
-    import sys, pathlib
-
-    util_path = str(pathlib.Path(__file__).parent.parent.resolve())
-    sys.path.append(util_path)
-    import utils
+    sys.path.append(root_folder)
+    import utils  # Utils are placed in root folder of CHAMPS
 
 _required_arguments = ["type"]
 _optional_arguments = {
-    "dll_path": "..\\drivers\\beamgage_drivers\\Beamgage_python_wrapper",
+    "dll_path": root_folder + "\\drivers\\beamgage_drivers\\Beamgage_python_wrapper",
     "verbose_printing": 0,
 }
 
