@@ -21,10 +21,13 @@ _required_arguments = [
     "dc_unit",
     "current",
     "v_max",
+    "save_folder",
 ]
 _optional_arguments = {
     "verbose_printing": 0,
     "plot_image": False,
+    "keep_plot": False,
+    "hold_console": False,
 }
 
 
@@ -60,6 +63,9 @@ def init(full_config: dict):
 def beam_main(beam_config: dict, DC_config: dict, beamgage_config: dict):
     current_intervals = beam_config["current"]
     V_max = beam_config["v_max"]
+    plot_image = beam_config["plot_image"]
+    keep_plot = beam_config["keep_plot"]
+    hold_console = beam_config["hold_console"]
     verbose = beam_config["verbose_printing"]
 
     current_interval_list = utils.interval_2_points(current_intervals)
@@ -78,6 +84,12 @@ def beam_main(beam_config: dict, DC_config: dict, beamgage_config: dict):
         traceback.print_exc()
         print("Something went wrong when getting and opening the resources")
         sys.exit()
+
+    if plot_image:
+        Plot = utils.AnimatedPlot(title="Beam profile")
+
+    if hold_console:
+        input("Configure settings in other software, press any key to continue: ")
 
     # Main measurement loop
     try:
@@ -111,6 +123,9 @@ def beam_main(beam_config: dict, DC_config: dict, beamgage_config: dict):
                     Results[loop_count]["current"] = current
                     Results[loop_count]["current"] = image
 
+                    if plot_image:
+                        Plot.add_image(image)
+
                     if verbose & 1 + 2:
                         print("volt", volt)
                         print("current", current)
@@ -124,5 +139,11 @@ def beam_main(beam_config: dict, DC_config: dict, beamgage_config: dict):
     except:
         traceback.print_exc()
 
-    print("Spectrum measurements done.")
+    # To hold plot open when measurement done
+    if keep_plot:
+        print("Beam measurements done. Keeping plot alive for your convenience.")
+        Plot.keep_open()
+    else:
+        print("Beam measurements done. Vaporizing plot!")
+
     return Results
