@@ -51,7 +51,7 @@ def main(config_path):
 
     # Save the config
     config_save_name = save_file_name + ".toml"
-    with open(config_save_name + ".toml", "wb") as f:
+    with open(config_save_name, "wb") as f:
         tomli_w.dump(used_config, f)
     print(f"Saving config file {config_save_name} to disk.") if verbose & 16 else None
 
