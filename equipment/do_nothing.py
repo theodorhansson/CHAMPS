@@ -43,7 +43,7 @@ class DoNothing:
                 print(f"{name}() in do_nothing, with {args=}, {kwargs=}")
             # Return something for getters
             if "get" in name:
-                time.sleep(0.5)
+                time.sleep(0.25)
                 return 1
             else:
                 return None
@@ -51,9 +51,12 @@ class DoNothing:
         return method
 
     def get_voltage_and_current(self, *args, **kwargs):
-        time.sleep(0.5)
+        time.sleep(0.25)
         print("get_voltage_and_current() in do_nothing") if self.verbose & 8 else None
         return 1, 1
+
+    def get_power(self, *args, **kwargs):
+        return np.random.rand()
 
     def get_frame_data(self, *args, **kwargs):
         time.sleep(0.5)
