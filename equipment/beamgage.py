@@ -104,5 +104,6 @@ class BeamCamera:
         return ans
 
     def calibrate(self):
+        # This isn't optimal. Better to do it in the BeamGage GUI.
         print("calibrate() in Beamgage") if self.verbose & 8 else None
         self.bg.Calibration.Ultracal()
