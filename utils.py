@@ -275,7 +275,7 @@ class AnimatedPlot:
     def add_point(self, x: float, y: float):
         # Adds point
         self.ax.scatter(x, y)
-        plt.pause(0.0001)
+        plt.pause(0.0001)  # Forces redraw, but seems to be fast.
 
     def add_image(self, image):
         # Draw an image

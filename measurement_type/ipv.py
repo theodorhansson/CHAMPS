@@ -131,6 +131,7 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
                     if loop_count % plot_update_interval == 0:
                         # approx 0.5s per measurement
                         Plot.update()
+
                     # Code to handle rollover functionality
                     if power > rollover_min:
                         power_max = max(power, power_max)
@@ -145,10 +146,17 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
             traceback.print_exc()
 
     # To hold plot open when measurement done
-    if keep_plot:
-        print("IPV measurements done. Keeping plot alive for your convenience.")
-        Plot.keep_open()
-    else:
-        print("IPV measurements done. Vaporizing plot!")
+    try:
+        if keep_plot:
+            print("IPV measurements done. Keeping plot alive for your convenience.")
+            Plot.keep_open()
+        else:
+            print("IPV measurements done. Vaporizing plot!")
+
+    except KeyboardInterrupt:
+        pass
+    except:
+        # print error if error isn't catched
+        traceback.print_exc()
 
     return Results
