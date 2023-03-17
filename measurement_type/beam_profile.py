@@ -125,9 +125,9 @@ def beam_main(beam_config: dict, DC_config: dict, beamgage_config: dict):
 
                     # Save data in dict
                     Results[loop_count] = dict()
-                    Results[loop_count]["voltage"] = volt
                     Results[loop_count]["current"] = current
-                    Results[loop_count]["current"] = image
+                    Results[loop_count]["voltage"] = volt
+                    Results[loop_count]["photon_count"] = image
 
                     if plot_image:
                         Plot.add_image(image)
