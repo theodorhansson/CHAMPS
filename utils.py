@@ -284,8 +284,11 @@ class AnimatedPlot:
 
     def keep_open(self):
         # Keeps plot open
-        plt.ioff()  # Turn off interactive
-        plt.show()
+        try:
+            plt.ioff()  # Turn off interactive
+            plt.show()
+        except:
+            pass
 
     def update(self):
         plt.draw()

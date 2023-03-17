@@ -146,17 +146,10 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
             traceback.print_exc()
 
     # To hold plot open when measurement done
-    try:
-        if keep_plot:
-            print("IPV measurements done. Keeping plot alive for your convenience.")
-            Plot.keep_open()
-        else:
-            print("IPV measurements done. Vaporizing plot!")
-
-    except KeyboardInterrupt:
-        pass
-    except:
-        # print error if error isn't catched
-        traceback.print_exc()
+    if keep_plot:
+        print("IPV measurements done. Keeping plot alive for your convenience.")
+        Plot.keep_open()
+    else:
+        print("IPV measurements done. Vaporizing plot!")
 
     return Results
