@@ -66,6 +66,9 @@ class BeamCamera:
         return data_pyth
 
     def get_frame_data(self, retry=True) -> list:
+        # Sleep to make sure the camera captures a pic of the newly set bias current
+        time.sleep(0.25)
+
         for i in range(5):
             data_list = self._get_raw_frame_data()
 
