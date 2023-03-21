@@ -5,7 +5,7 @@ Save_folder = "c:/LABDATA"
 DC_unit = "keithley2400"    # Refers to the [] below only
 BEAM_unit = "beam"          # Refers to the [] below only
 V_max = 5
-Current = [[1, 0.1, 5], [5, 0.5, 15]]  # [min, step, max]
+Current = [1, 10]  # [min, step, max]
 
 # Optional
 verbose_printing = 0
