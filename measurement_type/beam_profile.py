@@ -92,10 +92,6 @@ def beam_main(beam_config: dict, DC_config: dict, beamgage_config: dict):
         with beam_unit_obj(beamgage_config) as beam_unit, DC_unit_obj(
             DC_config
         ) as DC_unit:
-            # Some initial settings for DC_unit
-            DC_unit.set_current(0.0)
-            DC_unit.set_voltage_limit(V_max)
-            DC_unit.set_output(True)
 
             if hold_console:
                 input(
@@ -104,6 +100,11 @@ def beam_main(beam_config: dict, DC_config: dict, beamgage_config: dict):
 
             if plot_image:
                 Plot = utils.AnimatedPlot(title="Beam profile")
+
+            # Some initial settings for DC_unit
+            DC_unit.set_current(0.0)
+            DC_unit.set_voltage_limit(V_max)
+            DC_unit.set_output(True)
 
             prev_end_current = 0  # For first ramp up
             loop_count = 0  # The number of
