@@ -36,12 +36,14 @@ def main(config_path):
 
     # Create save folder if it doesn't exist
     if not os.path.isdir(save_folder):
+        print("Woops, your folder doesn't exist. Creating one here: ", save_folder)
         os.mkdir(save_folder)
 
     timestamp = time.strftime(rf"%Y%m%d-%H%M%S")  # get the current time in nice format
     save_file_name = save_folder + meas_name + "-" + timestamp
 
     # Save the data as json
+    print("Starting saving process. This might take a while for large files.")
     data_save_name = save_file_name + ".json"
     with open(data_save_name, "w") as export_file:
         json.dump(result_dict, export_file)
@@ -49,7 +51,7 @@ def main(config_path):
 
     # Save the config
     config_save_name = save_file_name + ".toml"
-    with open(config_save_name + ".toml", "wb") as f:
+    with open(config_save_name, "wb") as f:
         tomli_w.dump(used_config, f)
     print(f"Saving config file {config_save_name} to disk.") if verbose & 16 else None
 

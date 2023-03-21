@@ -1,8 +1,8 @@
 # Beam profile measurements
-The Beam routine takes a picture of the beam for a list of biasing currents. To make it work you need to supply most of the following params in the TOML file:
+The Beam routine takes a picture of the beam for a list of biasing currents. To make it work you need to supply most of the following params in the TOML file.
 
 Items marked with {M} are mandatory, {O} optional.
-
+**Note:** The resolution of the camera is approx 1920x1440=2 764 800 pixels. This results in HUGE output files.
 
 ```toml
 #Std units: mA, V, counts

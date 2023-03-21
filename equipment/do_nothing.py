@@ -1,4 +1,5 @@
 import numpy as np
+import time
 
 # This class can be used if you want an instrument, but don't have it connected
 
@@ -34,13 +35,15 @@ class DoNothing:
                 print(f"{exception_type=}, {exception_value=}, {exception_traceback=}")
 
     def __getattr__(self, name):
-        # Returns none if unknown method
+        # This method is called if an attribute isn't found. Overloads take precedence.
+        # Returns none if unknown method or setter
 
         def method(*args, **kwargs):
             if self.verbose & 8:
                 print(f"{name}() in do_nothing, with {args=}, {kwargs=}")
             # Return something for getters
             if "get" in name:
+                time.sleep(0.25)
                 return 1
             else:
                 return None
@@ -48,10 +51,15 @@ class DoNothing:
         return method
 
     def get_voltage_and_current(self, *args, **kwargs):
+        time.sleep(0.25)
         print("get_voltage_and_current() in do_nothing") if self.verbose & 8 else None
         return 1, 1
 
+    def get_power(self, *args, **kwargs):
+        return np.random.rand()
+
     def get_frame_data(self, *args, **kwargs):
+        time.sleep(0.5)
         print("get_frame_data() in do_nothing") if self.verbose & 8 else None
         # Returns large random matrix
         image_np = list(np.random.rand(50, 50))

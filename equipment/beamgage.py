@@ -15,6 +15,7 @@ _required_arguments = ["type"]
 _optional_arguments = {
     "dll_path": root_folder + "\\drivers\\beamgage_drivers\\Beamgage_python_wrapper",
     "verbose_printing": 0,
+    "keep_beamgage": 0,
 }
 
 
@@ -30,6 +31,7 @@ class BeamCamera:
 
         self.dll_path = config_dict["dll_path"]
         self.verbose = config_dict["verbose_printing"]
+        self.keep_beamgage = config_dict["keep_beamgage"]
         print("__init__() in Beamgage") if self.verbose & 4 + 8 else None
 
     def open(self):
@@ -51,7 +53,8 @@ class BeamCamera:
         if self.verbose & 8:
             print("__exit__() in Beamgage")
             print(f"{exception_type=}, {exception_value=}, {exception_traceback=}")
-        self.close()
+        if not self.keep_beamgage:
+            self.close()
 
     def close(self):
         print("close() in Beamgage") if self.verbose & 8 else None
@@ -62,7 +65,10 @@ class BeamCamera:
         data_pyth = [x for x in data_NET]
         return data_pyth
 
-    def get_frame_data(self) -> list:
+    def get_frame_data(self, retry=True) -> list:
+        # Sleep to make sure the camera captures a pic of the newly set bias current
+        time.sleep(0.25)
+
         for i in range(5):
             data_list = self._get_raw_frame_data()
 
@@ -83,7 +89,10 @@ class BeamCamera:
         length = len(matrix)
 
         if length != (shape[0] * shape[1]):  # length = no of pixels = height * width
-            raise Exception("The frame data didn't have the excpected shape.")
+            if retry:  # Try once more to get a good picture, else except
+                return self.get_frame_data(retry=False)
+            else:
+                raise Exception("The frame data didn't have the excpected shape.")
 
         matrix = np.reshape(matrix, shape)
 
@@ -101,5 +110,6 @@ class BeamCamera:
         return ans
 
     def calibrate(self):
+        # This isn't optimal. Better to do it in the BeamGage GUI.
         print("calibrate() in Beamgage") if self.verbose & 8 else None
         self.bg.Calibration.Ultracal()

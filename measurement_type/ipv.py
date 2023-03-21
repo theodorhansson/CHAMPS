@@ -131,6 +131,7 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
                     if loop_count % plot_update_interval == 0:
                         # approx 0.5s per measurement
                         Plot.update()
+
                     # Code to handle rollover functionality
                     if power > rollover_min:
                         power_max = max(power, power_max)
