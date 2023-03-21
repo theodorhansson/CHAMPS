@@ -90,7 +90,7 @@ class BeamCamera:
         if self.verbose & 8:
             print(f"get_frame_data() in Beamgage: {length=} {shape=} {min=} {max=}")
 
-        return [list(x) for x in matrix]
+        return [[int(element) for element in row] for row in matrix]
 
     def get_frame_shape(self) -> tuple[int, int]:
         width = int(self.bg.get_FrameInfoResults().Width)
