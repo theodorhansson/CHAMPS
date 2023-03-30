@@ -15,7 +15,6 @@ _required_arguments = ["type"]
 _optional_arguments = {
     "dll_path": root_folder + "\\drivers\\beamgage_drivers\\Beamgage_python_wrapper",
     "verbose_printing": 0,
-    "keep_beamgage": 0,
 }
 
 
@@ -31,7 +30,6 @@ class BeamCamera:
 
         self.dll_path = config_dict["dll_path"]
         self.verbose = config_dict["verbose_printing"]
-        self.keep_beamgage = config_dict["keep_beamgage"]
         print("__init__() in Beamgage") if self.verbose & 4 + 8 else None
 
     def open(self):
@@ -53,7 +51,9 @@ class BeamCamera:
         if self.verbose & 8:
             print("__exit__() in Beamgage")
             print(f"{exception_type=}, {exception_value=}, {exception_traceback=}")
-        if not self.keep_beamgage:
+
+        close_arg = str(input("Keep beamgage open? (y/n) "))
+        if close_arg.lower() == "y":
             self.close()
 
     def close(self):

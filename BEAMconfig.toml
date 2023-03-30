@@ -20,4 +20,3 @@ GPIB_address = "24"
 
 [beam]
 type = "beamgage"
-keep_beamgage = 0
