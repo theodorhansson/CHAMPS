@@ -15,7 +15,8 @@ sample_points = 501
 # Optional
 avg_factor = 10
 verbose_printing = 0
-#sensitivity = "SHI1"   # Only affects ando
+# sensitivity = "SHI1"          # Only affects ando
+# custom_name = "componentXYZ3" # Sets savefile name
 
 [keithley2400]  
 type = "keithley2400"   # The specific type of unit

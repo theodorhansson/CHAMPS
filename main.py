@@ -24,6 +24,13 @@ def main(config_path):
         verbose = 0
     print(f"Reading config {config_path} from disk") if verbose & 16 else None
 
+    # Set file name to current time if undefined
+    if "custom_name" not in config_lower["measurement"].keys():
+        # get the current time in nice format
+        timestamp = time.strftime(rf"%Y%m%d-%H%M%S")
+        config_lower["measurement"]["custom_name"] = meas_name + "-" + timestamp
+    file_name = config_lower["measurement"]["custom_name"]
+
     # Get the measurement object
     measurement_init = identify_measurement_type(meas_name)
     # Begin the measurement!
@@ -38,9 +45,7 @@ def main(config_path):
     if not os.path.isdir(save_folder):
         print("Woops, your folder doesn't exist. Creating one here: ", save_folder)
         os.mkdir(save_folder)
-
-    timestamp = time.strftime(rf"%Y%m%d-%H%M%S")  # get the current time in nice format
-    save_file_name = save_folder + meas_name + "-" + timestamp
+    save_file_name = save_folder + file_name
 
     # Save the data as json
     print("Starting saving process. This might take a while for large files.")

@@ -21,6 +21,7 @@ _required_arguments = [
     "current",
     "v_max",
     "save_folder",
+    "custom_name",
 ]
 _optional_arguments = {
     "rollover_threshold": 0,

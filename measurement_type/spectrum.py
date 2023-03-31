@@ -26,6 +26,7 @@ _required_arguments = [
     "linear_resolution",
     "wavelength_span",
     "sample_points",
+    "custom_name",
 ]
 _optional_arguments = {
     "avg_factor": 5,

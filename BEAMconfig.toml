@@ -12,6 +12,8 @@ verbose_printing = 0
 plot_image =  0
 keep_plot = 0
 hold_console = 1
+save_to_png = 1
+# custom_name = "componentXYZ"  # Sets savefile name
 
 
 [keithley2400] 

@@ -1,6 +1,9 @@
 import communication
 import traceback
 import sys
+import PIL.Image
+import numpy as np
+from pathlib import Path
 
 # Dumb code to import utils
 try:
@@ -22,12 +25,14 @@ _required_arguments = [
     "current",
     "v_max",
     "save_folder",
+    "custom_name",
 ]
 _optional_arguments = {
     "verbose_printing": 0,
     "plot_image": 0,
     "keep_plot": 0,
     "hold_console": 1,
+    "save_to_png": 1,
 }
 
 
@@ -69,6 +74,9 @@ def beam_main(beam_config: dict, DC_config: dict, beamgage_config: dict):
     keep_plot = beam_config["keep_plot"]
     hold_console = beam_config["hold_console"]
     verbose = beam_config["verbose_printing"]
+    save_to_png = beam_config["save_to_png"]
+    save_folder = beam_config["save_folder"]
+    custom_name = beam_config["custom_name"]
 
     current_interval_list = utils.interval_2_points(current_intervals)
     Results = {"header": "Current [mA], Voltage [V], 'photon' count"}
@@ -128,7 +136,17 @@ def beam_main(beam_config: dict, DC_config: dict, beamgage_config: dict):
                     Results[loop_count] = dict()
                     Results[loop_count]["current"] = current
                     Results[loop_count]["voltage"] = volt
-                    Results[loop_count]["photon_count"] = image
+
+                    print(save_to_png)
+                    if save_to_png:
+                        file_name = custom_name + "_" + str(loop_count) + ".png"
+                        save_path = str(Path(save_folder, file_name))
+                        image = np.array(image)
+                        print(image)
+                        image_obj = PIL.Image.fromarray(image)
+                        image_obj.save(save_path, format="png", bit_depth=16)
+                    else:
+                        Results[loop_count]["photon_count"] = image
 
                     if plot_image:
                         Plot.add_image(image)
