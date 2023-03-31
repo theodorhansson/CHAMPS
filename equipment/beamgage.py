@@ -53,7 +53,7 @@ class BeamCamera:
             print(f"{exception_type=}, {exception_value=}, {exception_traceback=}")
 
         close_arg = str(input("Keep beamgage open? (y/n) "))
-        if close_arg.lower() == "y":
+        if close_arg.lower() == "n":
             self.close()
 
     def close(self):
@@ -62,7 +62,7 @@ class BeamCamera:
 
     def _get_raw_frame_data(self) -> list:
         data_NET = self.bg.ResultsPriorityFrame.DoubleData
-        data_pyth = [x for x in data_NET]
+        data_pyth = [x for x in data_NET]  # TODO, unnecessary?
         return data_pyth
 
     def get_frame_data(self, retry=True) -> list:
