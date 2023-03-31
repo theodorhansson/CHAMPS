@@ -137,12 +137,10 @@ def beam_main(beam_config: dict, DC_config: dict, beamgage_config: dict):
                     Results[loop_count]["current"] = current
                     Results[loop_count]["voltage"] = volt
 
-                    print(save_to_png)
                     if save_to_png:
                         file_name = custom_name + "_" + str(loop_count) + ".png"
                         save_path = str(Path(save_folder, file_name))
                         image = np.array(image)
-                        print(image)
                         image_obj = PIL.Image.fromarray(image)
                         image_obj.save(save_path, format="png", bit_depth=16)
                     else:
