@@ -61,11 +61,12 @@ class DoNothing:
     def get_frame_data(self, *args, **kwargs):
         time.sleep(0.5)
         print("get_frame_data() in do_nothing") if self.verbose & 8 else None
-        # Returns large random matrix
-        image_np = list(np.random.rand(50, 50))
-        image = []
-        for row in image_np:
-            image.append(list(row))
+        # Returns large integer random matrix
+        length = 100
+        bit_depth = 12
+        max_val = 2**bit_depth - 1
+        image = np.random.randint(0, max_val, size=(length, length))
+        image = [[int(element) for element in row] for row in image]
         return image
 
 
