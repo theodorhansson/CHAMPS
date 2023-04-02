@@ -1,29 +1,23 @@
 #Std units: mA, V, mW, nm
 
 [measurement]
-Type = "ipv_diode"
+Type = "ipv"
 Save_folder = "c:/LABDATA"
 DC_unit = "keithley2400"    # Refers to the [] below only
-P_unit = "hamamatsu_s2281"
-V_max = 6
-Current = [[0, 0.01, 1], [1, 0.02, 12]]
-#Current = [[0, 0.005, 1], [1, 0.01, 10]]  # mA [min, step, max]
-#Current = [[0, 1, 5]]
+P_unit = "INT_sphere"
+V_max = 5
+Current = [[1, 0.1, 5], [5, 0.5, 15]]  # mA [min, step, max]
 
 # Optional arguments
-Rollover_threshold = 0.85 # Stops measurement when power < rollover_threshold * maxpower
-Rollover_min = 1        # Doesn't do rollover check on power values lower than this
-Plot_interval = 1000      # Update plot every nth measurement
-Verbose_printing = 1    # Flag for printing
-Keep_plot = 1           # To keep plot after measurement is done
+Rollover_threshold = 0  # Stops measurement when power < rollover_threshold * maxpower
+Rollover_min = 0        # Doesn't do rollover check on power values lower than this
+Plot_interval = 20      # Update plot every nth measurement
+Verbose_printing = 0    # Flag for printing
+Keep_plot = 0           # To keep plot after measurement is done
 
-[keithley2400]
+[keithley2400]  
 Type = "keithley2400"   # The specific type of unit
 GPIB_address = "24"
-
-[hamamatsu_s2281]
-Type = "hamamatsu_s2281"   # The specific type of unit
-GPIB_address = "9"
 
 [INT_sphere]
 Type = "ophir_IS6_D_UV"

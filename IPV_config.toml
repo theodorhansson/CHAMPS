@@ -1,0 +1,51 @@
+#Std units: mA, V, mW, nm
+
+[measurement]
+Type = "ipv"
+Save_folder = "c:/LABDATA"
+DC_unit = "keithley2400"    # Refers to the [] below only
+P_unit = "INT_sphere"
+V_max = 5
+current = [ [  0,        5e-05,  0.008   ],]
+#Current = [[0,0.00001,0.001]]  # mA [min, step, max]
+
+# Optional arguments
+Rollover_threshold = 0  # Stops measurement when power < rollover_threshold * maxpower
+Rollover_min = 0.001        # Doesn't do rollover check on power values lower than this
+Plot_interval = 20      # Update plot every nth measurement
+Verbose_printing = 0    # Flag for printing
+Keep_plot = 1           # To keep plot after measurement is done
+
+[keithley2400]  
+Type = "keithley2400"   # The specific type of unit
+GPIB_address = "24"
+
+[INT_sphere]
+Type = "ophir_IS6_D_UV"
+Range = 4
+Min_measure_time = 0.05  # How long to wait between new data to arrive from sphere
+Wavelength = 0
+
+[powercube]
+Type = "powercube"
+Port = "com4"
+
+
+# Avaliable ranges for IS6-D-UV
+# 0    auto
+# 1    1 W
+# 2    300 mW
+# 3    30 mW
+# 4    3 mW
+# 5    300 uW
+# 6    30 uW
+# 7    3 uW
+
+# Avaliable wavelengths for IS6-D-UV
+# 0    940 nm
+# 1    300 nm
+# 2    633 nm
+# 3    543 nm
+# 4    870 nm
+# 5    850 nm
+

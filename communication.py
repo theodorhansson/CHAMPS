@@ -42,6 +42,9 @@ class Communication:
         match Power_type:
             case "ophir_is6_d_uv":
                 return ophir_IS6_D_UV.INT_sphere
+            
+            case "hamamatsu_s2281":
+                return hamamatsu_s2281.hamamatsu_s2281
 
             case _:
                 # TODO Change this
