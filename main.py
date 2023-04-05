@@ -24,11 +24,15 @@ def main(config_path):
         verbose = 0
     print(f"Reading config {config_path} from disk") if verbose & 16 else None
 
+    # get the current time in nice format
+    timestamp = time.strftime(rf"%Y%m%d-%H%M%S")
+
     # Set file name to current time if undefined
     if "custom_name" not in config_lower["measurement"].keys():
-        # get the current time in nice format
-        timestamp = time.strftime(rf"%Y%m%d-%H%M%S")
         config_lower["measurement"]["custom_name"] = meas_name + "-" + timestamp
+    else:
+        config_lower["measurement"]["custom_name"] += "-" + timestamp
+
     file_name = config_lower["measurement"]["custom_name"]
 
     # Get the measurement object
