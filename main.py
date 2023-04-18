@@ -76,17 +76,17 @@ def identify_measurement_type(measurement: str):
             import measurement_type.spectrum
 
             return measurement_type.spectrum.init
-        
+
         case "ipv_diode":
             import measurement_type.ipv_diode
-			
-			return measurement_type.ipv_diode.init
+
+            return measurement_type.ipv_diode.init
 
         case "beam_profile":
             import measurement_type.beam_profile
 
             return measurement_type.beam_profile.init
-            
+
         case _:
             # TODO Change this
             raise Exception(f"No measurement of type {measurement} found.")
