@@ -29,9 +29,8 @@ def main(config_path):
 
     # Set file name to current time if undefined
     if "custom_name" not in config_lower["measurement"].keys():
-        config_lower["measurement"]["custom_name"] = meas_name + "-" + timestamp
-    else:
-        config_lower["measurement"]["custom_name"] += "-" + timestamp
+        config_lower["measurement"]["custom_name"] = meas_name
+    config_lower["measurement"]["custom_name"] += "-" + timestamp
 
     file_name = config_lower["measurement"]["custom_name"]
 
