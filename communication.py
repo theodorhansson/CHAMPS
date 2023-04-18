@@ -47,6 +47,11 @@ class Communication:
                 import equipment.ophir_IS6_D_UV
 
                 return equipment.ophir_IS6_D_UV.INT_sphere
+            
+            case "hamamatsu_s2281":
+				import equipment.hamamatsu_s2281
+				
+                return equipment.hamamatsu_s2281.hamamatsu_s2281
 
             case _:
                 # TODO Change this

@@ -77,6 +77,11 @@ def identify_measurement_type(measurement: str):
 
             return measurement_type.spectrum.init
 
+        case "ipv_diode":
+            import measurement_type.ipv_diode
+
+            return measurement_type.ipv_diode.init
+
         case "beam_profile":
             import measurement_type.beam_profile
 
