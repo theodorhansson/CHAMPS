@@ -1,7 +1,16 @@
 import communication
-import utils
 import traceback
 from numpy import average as np_average
+
+# Dumb code to import utils
+try:
+    import utils
+except:
+    import sys, pathlib
+
+    util_path = str(pathlib.Path(__file__).parent.parent.resolve())
+    sys.path.append(util_path)
+    import utils
 
 _DC_name_key = "dc_unit"
 _P_name_key = "p_unit"
@@ -12,6 +21,7 @@ _required_arguments = [
     "current",
     "v_max",
     "save_folder",
+    "custom_name",
 ]
 _optional_arguments = {
     "rollover_threshold": 0,
@@ -26,7 +36,6 @@ _optional_arguments = {
 def init(config: dict):
     # Get config dict and check for optional arguments
     IPV_config = config["measurement"]
-    IPV_name = IPV_config["type"]
     # Check and merge optional arguments
     utils.argument_checker(
         IPV_config, _required_arguments, _optional_arguments, source_func="IPV init"
@@ -34,6 +43,7 @@ def init(config: dict):
     IPV_config_opt = utils.optional_arguments_merge(IPV_config, _optional_arguments)
 
     # Used for getting instrument objects and their names
+    IPV_name = IPV_config["type"]
     DC_name = IPV_config[_DC_name_key]
     DC_config = config[DC_name]
     P_name = IPV_config[_P_name_key]
@@ -122,6 +132,7 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
                     if loop_count % plot_update_interval == 0:
                         # approx 0.5s per measurement
                         Plot.update()
+
                     # Code to handle rollover functionality
                     if power > rollover_min:
                         power_max = max(power, power_max)

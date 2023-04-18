@@ -1,0 +1,24 @@
+#Std units: mA, V, counts
+[measurement]
+Type = "beam_profile"
+Save_folder = "c:/LABDATA"
+DC_unit = "keithley2400"    # Refers to the [] below only
+BEAM_unit = "beam"          # Refers to the [] below only
+V_max = 5
+Current = [1, 10]  # [min, step, max]
+
+# Optional
+verbose_printing = 0
+plot_image =  0
+keep_plot = 0
+hold_console = 1
+save_to_png = 1
+# custom_name = "componentXYZ"  # Sets savefile name
+
+
+[keithley2400] 
+type = "keithley2400"   # The specific type of unit
+GPIB_address = "24"
+
+[beam]
+type = "beamgage"

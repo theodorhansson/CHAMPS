@@ -1,0 +1,495 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {
+      "Beamgage_python_wrapper/1.0.0": {
+        "dependencies": {
+          "Spiricon.Automation": "6.0.0.0",
+          "Spiricon.BeamGage.Automation": "6.0.0.0",
+          "Spiricon.Interfaces.ConsoleService": "6.7.0.0",
+          "Spiricon.TreePattern": "6.0.0.0"
+        },
+        "runtime": {
+          "Beamgage_python_wrapper.dll": {}
+        }
+      },
+      "Spiricon.Automation/6.0.0.0": {
+        "runtime": {
+          "Spiricon.Automation.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "6.18.0.0"
+          }
+        }
+      },
+      "Spiricon.BeamGage.Automation/6.0.0.0": {
+        "runtime": {
+          "Spiricon.BeamGage.Automation.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "6.18.0.0"
+          }
+        }
+      },
+      "Spiricon.Interfaces.ConsoleService/6.7.0.0": {
+        "runtime": {
+          "Spiricon.Interfaces.ConsoleService.dll": {
+            "assemblyVersion": "6.7.0.0",
+            "fileVersion": "6.12.25.0"
+          }
+        }
+      },
+      "Spiricon.TreePattern/6.0.0.0": {
+        "runtime": {
+          "Spiricon.TreePattern.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "6.23.0.0"
+          }
+        }
+      },
+      "Spiricon.TreePattern.Interfaces/6.0.0.0": {
+        "runtime": {
+          "Spiricon.TreePattern.Interfaces.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "6.23.0.0"
+          }
+        }
+      },
+      "Spiricon.Interfaces/6.0.0.0": {
+        "runtime": {
+          "Spiricon.Interfaces.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "6.23.0.0"
+          }
+        }
+      },
+      "Spiricon.Shared/6.0.0.0": {
+        "runtime": {
+          "Spiricon.Shared.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "6.23.0.0"
+          }
+        },
+        "resources": {
+          "de/Spiricon.Shared.resources.dll": {
+            "locale": "de"
+          },
+          "ja/Spiricon.Shared.resources.dll": {
+            "locale": "ja"
+          },
+          "zh-CN/Spiricon.Shared.resources.dll": {
+            "locale": "zh-CN"
+          }
+        }
+      },
+      "BeamStack.Interfaces/0.0.0.0": {
+        "runtime": {
+          "BeamStack.Interfaces.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.1.0.0"
+          }
+        }
+      },
+      "BG.Interfaces/6.0.0.0": {
+        "runtime": {
+          "BG.Interfaces.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "6.18.0.0"
+          }
+        }
+      },
+      "Spiricon.Remoting/6.7.0.0": {
+        "runtime": {
+          "Spiricon.Remoting.dll": {
+            "assemblyVersion": "6.7.0.0",
+            "fileVersion": "6.12.25.0"
+          }
+        }
+      },
+      "BeamStack.Extensions/0.0.0.0": {
+        "runtime": {
+          "BeamStack.Extensions.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.1.0.0"
+          }
+        }
+      },
+      "System.Reactive/4.4.0.0": {
+        "runtime": {
+          "System.Reactive.dll": {
+            "assemblyVersion": "4.4.0.0",
+            "fileVersion": "4.4.1.57983"
+          }
+        }
+      },
+      "Polly/7.0.0.0": {
+        "runtime": {
+          "Polly.dll": {
+            "assemblyVersion": "7.0.0.0",
+            "fileVersion": "7.2.1.0"
+          }
+        }
+      },
+      "BeamStack.Diagnostics/0.0.0.0": {
+        "runtime": {
+          "BeamStack.Diagnostics.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.1.0.0"
+          }
+        }
+      },
+      "BeamStack.Extensions.Windows/0.0.0.0": {
+        "runtime": {
+          "BeamStack.Extensions.Windows.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.1.0.0"
+          }
+        }
+      },
+      "WriteableBitmapEx.Wpf/1.6.7.0": {
+        "runtime": {
+          "WriteableBitmapEx.Wpf.dll": {
+            "assemblyVersion": "1.6.7.0",
+            "fileVersion": "1.6.7.0"
+          }
+        }
+      },
+      "System.Interactive/4.1.0.0": {
+        "runtime": {
+          "System.Interactive.dll": {
+            "assemblyVersion": "4.1.0.0",
+            "fileVersion": "4.1.1.36654"
+          }
+        }
+      },
+      "Microsoft.Bcl.AsyncInterfaces/1.0.0.0": {
+        "runtime": {
+          "Microsoft.Bcl.AsyncInterfaces.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "4.700.19.56404"
+          }
+        }
+      },
+      "MessagePack.Annotations/2.2.0.0": {
+        "runtime": {
+          "MessagePack.Annotations.dll": {
+            "assemblyVersion": "2.2.0.0",
+            "fileVersion": "2.2.60.5078"
+          }
+        }
+      },
+      "MessagePack/2.2.0.0": {
+        "runtime": {
+          "MessagePack.dll": {
+            "assemblyVersion": "2.2.0.0",
+            "fileVersion": "2.2.60.5078"
+          }
+        }
+      },
+      "Microsoft.Bcl.HashCode/1.0.0.0": {
+        "runtime": {
+          "Microsoft.Bcl.HashCode.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "4.700.19.56404"
+          }
+        }
+      },
+      "Microsoft.Extensions.FileSystemGlobbing/3.1.9.0": {
+        "runtime": {
+          "Microsoft.Extensions.FileSystemGlobbing.dll": {
+            "assemblyVersion": "3.1.9.0",
+            "fileVersion": "3.100.920.47302"
+          }
+        }
+      },
+      "Serilog/2.0.0.0": {
+        "runtime": {
+          "Serilog.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.10.0.0"
+          }
+        }
+      },
+      "BeamStack.Buffers/0.0.0.0": {
+        "runtime": {
+          "BeamStack.Buffers.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.1.0.0"
+          }
+        }
+      },
+      "Microsoft.Extensions.Configuration.Abstractions/3.1.9.0": {
+        "runtime": {
+          "Microsoft.Extensions.Configuration.Abstractions.dll": {
+            "assemblyVersion": "3.1.9.0",
+            "fileVersion": "3.100.920.47302"
+          }
+        }
+      },
+      "Ben.Demystifier/0.1.0.0": {
+        "runtime": {
+          "Ben.Demystifier.dll": {
+            "assemblyVersion": "0.1.0.0",
+            "fileVersion": "0.1.6.0"
+          }
+        }
+      },
+      "Serilog.Enrichers.Thread/2.0.0.0": {
+        "runtime": {
+          "Serilog.Enrichers.Thread.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "3.1.0.0"
+          }
+        }
+      },
+      "Serilog.Enrichers.Process/2.0.0.0": {
+        "runtime": {
+          "Serilog.Enrichers.Process.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.0.1.0"
+          }
+        }
+      },
+      "Serilog.Settings.Configuration/3.1.0.0": {
+        "runtime": {
+          "Serilog.Settings.Configuration.dll": {
+            "assemblyVersion": "3.1.0.0",
+            "fileVersion": "3.1.0.0"
+          }
+        }
+      },
+      "Microsoft.Extensions.DependencyModel/3.1.6.0": {
+        "runtime": {
+          "Microsoft.Extensions.DependencyModel.dll": {
+            "assemblyVersion": "3.1.6.0",
+            "fileVersion": "3.100.620.31604"
+          }
+        }
+      },
+      "Microsoft.Extensions.Configuration.Binder/2.0.0.0": {
+        "runtime": {
+          "Microsoft.Extensions.Configuration.Binder.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.0.0.17205"
+          }
+        }
+      },
+      "Serilog.Sinks.File/2.0.0.0": {
+        "runtime": {
+          "Serilog.Sinks.File.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "4.1.0.0"
+          }
+        }
+      },
+      "Serilog.Sinks.Trace/2.0.0.0": {
+        "runtime": {
+          "Serilog.Sinks.Trace.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.1.0.0"
+          }
+        }
+      },
+      "Serilog.Sinks.Console/3.1.1.0": {
+        "runtime": {
+          "Serilog.Sinks.Console.dll": {
+            "assemblyVersion": "3.1.1.0",
+            "fileVersion": "3.1.1.0"
+          }
+        }
+      },
+      "BitMiracle.LibTiff.NET/2.4.639.0": {
+        "runtime": {
+          "BitMiracle.LibTiff.NET.dll": {
+            "assemblyVersion": "2.4.639.0",
+            "fileVersion": "2.4.639.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Beamgage_python_wrapper/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Spiricon.Automation/6.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Spiricon.BeamGage.Automation/6.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Spiricon.Interfaces.ConsoleService/6.7.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Spiricon.TreePattern/6.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Spiricon.TreePattern.Interfaces/6.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Spiricon.Interfaces/6.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Spiricon.Shared/6.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "BeamStack.Interfaces/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "BG.Interfaces/6.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Spiricon.Remoting/6.7.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "BeamStack.Extensions/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "System.Reactive/4.4.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Polly/7.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "BeamStack.Diagnostics/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "BeamStack.Extensions.Windows/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "WriteableBitmapEx.Wpf/1.6.7.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "System.Interactive/4.1.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Microsoft.Bcl.AsyncInterfaces/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "MessagePack.Annotations/2.2.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "MessagePack/2.2.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Microsoft.Bcl.HashCode/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Microsoft.Extensions.FileSystemGlobbing/3.1.9.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Serilog/2.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "BeamStack.Buffers/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Microsoft.Extensions.Configuration.Abstractions/3.1.9.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Ben.Demystifier/0.1.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Serilog.Enrichers.Thread/2.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Serilog.Enrichers.Process/2.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Serilog.Settings.Configuration/3.1.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Microsoft.Extensions.DependencyModel/3.1.6.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Microsoft.Extensions.Configuration.Binder/2.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Serilog.Sinks.File/2.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Serilog.Sinks.Trace/2.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Serilog.Sinks.Console/3.1.1.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "BitMiracle.LibTiff.NET/2.4.639.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

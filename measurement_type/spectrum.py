@@ -1,8 +1,17 @@
 import communication
-import utils
 import numpy as np
 import traceback
 import sys
+
+# Dumb code to import utils
+try:
+    import utils
+except:
+    import sys, pathlib
+
+    util_path = str(pathlib.Path(__file__).parent.parent.resolve())
+    sys.path.append(util_path)
+    import utils
 
 _DC_name_key = "dc_unit"
 _OSA_name_key = "osa_unit"
@@ -17,6 +26,7 @@ _required_arguments = [
     "linear_resolution",
     "wavelength_span",
     "sample_points",
+    "custom_name",
 ]
 _optional_arguments = {
     "avg_factor": 5,
@@ -28,7 +38,6 @@ _optional_arguments = {
 def init(config: dict):
     # Get config dict and check for optional arguments
     spectrum_config = config["measurement"]
-    spectrum_name = spectrum_config["type"]
     # Check and merge optional arguments
     utils.argument_checker(
         spectrum_config,
@@ -41,6 +50,7 @@ def init(config: dict):
     )
 
     # Used for getting instrument objects
+    spectrum_name = spectrum_config["type"]
     DC_name = spectrum_config[_DC_name_key]
     DC_config = config[DC_name]
     OSA_name = spectrum_config[_OSA_name_key]

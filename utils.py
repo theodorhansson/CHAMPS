@@ -258,7 +258,11 @@ def closest_matcher(
 class AnimatedPlot:
     # Used to dynamically add datapoints
     def __init__(
-        self, x_label: str, y_label: str, title: str, enable_grid: bool = False
+        self,
+        x_label: str = "",
+        y_label: str = "",
+        title: str = "",
+        enable_grid: bool = False,
     ):
         self.plot = plt.ion()
         self.ax = plt.subplot(111)
@@ -271,11 +275,20 @@ class AnimatedPlot:
     def add_point(self, x: float, y: float):
         # Adds point
         self.ax.scatter(x, y)
+        plt.pause(0.0001)  # Forces redraw, but seems to be fast.
+
+    def add_image(self, image):
+        # Draw an image
+        self.ax.imshow(image)
+        plt.pause(0.0001)
 
     def keep_open(self):
         # Keeps plot open
-        plt.ioff()  # Turn off interactive
-        plt.show()
+        try:
+            plt.ioff()  # Turn off interactive
+            plt.show()
+        except:
+            pass
 
     def update(self):
         plt.draw()

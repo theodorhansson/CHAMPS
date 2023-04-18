@@ -4,3 +4,5 @@ pyserial~=3.5
 PyVISA~=1.13.0
 tomli_w~=1.0.0
 pywin32==305
+pythonnet~=3.0.1
+Pillow~=9.5.0

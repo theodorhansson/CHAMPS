@@ -9,12 +9,13 @@ V_max = 5
 Current = [[1, 0.1, 5], [5, 0.5, 15]]  # mA [min, step, max]
 
 # Optional arguments
-Rollover_threshold = 0  # Stops measurement when power < rollover_threshold * maxpower
-Rollover_min = 0        # Doesn't do rollover check on power values lower than this
-Offset_background = 10  # Number of times to measure background and offset
-Plot_interval = 20      # Update plot every nth measurement
-Keep_plot = 0           # To keep plot after measurement is done
-Verbose_printing = 0    # Flag for printing
+Rollover_threshold = 0          # Stops measurement when power < rollover_threshold * maxpower
+Rollover_min = 0                # Doesn't do rollover check on power values lower than this
+Offset_background = 10          # Number of times to measure background and offset
+Plot_interval = 20              # Update plot every nth measurement
+Keep_plot = 0                   # To keep plot after measurement is done
+Verbose_printing = 0            # Flag for printing
+# Custom_name = "componentXYZ"  # Sets savefile name
 
 [keithley2400]  
 Type = "keithley2400"   # The specific type of unit

@@ -162,6 +162,7 @@ cython_debug/
 # Visual Studio Code config files
 .vscode/
 .VSCodeCOunter/
+.vs/
 
 #archives
 *.7z

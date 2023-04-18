@@ -1,7 +1,16 @@
 import pyvisa
-import utils
 import time
 import numpy as np
+
+# Dumb code to import utils
+try:
+    import utils
+except:
+    import sys, pathlib
+
+    util_path = str(pathlib.Path(__file__).parent.parent.resolve())
+    sys.path.append(util_path)
+    import utils
 
 _required_arguments = ["gpib_address", "type"]
 _optional_arguments = {
@@ -130,9 +139,9 @@ class SpectrumAnalyzer:
 
     def set_linear_resolution_nm(self, resolution: float):
         # n indicates measurement resolution. The unit is always nm.
-        # input one of the following values: 1.0, 0.5, 0.2, 0.1, 0.07, 0.05
+        # input one of the following values: 1.0, 0.5, 0.2, 0.1, 0.07
 
-        accepted_vals = [1.0, 0.5, 0.2, 0.1, 0.07, 0.05]
+        accepted_vals = [1.0, 0.5, 0.2, 0.1, 0.07]
         resolution = utils.closest_matcher(resolution, accepted_vals, round_type="down")
         GPIB_write = "RES " + str(resolution)
         self.instrument.write(GPIB_write)

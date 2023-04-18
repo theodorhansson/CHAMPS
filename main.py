@@ -5,6 +5,7 @@ import time
 import tomli_w
 import utils
 import json
+import os
 
 default_conf_path = "config.toml"
 
@@ -23,6 +24,16 @@ def main(config_path):
         verbose = 0
     print(f"Reading config {config_path} from disk") if verbose & 16 else None
 
+    # get the current time in nice format
+    timestamp = time.strftime(rf"%Y%m%d-%H%M%S")
+
+    # Set file name to current time if undefined
+    if "custom_name" not in config_lower["measurement"].keys():
+        config_lower["measurement"]["custom_name"] = meas_name
+    config_lower["measurement"]["custom_name"] += "-" + timestamp
+
+    file_name = config_lower["measurement"]["custom_name"]
+
     # Get the measurement object
     measurement_init = identify_measurement_type(meas_name)
     # Begin the measurement!
@@ -33,18 +44,22 @@ def main(config_path):
     if save_folder[-1:] != "/":
         save_folder = save_folder + "/"  # make sure it ends with /
 
-    timestamp = time.strftime(rf"%Y%m%d-%H%M%S")  # get the current time in nice format
-    save_file = save_folder + meas_name + "-" + timestamp
+    # Create save folder if it doesn't exist
+    if not os.path.isdir(save_folder):
+        print("Woops, your folder doesn't exist. Creating one here: ", save_folder)
+        os.mkdir(save_folder)
+    save_file_name = save_folder + file_name
 
     # Save the data as json
-    data_save_name = save_file + ".json"
+    print("Starting saving process. This might take a while for large files.")
+    data_save_name = save_file_name + ".json"
     with open(data_save_name, "w") as export_file:
         json.dump(result_dict, export_file)
     print(f"Saving data file {data_save_name} to disk.") if verbose & 16 else None
 
     # Save the config
-    config_save_name = save_file + ".toml"
-    with open(config_save_name + ".toml", "wb") as f:
+    config_save_name = save_file_name + ".toml"
+    with open(config_save_name, "wb") as f:
         tomli_w.dump(used_config, f)
     print(f"Saving config file {config_save_name} to disk.") if verbose & 16 else None
 
@@ -64,8 +79,13 @@ def identify_measurement_type(measurement: str):
         
         case "ipv_diode":
             import measurement_type.ipv_diode
+			
+			return measurement_type.ipv_diode.init
 
-            return measurement_type.ipv_diode.init
+        case "beam_profile":
+            import measurement_type.beam_profile
+
+            return measurement_type.beam_profile.init
             
         case _:
             # TODO Change this

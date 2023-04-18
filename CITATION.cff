@@ -1,0 +1,22 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: CHAMPS
+message: Chalmers Automated Measurement Photonics System
+type: software
+authors:
+  - given-names: Theodor
+    family-names: Hansson
+    affiliation: Chalmers University of Technology
+  - given-names: Jacob
+    family-names: Billvén
+    affiliation: Chalmers University of Technology
+  - given-names: Sofia
+    family-names: Damne
+    affiliation: Chalmers University of Technology
+  - given-names: Gustav
+    family-names: Persson
+    affiliation: Chalmers University of Technology
+repository-code: 'https://github.com/theodorhansson/CHAMPS/'
+license: GPL-3.0
