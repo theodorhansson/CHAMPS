@@ -7,7 +7,7 @@ The script is part of the MCCX11-VT23-13 bachlelor's project.
 
 Devs:
 - Jacob Billvén
-- Sofia Damne
+- Sofia Danielson Damne
 - Theodor Hansson
 - Gustav Persson
 
