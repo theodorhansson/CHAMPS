@@ -12,6 +12,7 @@ Equipment
 - [Ophir IS6-D-UV integrating Sphere](equipment/ophir_IS6_D_UV.md)
 - [Anritsu MS9710A Oprical Spectrum Analyzer](equipment/anritsuMS9710A.md)
 - [BeamGage](equipment/beamgage.md)
+- [do_nothing](equipment/do_nothing.md)
 
 Advanced
 - [Advanced device notes](advanced/adv_device_notes.md)
