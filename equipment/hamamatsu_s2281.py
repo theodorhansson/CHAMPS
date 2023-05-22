@@ -1,6 +1,15 @@
 import pyvisa
-import utils
 import time
+
+# Dumb code to import utils
+try:
+    import utils
+except:
+    import sys, pathlib
+
+    util_path = str(pathlib.Path(__file__).parent.parent.resolve())
+    sys.path.append(util_path)
+    import utils
 
 _required_arguments = ["gpib_address", "type"]
 _optional_arguments = {"verbose_printing": 0}
