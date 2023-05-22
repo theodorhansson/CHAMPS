@@ -79,25 +79,22 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
     # Gets isntruments
     P_unit_obj = Instrument_COM.get_PowerUnit(P_config)
     DC_unit_obj = Instrument_COM.get_DCsupply(DC_config)
-        
 
     with P_unit_obj(P_config) as P_unit, DC_unit_obj(DC_config) as DC_unit:
         try:
-            
-            
             # number_of_integration_steps = 3
             # voltage_offset_integration = np.zeros(number_of_integration_steps)
             # for i in range(number_of_integration_steps):
             #     time.sleep(1)
-                
+
             #     voltage_offset_integration[i] = P_unit.get_voltage()
-                
+
             # voltage_offset_avarage = np.sum(voltage_offset_integration)/number_of_integration_steps
-           
+
             # voltage_offset_avarage = P_unit.get_power()
-            
+
             # voltage_offset_avarage = 0
-            
+
             # Set instrument to 0 for safety
             DC_unit.set_current(0.0)
             DC_unit.set_voltage_limit(V_max)
@@ -114,9 +111,9 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
 
                 for loop_count, set_current in enumerate(interval):
                     DC_unit.set_current(set_current)
-                    
+
                     volt, current = DC_unit.get_voltage_and_current()
-                    power = P_unit.get_power(0) 
+                    power = P_unit.get_power(0)
 
                     Results["voltage"].append(volt)
                     Results["current"].append(current)
@@ -146,9 +143,9 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
 
     # To hold plot open when measurement done
     if keep_plot:
-        print("IPV measurements done. Keeping plot alive for your convenience.")
+        print("IPV-diode measurements done. Keeping plot alive for your convenience.")
         Plot.keep_open()
     else:
-        print("IPV measurements done. Vaporizing plot!")
+        print("IPV-diode measurements done. Vaporizing plot!")
 
     return Results

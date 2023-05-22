@@ -12,7 +12,7 @@ class hamamatsu_s2281:
             config_dict,
             _required_arguments,
             _optional_arguments,
-            source_func="hamamatsu_s2281",
+            source_func="diode_detector",
         )
         config_dict = utils.optional_arguments_merge(config_dict, _optional_arguments)
 
@@ -26,17 +26,17 @@ class hamamatsu_s2281:
         else:
             self.resource_manager = pyvisa.ResourceManager()
 
-        print("__init__() in hamamatsu_s2281") if self.verbose & 4 + 8 else None
+        print("__init__() in diode_detector") if self.verbose & 4 + 8 else None
 
     def __enter__(self):
-        print("__enter__() in hamamatsu_s2281") if self.verbose & 8 else None
+        print("__enter__() in diode_detector") if self.verbose & 8 else None
         self.open()
         return self
 
     def __exit__(self, exception_type, exception_value, exception_traceback):
         time.sleep(0.1)  # Short wait in case of exception
         if self.verbose & 8:
-            print("__exit__() in hamamatsu_s2281")
+            print("__exit__() in diode_detector")
             print(f"{exception_type=}, {exception_value=}, {exception_traceback=}")
 
         utils.ramp_current(self, self.get_current(), 0)
@@ -47,7 +47,7 @@ class hamamatsu_s2281:
 
     def open(self):  # TODO: Rename to open_current?
         # Define where instrument is
-        print("enter() in hamamatsu_s2281") if self.verbose & 8 else None
+        print("enter() in diode_detector") if self.verbose & 8 else None
 
         conn_str = self.interface + "::" + self.address  # like GPIB0::24
 
@@ -64,7 +64,7 @@ class hamamatsu_s2281:
         self.instrument.write(":SENSE:VOLT:RANGE:AUTO 1")
 
     def close(self):
-        print("close() in hamamatsu_s2281") if self.verbose & 8 else None
+        print("close() in diode_detector") if self.verbose & 8 else None
         self.instrument.close()
 
     def get_voltage(self) -> float:
@@ -72,18 +72,18 @@ class hamamatsu_s2281:
         ans = ans.split(",")[0]  # First item is voltage
 
         if self.verbose & 8:
-            print(f"get_voltage() in hamamatsu_s2281: value {ans}")
+            print(f"get_voltage() in diode_detector: value {ans}")
         return float(ans)
 
     def set_voltage_limit(self, volts: float):
         if self.verbose & 8:
-            print(f"set_voltage_limit() in hamamatsu_s2281: setting to {volts}")
+            print(f"set_voltage_limit() in diode_detector: setting to {volts}")
 
         self.instrument.write(":SENSE:VOLTAGE:DC:PROTECTION " + str(volts))
 
     def set_current(self, current: float):
         if self.verbose & 8:
-            print(f"set_current() in hamamatsu_s2281: setting to {current}")
+            print(f"set_current() in diode_detector: setting to {current}")
 
         current = current * 1e-3  # mA to A
         self.instrument.write(":SOURCE:CURRENT " + str(current))
@@ -94,7 +94,7 @@ class hamamatsu_s2281:
         current = float(current) * 1e3  # A to mA
 
         if self.verbose & 8:
-            print(f"get_current() in hamamatsu_s2281: value {current}")
+            print(f"get_current() in diode_detector: value {current}")
         return current
 
     def get_voltage_and_current(self) -> list[float]:
@@ -104,16 +104,16 @@ class hamamatsu_s2281:
         data[1] = data[1] * 1e3  # A to mA
 
         if self.verbose & 8:
-            print(f"get_voltage_and_current() in hamamatsu_s2281: values {data}")
+            print(f"get_voltage_and_current() in diode_detector: values {data}")
         return data  # [volt, mA]
 
     def set_output(self, state: bool):
         # Toggle kethley output on/off
         if self.verbose & 4 + 8:
             if state:
-                print("set_output() in hamamatsu_s2281: Enabling")
+                print("set_output() in diode_detector: Enabling")
             else:
-                print("set_output() in hamamatsu_s2281: Disabling")
+                print("set_output() in diode_detector: Disabling")
 
         self.instrument.write(":OUTPUT " + str(int(state)))
 
