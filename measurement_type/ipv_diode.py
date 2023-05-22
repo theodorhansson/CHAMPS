@@ -122,7 +122,7 @@ def ipv_main(IPV_config: dict, DC_config: dict, P_config: dict):
                     Plot.add_point(current, power)
 
                     if verbose & 1:
-                        print("IPV data", volt, current, power)
+                        print("IPV-diode data", volt, current, power)
 
                     # Only plot sometimes
                     if loop_count % plot_update_interval == 0:

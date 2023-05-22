@@ -100,7 +100,6 @@ def beam_main(beam_config: dict, DC_config: dict, beamgage_config: dict):
         with beam_unit_obj(beamgage_config) as beam_unit, DC_unit_obj(
             DC_config
         ) as DC_unit:
-
             if hold_console:
                 input(
                     "Configure settings in other software, press any key to continue: "
@@ -141,7 +140,7 @@ def beam_main(beam_config: dict, DC_config: dict, beamgage_config: dict):
                         file_name = custom_name + "_" + str(loop_count) + ".png"
                         save_path = str(Path(save_folder, file_name))
                         image = np.array(image)
-                        image = np.left_shift(image, 4)
+                        # image = np.left_shift(image, 4) # Image from beamgage is 12 bit. Bitshift for better png
                         image_obj = PIL.Image.fromarray(image)
                         image_obj.save(save_path, format="png", bit_depth=16)
                     else:
@@ -150,7 +149,7 @@ def beam_main(beam_config: dict, DC_config: dict, beamgage_config: dict):
                     if plot_image:
                         Plot.add_image(image)
 
-                    if verbose & 1 + 2:
+                    if verbose & 1:
                         print("volt", volt)
                         print("current", current)
                     if verbose & 2:
