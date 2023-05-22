@@ -26,7 +26,7 @@ def argument_checker(
     Missing_parameters = expected_set - config_values
 
     if source_func:
-        source_func = " in " + source_func
+        source_func = "in " + source_func
 
     if Extra_parameters != set() and Missing_parameters != set() and warn_extra:
         raise Exception(
@@ -34,8 +34,8 @@ def argument_checker(
         )
 
     elif Extra_parameters != set() and warn_extra:
-        # print(f"Warning: Unused parameter {Extra_parameters}{source_func}")
-        warnings.warn(f"Unused parameter {Extra_parameters}{source_func}", UserWarning)
+        print(f"Warning: Unused parameter {Extra_parameters} {source_func}")
+        # warnings.warn(f"Unused parameter {Extra_parameters} {source_func}", UserWarning)
 
     elif Missing_parameters != set():
         raise Exception  # (f"Missing parameters {Missing_parameters}{source_func}")
@@ -231,7 +231,6 @@ def closest_matcher(
 
     # If not in list, round up to closest value in list
     elif data not in accepted_vals:
-
         match round_type.lower():
             case "up":
                 custom_key = lambda x: math.inf if x - data < 0 else x - data

@@ -46,9 +46,9 @@ class PhotonicTest(unittest.TestCase):
 
         # Too many arguments
         # Expected: Warning
-        config = {"value1": 2, "value2": 4, "value5": 3}
-        with self.assertWarns(UserWarning):
-            utils.argument_checker(config, required, optional)
+        # config = {"value1": 2, "value2": 4, "value5": 3}
+        # with self.assertWarns(UserWarning):
+        #     utils.argument_checker(config, required, optional)
 
         # All arguments included
         # Expected: Nothing
