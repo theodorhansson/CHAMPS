@@ -1,3 +1,4 @@
+[Table of contents](../readme.md)
 # Beam profile measurements
 The Beam routine takes a picture of the beam for a list of biasing currents. To make it work you need to supply most of the following params in the TOML file.
 

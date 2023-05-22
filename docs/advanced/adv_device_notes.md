@@ -1,3 +1,4 @@
+[Table of contents](../readme.md)
 # Devices, advanced notes
 
 Here are details of how each device works.
