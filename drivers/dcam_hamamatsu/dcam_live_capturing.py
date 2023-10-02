@@ -3,11 +3,8 @@ if os.path.dirname(os.path.dirname(os.path.realpath(__file__))) not in sys.path:
     sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
     
 from dcam_hamamatsu.dcam import *
-
 import threading
-
 import cv2
-
 
 def dcamtest_show_framedata(data, windowtitle, iShown):
     """
@@ -21,9 +18,9 @@ def dcamtest_show_framedata(data, windowtitle, iShown):
         >0  already openend
     """
     if iShown > 0 and cv2.getWindowProperty(windowtitle, cv2.WND_PROP_VISIBLE) == 0:
-        return -1
+        return (-1, cv2)
     if iShown < 0:
-        return -1  
+        return (-1, cv2)  
     
     if data.dtype == np.uint16:
         imax = np.amax(data)
@@ -32,16 +29,16 @@ def dcamtest_show_framedata(data, windowtitle, iShown):
             data = data * imul
 
         cv2.imshow(windowtitle, data)
-        return 1
+        return (1, cv2)
     else:
         print('-NG: dcamtest_show_image(data) only support Numpy.uint16 data')
-        return -1
+        return (-1, cv2)
 
 
 def dcamtest_thread_live(dcam):
     """
     Show live image
-
+s
     Arg1:   Dcam instance
     """
     if dcam.cap_start() is not False:
@@ -51,20 +48,21 @@ def dcamtest_thread_live(dcam):
         while iWindowStatus >= 0:
             if dcam.wait_capevent_frameready(timeout_milisec) is not False:
                 data = dcam.buf_getlastframedata()
-                iWindowStatus = dcamtest_show_framedata(data, 'test', iWindowStatus)
+                (iWindowStatus, cv_object) = dcamtest_show_framedata(data, 'test', iWindowStatus)
             else:
                 dcamerr = dcam.lasterr()
                 if dcamerr.is_timeout():
-                    print('===: timeout')
+                    # print('===: timeout')
+                    pass
                 else:
                     print('-NG: Dcam.wait_event() fails with error {}'.format(dcamerr))
                     break
 
             key = cv2.waitKey(1)
             if key == ord('q') or key == ord('Q'):  # if 'q' was pressed with the live window, close it
+                cv_object.destroyAllWindows()
                 break
 
-        dcam.cap_stop()
     else:
         print('-NG: Dcam.cap_start() fails with error {}'.format(dcam.lasterr()))
 

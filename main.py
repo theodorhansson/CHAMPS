@@ -50,18 +50,22 @@ def main(config_path):
         os.mkdir(save_folder)
     save_file_name = save_folder + file_name
 
-    # Save the data as json
-    print("Starting saving process. This might take a while for large files.")
-    data_save_name = save_file_name + ".json"
-    with open(data_save_name, "w") as export_file:
-        json.dump(result_dict, export_file)
-    print(f"Saving data file {data_save_name} to disk.") if verbose & 16 else None
-
-    # Save the config
-    config_save_name = save_file_name + ".toml"
-    with open(config_save_name, "wb") as f:
-        tomli_w.dump(used_config, f)
-    print(f"Saving config file {config_save_name} to disk.") if verbose & 16 else None
+    # print(config_lower["type"])
+    if config_lower["measurement"]["type"] == "missalignment":
+        pass
+    else:
+        # Save the data as json
+        print("Starting saving process. This might take a while for large files.")
+        data_save_name = save_file_name + ".json"
+        with open(data_save_name, "w") as export_file:
+            json.dump(result_dict, export_file)
+        print(f"Saving data file {data_save_name} to disk.") if verbose & 16 else None
+    
+        # Save the config
+        config_save_name = save_file_name + ".toml"
+        with open(config_save_name, "wb") as f:
+            tomli_w.dump(used_config, f)
+        print(f"Saving config file {config_save_name} to disk.") if verbose & 16 else None
 
 
 def identify_measurement_type(measurement: str):

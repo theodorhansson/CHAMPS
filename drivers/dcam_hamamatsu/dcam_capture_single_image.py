@@ -4,27 +4,9 @@ if os.path.dirname(os.path.dirname(os.path.realpath(__file__))) not in sys.path:
     
 from dcam_hamamatsu.dcam import *
 import cv2
+from PIL import Image
 
-def dcamtest_show_framedata(data):
-    """
-    Show numpy buffer as an image
-
-    Arg1:   NumPy array
-    """
-    if data.dtype == np.uint16:
-        imax = np.amax(data)
-        if imax > 0:
-            imul = int(65535 / imax)
-            data = data * imul
-
-        cv2.imshow('test', data)
-        cv2.waitKey(0)
-        
-    else:
-        print('-NG: dcamtest_show_image(data) only support Numpy.uint16 data')
-
-    return (data, cv2)
-
+    
 def dcam_show_single_captured_image(iDevice=0):
     """
     Capture and show a image
@@ -38,19 +20,17 @@ def dcam_show_single_captured_image(iDevice=0):
                 
                 if dcam.cap_snapshot() is not False:
                     
-                    timeout_milisec = 1000
+                    timeout_milisec = 100
                     while True:
                         if dcam.wait_capevent_frameready(timeout_milisec) is not False:
                             data = dcam.buf_getlastframedata()
-                            (data, cv_object) = dcamtest_show_framedata(data)
-                            
-                            cv_object.destroyAllWindows()
                             break
-
+                    
                         dcamerr = dcam.lasterr()
                         if dcamerr.is_timeout():
-                            print('===: timeout')
+                            # print('===: timeout')
                             continue
+                        
 
                         print('-NG: Dcam.wait_event() fails with error {}'.format(dcamerr))
                         break
@@ -61,13 +41,15 @@ def dcam_show_single_captured_image(iDevice=0):
             else:
                 print('-NG: Dcam.buf_alloc(1) fails with error {}'.format(dcam.lasterr()))
             dcam.dev_close()
+            
         else:
             print('-NG: Dcam.dev_open() fails with error {}'.format(dcam.lasterr()))
     else:
         print('-NG: Dcamapi.init() fails with error {}'.format(Dcamapi.lasterr()))
 
     Dcamapi.uninit()
+    return data
 
 
 if __name__ == '__main__':
-    dcam_show_single_captured_image()
+    data = dcam_show_single_captured_image()

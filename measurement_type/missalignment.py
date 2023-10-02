@@ -2,6 +2,10 @@ import communication
 import traceback
 from numpy import average as np_average
 
+import os, sys
+if os.path.dirname(os.path.dirname(os.path.realpath(__file__))) not in sys.path:
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+    
 # Dumb code to import utils
 try:
     import utils
@@ -30,8 +34,8 @@ _optional_arguments = {
     "offset_background": 0,
 }
 
-import logging
-from hamamatsu.dcam import copy_frame, dcam, Stream
+from drivers.dcam_hamamatsu.dcam_live_capturing import dcam_live_capturing
+from drivers.dcam_hamamatsu.dcam_capture_single_image import dcam_show_single_captured_image
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -60,6 +64,11 @@ def init(config: dict):
 
 
 def missalignment_main(IPV_config: dict, DC_config: dict):
+    
+    ## Start live capturing stop with q and start measuring
+    dcam_live_capturing()
+    
+    
     # The main IPV function
     V_max = IPV_config["v_max"]
     plot_update_interval = IPV_config["plot_interval"]
@@ -90,7 +99,7 @@ def missalignment_main(IPV_config: dict, DC_config: dict):
         if "verbose_printing" not in instru_dict.keys():
             instru_dict["verbose_printing"] = verbose
 
-    Plot = utils.AnimatedPlot("Current[mA]", "Optical Power [mW]", "IPV")
+    # Plot = utils.AnimatedPlot("Current[mA]", "Optical Power [mW]", "IPV")
     Instrument_COM = communication.Communication()
 
     # Gets isntruments
@@ -108,10 +117,12 @@ def missalignment_main(IPV_config: dict, DC_config: dict):
             # The main measurement loop
             for interval in interval_list:
                 # Code to ramp current between intervals
-                power_max = 0
+                # power_max = 0
                 start_current = interval[0]
                 utils.ramp_current(DC_unit, prev_end_current, start_current)
                 prev_end_current = interval[-1]
+                
+                data = 0
 
                 for loop_count, set_current in enumerate(interval):
                     DC_unit.set_current(set_current)
@@ -120,57 +131,21 @@ def missalignment_main(IPV_config: dict, DC_config: dict):
 
                     Results["voltage"].append(volt)
                     Results["current"].append(current)
-
-                    Plot.add_point(volt, current)
                     
-                    with dcam:
-                        camera = dcam[0]
-                        with camera:
-                            
-                            nb_frames = 1
-                            camera["exposure_time"] = 0.033
-                            
-                            x_pixels = camera['image_width'].value
-                            y_pixels = camera['image_height'].value
-                            
-  
-                            with Stream(camera, nb_frames) as stream:
-
-                                    camera.start()
-                                    
-                                    for i, frame_buffer in enumerate(stream):
-
-                                        picture = copy_frame(frame_buffer)
-                                        figure_list.append(picture)
-                                        
-                                        plt.pause(1/30)
-
                     if verbose & 1:
                         print("IPV data", volt, current)
-
-                    # Only plot sometimes
-                    if loop_count % plot_update_interval == 0:
-                        # approx 0.5s per measurement
-                        Plot.update()
-                      
-
-            for i, img in enumerate(figure_list):
-                im = Image.fromarray(img)
-                im.save(figure_folder + "\\" + str(i) + ".png")
-                
-                Plot.update()
-
+                        
+                    data = dcam_show_single_captured_image()
+                    figure_list.append(data)
+                    
         except KeyboardInterrupt:
             print("Keyboard interrupt detected, stopping.")
         except:
             # print error if error isn't catched
             traceback.print_exc()
 
-    # To hold plot open when measurement done
-    if keep_plot:
-        print("IPV measurements done. Keeping plot alive for your convenience.")
-        Plot.keep_open()
-    else:
-        print("IPV measurements done. Vaporizing plot!")
+    for i, figure_data in enumerate(figure_list):
+        im = Image.fromarray(figure_data)
+        im.save(figure_folder + "\\" + str(interval_list[0][i]) + ".png")
 
     return Results
