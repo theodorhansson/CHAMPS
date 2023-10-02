@@ -1,14 +1,14 @@
 #Std units: mA, V, mW, nm
 
 [measurement]
-Type = "ipv_diode"
-Save_folder = "c:/LABDATA"
+Type = "missalignment"
+Save_folder = "C:/Users/Mindaugas Juodenas/Documents/GitHub/CHAMPS_data"
 DC_unit = "keithley2400"    # Refers to the [] below only
-P_unit = "hamamatsu_s2281"
-V_max = 6
-Current = [[0, 0.01, 1], [1, 0.02, 12]]
+#P_unit = "hamamatsu_s2281"
+V_max = 5
+#Current = [[0, 0.01, 1], [1, 0.02, 12]]
 #Current = [[0, 0.005, 1], [1, 0.01, 10]]  # mA [min, step, max]
-#Current = [[0, 1, 5]]
+Current = [[0, 1, 5]]
 
 # Optional arguments
 Rollover_threshold = 0.85 # Stops measurement when power < rollover_threshold * maxpower

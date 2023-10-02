@@ -19,4 +19,5 @@ namespace Beamgage_python_wrapper
         }
 
     }
+    
 }

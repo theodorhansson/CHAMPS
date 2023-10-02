@@ -86,7 +86,12 @@ def identify_measurement_type(measurement: str):
             import measurement_type.beam_profile
 
             return measurement_type.beam_profile.init
+        
+        case "missalignment":
+            import measurement_type.missalignment
 
+            return measurement_type.missalignment.init
+            
         case _:
             # TODO Change this
             raise Exception(f"No measurement of type {measurement} found.")
