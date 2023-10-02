@@ -6,6 +6,8 @@ from dcam_hamamatsu.dcam import *
 import threading
 import cv2
 
+import numpy as np
+
 def dcamtest_show_framedata(data, windowtitle, iShown):
     """
     Show numpy buffer as an image
@@ -16,11 +18,16 @@ def dcamtest_show_framedata(data, windowtitle, iShown):
         0   open as a new window
         <0  already closed
         >0  already openend
+        
     """
     if iShown > 0 and cv2.getWindowProperty(windowtitle, cv2.WND_PROP_VISIBLE) == 0:
         return (-1, cv2)
     if iShown < 0:
         return (-1, cv2)  
+    
+    cv2.namedWindow(windowtitle, cv2.WINDOW_NORMAL)
+    cv2.resizeWindow(windowtitle, 800, 600)
+    
     
     if data.dtype == np.uint16:
         imax = np.amax(data)
@@ -29,7 +36,9 @@ def dcamtest_show_framedata(data, windowtitle, iShown):
             data = data * imul
 
         cv2.imshow(windowtitle, data)
+        
         return (1, cv2)
+    
     else:
         print('-NG: dcamtest_show_image(data) only support Numpy.uint16 data')
         return (-1, cv2)
@@ -48,7 +57,7 @@ s
         while iWindowStatus >= 0:
             if dcam.wait_capevent_frameready(timeout_milisec) is not False:
                 data = dcam.buf_getlastframedata()
-                (iWindowStatus, cv_object) = dcamtest_show_framedata(data, 'test', iWindowStatus)
+                (iWindowStatus, cv_object) = dcamtest_show_framedata(data, 'Live image', iWindowStatus)
             else:
                 dcamerr = dcam.lasterr()
                 if dcamerr.is_timeout():

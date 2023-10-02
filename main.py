@@ -8,7 +8,9 @@ import json
 import os
 
 default_conf_path = "config.toml"
-
+import numpy as np
+import matplotlib.pyplot as plt
+from PIL import Image
 
 def main(config_path):
     # Open the config file
@@ -51,8 +53,15 @@ def main(config_path):
     save_file_name = save_folder + file_name
 
     # print(config_lower["type"])
-    if config_lower["measurement"]["type"] == "missalignment":
+    if config_lower["measurement"]["type"] == "missalignment" or config_lower["measurement"]["type"] == "spr_no_lam_sweep":
         pass
+        # currents = result_dict["current"]
+        # image_list = result_dict["camera_images"]
+        
+        # for i, image_data in enumerate(image_list):
+        #     im = Image.fromarray(image_data)
+        #     im.save(save_folder + "\\" + str(round(currents[i], 2)) + ".png")
+
     else:
         # Save the data as json
         print("Starting saving process. This might take a while for large files.")
@@ -73,28 +82,27 @@ def identify_measurement_type(measurement: str):
     match measurement:
         case "ipv":
             import measurement_type.ipv
-
             return measurement_type.ipv.init
 
         case "spectrum":
             import measurement_type.spectrum
-
             return measurement_type.spectrum.init
 
         case "ipv_diode":
             import measurement_type.ipv_diode
-
             return measurement_type.ipv_diode.init
 
         case "beam_profile":
             import measurement_type.beam_profile
-
             return measurement_type.beam_profile.init
         
         case "missalignment":
             import measurement_type.missalignment
-
             return measurement_type.missalignment.init
+        
+        case "spr_no_lam_sweep":
+            import measurement_type.SPR_no_lam_sweep
+            return measurement_type.SPR_no_lam_sweep.init
             
         case _:
             # TODO Change this
