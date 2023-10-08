@@ -12,9 +12,9 @@ Current              = 1    # Current for measurement
 Check_bias           = 1    # Bias current to check the alignment
 Measurement_time     = 100 # Measurement time in seconds
 Measurement_interval = 10   # Take a picture every x sec
-Exposure_time        = 0.01 # Exposure time in sec
+Exposure_time        = 0.03 # Exposure time in sec
 
-Find_det_lines       = 1    # Run live capturing to find detection line
+Find_det_lines       = 0    # Run live capturing to find detection line
 Find_line_biased     = 1    # Run live capturing with biased VCSEL
 
 Verbose_printing     = 1        # Flag for printing

@@ -9,7 +9,7 @@ import logging
 import os
 import time
 import cv2
-from scipy.signal import convolve, butter, filtfilt
+from scipy.signal import convolve, butter, filtfilt, argrelextrema
 import datetime
 
 TIMESTAMP = datetime.datetime.now().strftime("%m%d_%H%M%S")
@@ -30,44 +30,70 @@ def process_image(image):
     coords = np.arange(cropped_image.shape[1])*px_scale    
     
     return coords, values, cropped_image
+
+def find_valley_width_around_local_minima(data, local_minimum, width_threshold=0):
+    valley_widths = []
+
+    for peak_index in local_minimum:
+        left_index = peak_index
+        right_index = peak_index
+        
+        while left_index > 0 and data[left_index] <= data[left_index - 1]:
+            left_index -= 1
+        
+        while right_index < len(data) - 1 and data[right_index] <= data[right_index + 1]:
+            right_index += 1
+        
+        valley_width = right_index - left_index + 1
+        
+        if valley_width > width_threshold:
+            valley_widths.append(valley_width)
     
-def find_peaks(coords, values, spacing=15, px_avg = 3, smoothing=False):
+    return valley_widths
+    
+def find_peaks(coords, values, spacing = 15, px_avg = 3):
     ### takes in the integrated spectrum and returns just the peak values
-    ### zero the spectrum to the max peak    
-    zeroed_values = values[np.argmax(values):]    
+    ### zero the spectrum to the max peak 
+    index_max_peak = 0
+    zeroed_values = values[index_max_peak:]    
     zeroed_coords = np.arange(zeroed_values.size)*px_scale
     ### zeroed coordinates
-    peak_coords = np.arange(0,max(zeroed_coords),spacing)
+    peak_coords = np.arange(0,max(zeroed_coords), spacing)
     ### find peaks at the line coordinates within px_avg number of pixels
     peaks = []
     for peak_x in peak_coords:
         peaks.append(np.max(zeroed_values[abs(zeroed_coords - peak_x) < px_scale*px_avg]) )
     
-        
-    ### smoothing
-    if smoothing:
-        ### moving average
-        # window_size = 1
-        # window = np.ones(window_size) / window_size
-        # peaks = np.convolve(peaks, window, mode='same')
-        ### butterworth
-        sampling_freq=1/15
-        cutoff_freq=1/200
-        order=2
-        nyquist_freq = 0.5 * sampling_freq
-        normalized_cutoff_freq = cutoff_freq / nyquist_freq
-        b, a = butter(order, normalized_cutoff_freq, btype='lowpass')
-        peaks = filtfilt(b, a, peaks)
-    return peak_coords, np.array(peaks)
+    ### moving average
+    # window_size = 1
+    # window = np.ones(window_size) / window_size
+    # peaks = np.convolve(peaks, window, mode='same')
+    ### butterworth
+    sampling_freq=1/15
+    cutoff_freq=1/200
+    order=2
+    nyquist_freq = 0.5 * sampling_freq
+    normalized_cutoff_freq = cutoff_freq / nyquist_freq
+    b, a = butter(order, normalized_cutoff_freq, btype='lowpass')
+    peaks = filtfilt(b, a, peaks)
+    peaks = np.array(peaks)
+    
+    ## Extract the localminimum
+    local_minimum = argrelextrema(peaks, np.less)[0]
+    
+    ## Find widths of dips in spectrum
+    valley_widths = find_valley_width_around_local_minima(peaks, local_minimum, width_threshold=0)
+    
+    ## Coordinate of the SPR dip
+    SPR_coord = int(local_minimum[np.argmax(valley_widths)])
+    
+    return peak_coords, peaks, SPR_coord
 
-def isolate_SPR(peak_coords, peak_values, manual=None):
-    ### takes in the peak spectrum and isolates the SPR dip only
-    if manual:
-        SPR_x = np.argmin(abs(peak_coords - manual))
-    else:
-        SPR_x = np.argmin(peak_values[:50]) # provided SPR is the minimum...
-    new_x = np.arange(peak_coords[SPR_x]-210, peak_coords[SPR_x]+210, 15)
-    new_y = peak_values[SPR_x-new_x.size//2:SPR_x+new_x.size//2]
+def isolate_SPR(peak_coords, peak_values, SPR_coord, manual=None):
+
+    new_x = np.arange(peak_coords[SPR_coord]-210, peak_coords[SPR_coord]+210, 15)
+    new_y = peak_values[SPR_coord-new_x.size//2:SPR_coord+new_x.size//2]
+    # print(SPR_coord)
     return new_x, new_y
    
 def find_centroid(x,y):
@@ -89,9 +115,9 @@ def init_figure():
 
 def analyze_image(im, fig=None):    
     x, y, crp_img = process_image(image = im)
-    peak_x, peak_y = find_peaks(x, y)
-    sprx, spry = isolate_SPR(peak_x, peak_y, manual = None)
-    x_c, y_c = find_centroid(sprx, max(spry)-spry)
+    peak_x, peak_y, SPR_coord = find_peaks(x, y)
+    sprx, spry = isolate_SPR(peak_x, peak_y, SPR_coord, manual = None)
+    x_c, y_cspry = find_centroid(sprx, np.max(spry)-spry)
     if fig is not None:
         for ax in fig.axes:
             ax.clear()
