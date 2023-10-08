@@ -21,15 +21,17 @@ def process_image(image):
     ### takes in the raw camera image and returns an integrated spectrum
     ### find maximum value coordinate
     max_coords = np.unravel_index(np.argmax(image), image.shape)
+    
     ### crop image
     cropped_image = image[max_coords[0]-100:max_coords[0]+100,:]
+    
     ### integrate vertically
     values = np.mean(cropped_image, axis=0)
     coords = np.arange(cropped_image.shape[1])*px_scale    
     
     return coords, values, cropped_image
     
-def find_peaks(coords, values, spacing=15, px_avg = 3, smoothing=True):
+def find_peaks(coords, values, spacing=15, px_avg = 3, smoothing=False):
     ### takes in the integrated spectrum and returns just the peak values
     ### zero the spectrum to the max peak    
     zeroed_values = values[np.argmax(values):]    
@@ -39,7 +41,7 @@ def find_peaks(coords, values, spacing=15, px_avg = 3, smoothing=True):
     ### find peaks at the line coordinates within px_avg number of pixels
     peaks = []
     for peak_x in peak_coords:
-        peaks.append( np.max(zeroed_values[abs(zeroed_coords - peak_x) < px_scale*px_avg]) )
+        peaks.append(np.max(zeroed_values[abs(zeroed_coords - peak_x) < px_scale*px_avg]) )
     
         
     ### smoothing
@@ -85,35 +87,10 @@ def init_figure():
     plt.tight_layout()
     return fig
 
-def test():
-    ### initialize data arrays
-    frame_list = []
-    frame_time = []
-    SPR_data = []
-    ### initialize figure
-    fig = init_figure()
-    measure_time=60
-    i=0
-    measure_time_start = time.time()
-    while time.time() - measure_time_start < measure_time:
-        print(f'Taking Picture No {len(frame_list)}')
-        ### grab frame_avg frames from the camera stream
-        ### and return an averaged image
-        picture = iio.imread(f'data\SPR Test\image_{i}.png')    
-        frame_list.append(picture)
-        ### analyze that image
-        SPR_data.append(analyze_image(picture, fig))
-        frame_time.append(time.time()-measure_time_start)
-        ### plot the SPR position        
-        fig.axes[4].scatter(frame_time, SPR_data) 
-        plt.show(False)
-        i+=1
-    return frame_time, SPR_data, frame_list
-
 def analyze_image(im, fig=None):    
     x, y, crp_img = process_image(image = im)
     peak_x, peak_y = find_peaks(x, y)
-    sprx, spry = isolate_SPR(peak_x, peak_y, manual= None)
+    sprx, spry = isolate_SPR(peak_x, peak_y, manual = None)
     x_c, y_c = find_centroid(sprx, max(spry)-spry)
     if fig is not None:
         for ax in fig.axes:
@@ -123,66 +100,3 @@ def analyze_image(im, fig=None):
         fig.axes[2].plot(peak_x,peak_y, marker='o',markersize=3)
         fig.axes[3].plot(sprx,spry, marker='o', markersize=3); fig.axes[3].axvline(x_c, color='r')
     return x_c
-
-# def grab_image(camera, frame_avg=10):
-#     captured_frames = []
-#     with Stream(camera, frame_avg) as stream:
-#         # logging.info("start acquisition")
-#         camera.start()                       
-#         for i, frame_buffer in enumerate(stream): 
-#             fr = copy_frame(frame_buffer)
-#             captured_frames.append(fr)                         
-#             # logging.info(f"acquired frame #%d/%d", i+1, frame_avg)                        
-#         camera.stop()    
-#         # logging.info("finished acquisition")   
-#     mean_frame = np.mean(captured_frames, axis=0).astype(int)
-#     return mean_frame
-
-# def process_image(image):    
-    
-#     ### initialize data arrays
-#     frame_list = []
-#     frame_time = []
-#     SPR_data = []
-    
-#     ### initialize figure
-#     # fig = init_figure()
-    
-
-#     measure_time_start = time.time()
-
-#     # picture = grab_image(camera, frame_avg=frame_avg)
-#     frame_list.append(image)
-#     ### analyze that image
-#     SPR_data.append(analyze_image(image))
-#     frame_time.append(time.time()-measure_time_start)
-    
-#     ### if given directory does not exist, create one
-#     # name = TIMESTAMP+'_'+name
-    # path = os.path.join(os.getcwd(),'data', name)
-    # if not os.path.exists(path):    os.makedirs(path)        
-    
-    # ### save images
-    # if save_images:
-    #     print('Saving Images')
-    #     for i, im in enumerate(frame_list):      
-    #         iio.imwrite(os.path.join(path, f'{name}_image{i}.png'), im)
-    # ### save data
-    # if save_data:
-    #     print(f'Saving Data to {path}')
-    #     xy = np.vstack((frame_time,SPR_data)).T
-    #     np.savetxt(os.path.join(path, f'{name}_data.txt'), xy, delimiter=',') 
-    #     fig.savefig(os.path.join(path, f'{name}_data.png'))
-    
-#     return frame_time, SPR_data, frame_list
-
-# if __name__ == '__main__':
-#     name = 'StepExperiment400'
-#     x, y, images = run(measure_time = 3600, 
-#                         measure_rate = 5,
-#                         frame_avg = 5,
-#                         exposure = 0.01,
-#                         save_images = False,
-#                         save_data = True,
-#                         name = name)
-#     test()

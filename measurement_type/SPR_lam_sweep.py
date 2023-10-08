@@ -35,7 +35,6 @@ _required_arguments = [
     "v_max",
     "save_folder",
     "custom_name",
-    "spr_measurement_name",
 ]
 _optional_arguments = {
     "rollover_threshold": 0,
@@ -46,10 +45,7 @@ _optional_arguments = {
     "offset_background": 0,
     "check_bias": 1,
     "measurement_time": 1,
-    "measurement_interval": 1,
-    "find_det_lines": 1,
-    "find_line_biased": 1,
-    "exposure_time": 0.03,
+    "measurement_inteval": 1,
 }
 
 
@@ -150,8 +146,6 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
             # Main measurement loop
             while (time.time() - measurement_time_start) < measurement_time:
                 start_time = time.time()
-                
-                print(f'Taking Picture No {len(frame_list)}')
                 
                 utils.ramp_current(DC_unit, 0, measurement_bias)
                 # Grab picture from Hamamatsu

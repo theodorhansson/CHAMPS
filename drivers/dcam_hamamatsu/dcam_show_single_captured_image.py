@@ -6,6 +6,8 @@ from dcam_hamamatsu.dcam import *
 from dcam_hamamatsu.dcamapi4 import DCAM_IDPROP
 import cv2
 
+import time
+
 def dcamtest_show_framedata(data):
     """
     Show numpy buffer as an image
@@ -26,15 +28,17 @@ def dcamtest_show_framedata(data):
 
     return (data, cv2)
 
-def dcam_show_single_captured_image(iDevice=0):
+def dcam_show_single_captured_image(iDevice=0, exposure_time=0.03):
     """
     Capture and show a image
     """
     if Dcamapi.init() is not False:
         dcam = Dcam(iDevice)
-        
+       
         if dcam.dev_open() is not False:
-            
+            dcam.prop_setvalue(DCAM_IDPROP.EXPOSURETIME_CONTROL, 2)
+            dcam.prop_setvalue(DCAM_IDPROP.EXPOSURETIME, exposure_time)
+                        
             if dcam.buf_alloc(1) is not False:
                 
                 if dcam.cap_snapshot() is not False:
@@ -42,7 +46,7 @@ def dcam_show_single_captured_image(iDevice=0):
                     timeout_milisec = 1000
                     while True:
                         if dcam.wait_capevent_frameready(timeout_milisec) is not False:
-                            # dcam.prop_setvalue(DCAM_IDPROP.EXPOSURETIME, 4)
+
                             data = dcam.buf_getlastframedata()
                             (data, cv_object) = dcamtest_show_framedata(data)
                             

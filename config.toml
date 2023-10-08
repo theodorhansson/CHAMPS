@@ -8,16 +8,16 @@ V_max = 5                   # Max allowed voltaged
 
 SPR_measurement_name = "erik_testing"
 
-Current = 1                 # Current for measurement
-Check_bias = 1              # Bias current to check the alignment
-Measurement_time = 1200     # Measurement time in seconds
+Current              = 1    # Current for measurement
+Check_bias           = 1    # Bias current to check the alignment
+Measurement_time     = 100 # Measurement time in seconds
 Measurement_interval = 10   # Take a picture every x sec
+Exposure_time        = 0.01 # Exposure time in sec
 
-Find_det_lines   = 0
-Find_line_biased = 0
+Find_det_lines       = 1    # Run live capturing to find detection line
+Find_line_biased     = 1    # Run live capturing with biased VCSEL
 
-
-Verbose_printing = 1        # Flag for printing
+Verbose_printing     = 1        # Flag for printing
 
 [keithley2400]
 Type = "keithley2400"       # The specific type of unit

@@ -16,37 +16,31 @@ def dcam_show_properties(iDevice=0):
     if Dcamapi.init() is not False:
 
         dcam = Dcam(iDevice)
-        
-        # dcam.
-        print(DCAMPROP.EXPOSURETIME_CONTROL())
-        
-        
+  
         if dcam.dev_open() is not False:
-            
-
-            
+        
             idprop = dcam.prop_getnextid(0)
             while idprop is not False:
                 if idprop == DCAM_IDPROP.EXPOSURETIME:
                     
-                    
-                    exposure_time_prop_value = dcam.prop_getvaluetext(DCAM_IDPROP.EXPOSURETIME_CONTROL, 1)
-                    print(exposure_time_prop_value)
-                    
-                    # exposure_time_control_value = dcam.prop_getvaluetext(DCAM_IDPROP.EXPOSURETIME_CONTROL, 1)
-                    # print(exposure_time_control_value)
-                    
-                    # exposure_time_control_value = dcam.prop_setvalue(DCAM_IDPROP.EXPOSURETIME_CONTROL, 1)
-                    # print(exposure_time_control_value)
+                    # 
+                    # exposure_time_prop_value = dcam.prop_getvaluetext(DCAM_IDPROP.EXPOSURETIME_CONTROL, 1)
+                    # print(exposure_time_prop_value)
                     
                     # exposure_time_control_value = dcam.prop_getvaluetext(DCAM_IDPROP.EXPOSURETIME_CONTROL, 1)
                     # print(exposure_time_control_value)
+                    
+                    exposure_time_control_value = dcam.prop_setvalue(DCAM_IDPROP.EXPOSURETIME_CONTROL, 2)
+                    print(exposure_time_control_value)
+                    
+                    # # exposure_time_control_value = dcam.prop_getvaluetext(DCAM_IDPROP.EXPOSURETIME_CONTROL, 1)
+                    # # print(exposure_time_control_value)
                     
                     # success = dcam.prop_setvalue(DCAM_IDPROP.EXPOSURETIME, 1)
-                    # print(success)
+                    # # print(success)
                     
-                    # exposure_time_control_value = dcam.prop_getvaluetext(DCAM_IDPROP.EXPOSURETIME, 0.1)
-                    # print(dcam.prop_getvaluetext(DCAM_IDPROP.EXPOSURETIME, 4))
+                    # exposure_time_control_value = dcam.prop_setvalue(DCAM_IDPROP.EXPOSURETIME, 3)
+                    # print(dcam.prop_getvaluetext(DCAM_IDPROP.EXPOSURETIME, 0))
                     
                     
                     

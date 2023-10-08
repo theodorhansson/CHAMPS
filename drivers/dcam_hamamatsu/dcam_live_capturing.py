@@ -76,13 +76,16 @@ s
         print('-NG: Dcam.cap_start() fails with error {}'.format(dcam.lasterr()))
 
 
-def dcam_live_capturing(iDevice=0):
+def dcam_live_capturing(iDevice=0, exposure_time=0.03):
     """
     Capture and show a image
     """
     if Dcamapi.init() is not False:
         dcam = Dcam(iDevice)
         if dcam.dev_open() is not False:
+            dcam.prop_setvalue(DCAM_IDPROP.EXPOSURETIME_CONTROL, 2)
+            dcam.prop_setvalue(DCAM_IDPROP.EXPOSURETIME, exposure_time)
+            
             if dcam.buf_alloc(3) is not False:
                 # th = threading.Thread(target=dcamtest_thread_live, args=(dcam,))
                 # th.start()

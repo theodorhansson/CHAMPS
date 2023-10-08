@@ -7,7 +7,7 @@ import cv2
 from PIL import Image
 
     
-def dcam_show_single_captured_image(iDevice=0):
+def dcam_capture_image(iDevice=0, exposure_time=0.03):
     """
     Capture and show a image
     """
@@ -15,6 +15,8 @@ def dcam_show_single_captured_image(iDevice=0):
         dcam = Dcam(iDevice)
         
         if dcam.dev_open() is not False:
+            dcam.prop_setvalue(DCAM_IDPROP.EXPOSURETIME_CONTROL, 2)
+            dcam.prop_setvalue(DCAM_IDPROP.EXPOSURETIME, exposure_time)
             
             if dcam.buf_alloc(1) is not False:
                 
