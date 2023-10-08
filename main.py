@@ -54,7 +54,7 @@ def main(config_path):
     save_file_name = save_folder + file_name
 
     # print(config_lower["type"])
-    if config_lower["measurement"]["type"] == "missalignment" or config_lower["measurement"]["type"] == "spr_no_lam_sweep":
+    if config_lower["measurement"]["type"] == "missalignment" or config_lower["measurement"]["type"] == "spr_no_lam_sweep" or config_lower["measurement"]["type"] == "spr_lam_sweep":
 
         SPR_measurement_name = config_lower["measurement"]["spr_measurement_name"]
         
@@ -117,6 +117,10 @@ def identify_measurement_type(measurement: str):
         case "spr_no_lam_sweep":
             import measurement_type.SPR_no_lam_sweep
             return measurement_type.SPR_no_lam_sweep.init
+        
+        case "spr_lam_sweep":
+            import measurement_type.SPR_lam_sweep
+            return measurement_type.SPR_lam_sweep.init
             
         case _:
             # TODO Change this

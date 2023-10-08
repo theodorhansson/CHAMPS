@@ -10,7 +10,7 @@ from spr_functions.main_spr import process_image, init_figure, analyze_image
 
 # Python modules
 import traceback
-from numpy import average as np_average
+import numpy as np
 import matplotlib.pyplot as plt
 import time
 import os, sys
@@ -35,6 +35,8 @@ _required_arguments = [
     "v_max",
     "save_folder",
     "custom_name",
+    "spr_measurement_name",
+    "swept_bias",
 ]
 _optional_arguments = {
     "rollover_threshold": 0,
@@ -45,7 +47,10 @@ _optional_arguments = {
     "offset_background": 0,
     "check_bias": 1,
     "measurement_time": 1,
-    "measurement_inteval": 1,
+    "measurement_interval": 1,
+    "find_det_lines": 1,
+    "find_line_biased": 1,
+    "exposure_time": 0.03,
 }
 
 
@@ -85,9 +90,8 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
     
     exposure_time = IPV_config["exposure_time"]
     
+    swept_bias = np.array(utils.interval_2_points(IPV_config["swept_bias"])[0])
     
-    # interval_list = utils.interval_2_points(intervals)
-
     # Create result dict
     Results = {
         "header": "Current[mA], Optical Power [mW], Voltage [V]",
@@ -121,9 +125,7 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
     
     with DC_unit_obj(DC_config) as DC_unit:
         try:
-            
-            
-            # # Set instrument to 0 for safety
+            ## Set instrument to 0 for safety
             prev_end_current = 0.0
             DC_unit.set_current(prev_end_current)
             DC_unit.set_voltage_limit(V_max)
@@ -147,16 +149,43 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
             while (time.time() - measurement_time_start) < measurement_time:
                 start_time = time.time()
                 
-                utils.ramp_current(DC_unit, 0, measurement_bias)
-                # Grab picture from Hamamatsu
-                image = dcam_capture_image(exposure_time=exposure_time)
+                print(f'Taking Picture No {len(frame_list)}')
                 
-                frame_list.append(image)
-                SPR_data.append(analyze_image(image, fig))
+                utils.ramp_current(DC_unit, 0, swept_bias[0])
+                
+                images_sweep = []
+                image_max = []
+                for bias in swept_bias:
+                
+                    DC_unit.set_current(bias)
+                    
+                    # Grab picture from Hamamatsu
+                    current_image = dcam_capture_image(exposure_time=exposure_time)
+                    
+                    # All images from current sweep
+                    images_sweep.append(current_image)
+                    
+                    # Maximum of all images
+                    image_max.append(np.max(current_image))
+                        
+                # Averaged image sent to analysis
+                image_avg = np.zeros(images_sweep[0].shape)
+                
+                # Total maxmimum
+                maximum_all_images = np.max(image_max)
+
+                # Normalize all images to the highest value of entire sweep
+                for i, images in enumerate(images_sweep):
+                    image_avg += images*(maximum_all_images/image_max[i])
+                
+                image_avg = image_avg/len(swept_bias)
+                
+                # Analysis
+                frame_list.append(image_avg)
+                SPR_data.append(analyze_image(image_avg, fig))
                 frame_time.append(time.time() - measurement_time_start)
                 
-                fig.axes[4].plot(frame_time, SPR_data, marker='o', linewidth=0.2, markersize=3) 
-
+                fig.axes[4].plot(frame_time, SPR_data, marker='o', linewidth=0.2, markersize=3)
                 plt.show(False)
                 
                 utils.ramp_current(DC_unit, measurement_bias, 0)

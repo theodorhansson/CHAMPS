@@ -125,9 +125,7 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
     
     with DC_unit_obj(DC_config) as DC_unit:
         try:
-            
-            
-            # # Set instrument to 0 for safety
+            ## Set instrument to 0 for safety
             prev_end_current = 0.0
             DC_unit.set_current(prev_end_current)
             DC_unit.set_voltage_limit(V_max)
@@ -162,7 +160,6 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
                 frame_time.append(time.time() - measurement_time_start)
                 
                 fig.axes[4].plot(frame_time, SPR_data, marker='o', linewidth=0.2, markersize=3) 
-
                 plt.show(False)
                 
                 utils.ramp_current(DC_unit, measurement_bias, 0)

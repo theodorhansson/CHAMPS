@@ -81,6 +81,9 @@ def find_peaks(coords, values, spacing = 15, px_avg = 3):
     ## Extract the localminimum
     local_minimum = argrelextrema(peaks, np.less)[0]
     
+    ## Omit last value since the last peak is a "false" local minimum
+    local_minimum = local_minimum[:-1]
+    
     ## Find widths of dips in spectrum
     valley_widths = find_valley_width_around_local_minima(peaks, local_minimum, width_threshold=0)
     
@@ -97,9 +100,11 @@ def isolate_SPR(peak_coords, peak_values, SPR_coord, manual=None):
     return new_x, new_y
    
 def find_centroid(x,y):
+
     area = simps(y,x)
     x_centroid = simps(x * y, x) / area
     y_centroid = simps(y * y, x) / (2 * area)
+    
     # print(f'Found curve center at: x={x_centroid} y={y_centroid}')
     return x_centroid, y_centroid
 
