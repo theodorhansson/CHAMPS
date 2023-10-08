@@ -138,27 +138,27 @@ def analyze_image(im, fig=None):
 #     mean_frame = np.mean(captured_frames, axis=0).astype(int)
 #     return mean_frame
 
-def process_image(image):    
+# def process_image(image):    
     
-    ### initialize data arrays
-    frame_list = []
-    frame_time = []
-    SPR_data = []
+#     ### initialize data arrays
+#     frame_list = []
+#     frame_time = []
+#     SPR_data = []
     
-    ### initialize figure
-    # fig = init_figure()
+#     ### initialize figure
+#     # fig = init_figure()
     
 
-    measure_time_start = time.time()
+#     measure_time_start = time.time()
 
-    # picture = grab_image(camera, frame_avg=frame_avg)
-    frame_list.append(image)
-    ### analyze that image
-    SPR_data.append(analyze_image(image))
-    frame_time.append(time.time()-measure_time_start)
+#     # picture = grab_image(camera, frame_avg=frame_avg)
+#     frame_list.append(image)
+#     ### analyze that image
+#     SPR_data.append(analyze_image(image))
+#     frame_time.append(time.time()-measure_time_start)
     
-    ### if given directory does not exist, create one
-    # name = TIMESTAMP+'_'+name
+#     ### if given directory does not exist, create one
+#     # name = TIMESTAMP+'_'+name
     # path = os.path.join(os.getcwd(),'data', name)
     # if not os.path.exists(path):    os.makedirs(path)        
     
@@ -174,15 +174,15 @@ def process_image(image):
     #     np.savetxt(os.path.join(path, f'{name}_data.txt'), xy, delimiter=',') 
     #     fig.savefig(os.path.join(path, f'{name}_data.png'))
     
-    return frame_time, SPR_data, frame_list
+#     return frame_time, SPR_data, frame_list
 
 # if __name__ == '__main__':
-    # name = 'StepExperiment400'
-    # x, y, images = run(measure_time = 3600, 
-    #                     measure_rate = 5,
-    #                     frame_avg = 5,
-    #                     exposure = 0.01,
-    #                     save_images = False,
-    #                     save_data = True,
-    #                     name = name)
-    # test()
+#     name = 'StepExperiment400'
+#     x, y, images = run(measure_time = 3600, 
+#                         measure_rate = 5,
+#                         frame_avg = 5,
+#                         exposure = 0.01,
+#                         save_images = False,
+#                         save_data = True,
+#                         name = name)
+#     test()

@@ -2,25 +2,35 @@
 
 [measurement]
 Type = "spr_no_lam_sweep"
-Save_folder = "C:/Users/Mindaugas Juodenas/Documents/GitHub/CHAMPS_data"
+Save_folder = "C:/Users/Mindaugas Juodenas/Documents/GitHub/SPR_measurements/" 
 DC_unit = "keithley2400"    # Refers to the [] below only
-V_max = 5
-Current = [[0, 1, 5]]
+V_max = 5                   # Max allowed voltaged
 
-Verbose_printing = 1    # Flag for printing
+SPR_measurement_name = "erik_testing"
+
+Current = 1                 # Current for measurement
+Check_bias = 1              # Bias current to check the alignment
+Measurement_time = 1200     # Measurement time in seconds
+Measurement_interval = 10   # Take a picture every x sec
+
+Find_det_lines   = 0
+Find_line_biased = 0
+
+
+Verbose_printing = 1        # Flag for printing
 
 [keithley2400]
-Type = "keithley2400"   # The specific type of unit
+Type = "keithley2400"       # The specific type of unit
 GPIB_address = "24"
 
 [hamamatsu_s2281]
-Type = "hamamatsu_s2281"   # The specific type of unit
+Type = "hamamatsu_s2281"    # The specific type of unit
 GPIB_address = "9"
 
 [INT_sphere]
 Type = "ophir_IS6_D_UV"
 Range = 2
-Min_measure_time = 0.2  # How long to wait between new data to arrive from sphere
+Min_measure_time = 0.2      # How long to wait between new data to arrive from sphere
 Wavelength = 5
 
 [powercube]

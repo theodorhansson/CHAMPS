@@ -3,6 +3,7 @@ if os.path.dirname(os.path.dirname(os.path.realpath(__file__))) not in sys.path:
     sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
     
 from dcam_hamamatsu.dcam import *
+from dcam_hamamatsu.dcamapi4 import DCAM_IDPROP
 import cv2
 
 def dcamtest_show_framedata(data):
@@ -41,6 +42,7 @@ def dcam_show_single_captured_image(iDevice=0):
                     timeout_milisec = 1000
                     while True:
                         if dcam.wait_capevent_frameready(timeout_milisec) is not False:
+                            # dcam.prop_setvalue(DCAM_IDPROP.EXPOSURETIME, 4)
                             data = dcam.buf_getlastframedata()
                             (data, cv_object) = dcamtest_show_framedata(data)
                             

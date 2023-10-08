@@ -6,9 +6,10 @@ import tomli_w
 import utils
 import json
 import os
+import imageio.v3 as iio
 
 default_conf_path = "config.toml"
-import numpy as np
+import numpy as npq
 import matplotlib.pyplot as plt
 from PIL import Image
 
@@ -54,13 +55,26 @@ def main(config_path):
 
     # print(config_lower["type"])
     if config_lower["measurement"]["type"] == "missalignment" or config_lower["measurement"]["type"] == "spr_no_lam_sweep":
-        pass
-        # currents = result_dict["current"]
-        # image_list = result_dict["camera_images"]
+
+        SPR_measurement_name = config_lower["measurement"]["spr_measurement_name"]
         
-        # for i, image_data in enumerate(image_list):
-        #     im = Image.fromarray(image_data)
-        #     im.save(save_folder + "\\" + str(round(currents[i], 2)) + ".png")
+        save_path_current_measurement = os.path.join(save_folder, SPR_measurement_name)
+        if not os.path.isdir(save_path_current_measurement):
+            os.mkdir(save_path_current_measurement)
+
+        frame_list = result_dict["frame_list"]
+        frame_time = result_dict["frame_time"]
+        SPR_data = result_dict["SPR_data"]
+        fig_object = result_dict["fig_object"]
+
+        print('Saving Images')
+        for i, im in enumerate(frame_list):      
+            iio.imwrite(os.path.join(save_path_current_measurement, f'{SPR_measurement_name}_image{i}.png'), im)
+            
+        print(f'Saving Data to {save_folder}')
+        xy = np.vstack((frame_time,SPR_data)).T
+        np.savetxt(os.path.join(save_path_current_measurement, f'{SPR_measurement_name}_data.txt'), xy, delimiter=',') 
+        fig_object.savefig(os.path.join(save_path_current_measurement, f'{SPR_measurement_name}_data.png'))
 
     else:
         # Save the data as json

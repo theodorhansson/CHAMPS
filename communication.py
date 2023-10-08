@@ -20,12 +20,10 @@ class Communication:
         match DC_type:
             case "keithley2400":
                 import equipment.keithley2400
-
                 return equipment.keithley2400.keithley2400
 
             case "powercube":
                 import equipment.powercube
-
                 return equipment.powercube.powercube
 
             case _:

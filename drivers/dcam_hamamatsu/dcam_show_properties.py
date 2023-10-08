@@ -16,6 +16,7 @@ def dcam_show_properties(iDevice=0):
                 output = '0x{:08X}: '.format(idprop)
 
                 propname = dcam.prop_getname(idprop)
+                
                 if propname is not False:
                     output = output + propname
 

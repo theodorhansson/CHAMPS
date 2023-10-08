@@ -1,7 +1,18 @@
+# Import CHAMPS module for GPIB connections
 import communication
+
+# Import hamamatsu python drivers
+from drivers.dcam_hamamatsu.dcam_live_capturing import dcam_live_capturing
+from drivers.dcam_hamamatsu.dcam_capture_single_image import dcam_show_single_captured_image
+
+# Import meta-SPR
+from spr_functions.main_spr import process_image, init_figure, analyze_image
+
+# Python modules
 import traceback
 from numpy import average as np_average
-
+import matplotlib.pyplot as plt
+import time
 import os, sys
 if os.path.dirname(os.path.dirname(os.path.realpath(__file__))) not in sys.path:
     sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
@@ -32,11 +43,11 @@ _optional_arguments = {
     "verbose_printing": 0,
     "keep_plot": False,
     "offset_background": 0,
+    "check_bias": 1,
+    "measurement_time": 1,
+    "measurement_inteval": 1,
 }
 
-from drivers.dcam_hamamatsu.dcam_live_capturing import dcam_live_capturing
-from drivers.dcam_hamamatsu.dcam_capture_single_image import dcam_show_single_captured_image
-from spr_functions.main_spr import process_image
 
 def init(config: dict):
     # Get config dict and check for optional arguments
@@ -61,14 +72,19 @@ def init(config: dict):
 
 def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
     
-    ## Start live capturing stop with q and start measuring
-    dcam_live_capturing()
-    
     # The main IPV function
     V_max = IPV_config["v_max"]
-    intervals = IPV_config["current"]
+    check_bias = IPV_config["check_bias"]
+    measurement_bias = IPV_config["current"]
     verbose = IPV_config["verbose_printing"]
-    interval_list = utils.interval_2_points(intervals)
+    measurement_time = IPV_config["measurement_time"]
+    measurement_interval = IPV_config["measurement_interval"]
+    
+    find_det_lines = IPV_config["find_det_lines"]
+    find_line_biased = IPV_config["find_line_biased"]
+    
+    
+    # interval_list = utils.interval_2_points(intervals)
 
     # Create result dict
     Results = {
@@ -77,61 +93,84 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
         "current": [],
         "power": [],
     }
-    
-    camera_image_list = []
+
+    frame_list = []
+    frame_time = []
+    SPR_data = []
     
     # Send verbose_printing to instruments if not specified
     for instru_dict in [DC_config]:
         if "verbose_printing" not in instru_dict.keys():
             instru_dict["verbose_printing"] = verbose
 
+    
+    
     # Plot = utils.AnimatedPlot("Current[mA]", "Optical Power [mW]", "IPV")
     Instrument_COM = communication.Communication()
 
     # Gets isntruments
     DC_unit_obj = Instrument_COM.get_DCsupply(DC_config)
 
+    ## Start live capturing stop with q and start measuring
+    if find_det_lines:
+        dcam_live_capturing()
+    
+    
+    
     with DC_unit_obj(DC_config) as DC_unit:
         try:
             
-            # Set instrument to 0 for safety
-            DC_unit.set_current(0.0)
+            
+            # # Set instrument to 0 for safety
+            prev_end_current = 0.0
+            DC_unit.set_current(prev_end_current)
             DC_unit.set_voltage_limit(V_max)
             DC_unit.set_output(True)
-                    
-            prev_end_current = 0
-            # The main measurement loop
-            for interval in interval_list:
-                # Code to ramp current between intervals
-                # power_max = 0
-                start_current = interval[0]
-                utils.ramp_current(DC_unit, prev_end_current, start_current)
-                prev_end_current = interval[-1]
+            
+            # Check alignment of SPR line
+            utils.ramp_current(DC_unit, prev_end_current, check_bias)
+            DC_unit.set_current(check_bias)
+            if find_line_biased:
+                dcam_live_capturing()
+        
+            utils.ramp_current(DC_unit, check_bias, 0)
+            
+            # Initialize figure for plotting
+            fig = init_figure()
+            
+            # Start time of measurement
+            measurement_time_start = time.time()
+            
+            # Main measurement loop
+            while (time.time() - measurement_time_start) < measurement_time:
+                start_time = time.time()
                 
-                data = 0
-
-                for loop_count, set_current in enumerate(interval):
-                    DC_unit.set_current(set_current)
-
-                    volt, current = DC_unit.get_voltage_and_current()
-
-                    Results["voltage"].append(volt)
-                    Results["current"].append(current)
-                    
-                    if verbose & 1:
-                        print("IPV data", volt, current)
-                        
-                    image = dcam_show_single_captured_image()
-                    
-                    process_image(image)
-                    # camera_image_list.append(data)
-                    
+                utils.ramp_current(DC_unit, 0, measurement_bias)
+                # Grab picture from Hamamatsu
+                image = dcam_show_single_captured_image()
+                
+                frame_list.append(image)
+                SPR_data.append(analyze_image(image, fig))
+                frame_time.append(time.time()-measurement_time_start)
+                
+                fig.axes[4].plot(frame_time, SPR_data,marker='o', linewidth=0.2, markersize=3) 
+                # fig.axes[4].set_ylim([350,500])
+                plt.show(False)
+                
+                utils.ramp_current(DC_unit, measurement_bias, 0)
+                
+                duration = time.time() - start_time
+                time.sleep(measurement_interval - duration if duration < measurement_interval else 0)
+                
         except KeyboardInterrupt:
             print("Keyboard interrupt detected, stopping.")
         except:
             # print error if error isn't catched
             traceback.print_exc()
 
-    Results["camera_images"] = camera_image_list
+    Results["frame_list"] = frame_list
+    Results["frame_time"] = frame_time
+    Results["SPR_data"] = SPR_data
+    Results["fig_object"] = fig
 
     return Results
