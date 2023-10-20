@@ -1,7 +1,7 @@
 #Std units: mA, V, mW, nm
 
 [measurement]
-Type = "spr_no_lam_vcsel_sweep"
+Type = "spr_lam_sweep"
 Save_folder = "C:/Users/Mindaugas Juodenas/Documents/GitHub/SPR_measurements/" 
 DC_unit = "keithley2400"    # Refers to the [] below only
 V_max = 5                   # Max allowed voltaged
@@ -10,14 +10,13 @@ SPR_measurement_name = "erik_testing"
 
 Current              = 1    # Current for measurement
 Check_bias           = 1    # Bias current to check the alignment
-Measurement_time     = 10    # Measurement time in seconds
-Measurement_interval = 1    # Take a picture every x sec
+Measurement_time     = 100  # Measurement time in seconds
+Measurement_interval = 10   # Take a picture every x sec
 Exposure_time        = 0.03 # Exposure time in sec
+swept_bias           = [[0.5, 0.05, 1]]
 
 Find_det_lines       = 0    # Run live capturing to find detection line
-Find_line_biased     = 0    # Run live capturing with biased VCSEL
-
-VCSEL_chip           = "johannes" # Which chip is being used
+Find_line_biased     = 1    # Run live capturing with biased VCSEL
 
 Verbose_printing     = 1        # Flag for printing
 

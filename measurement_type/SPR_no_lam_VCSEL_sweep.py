@@ -13,7 +13,7 @@ from spr_functions.main_spr import process_image, init_figure, analyze_image
 
 # Python modules
 import traceback
-from numpy import average as np_average
+import numpy as np
 import matplotlib.pyplot as plt
 import time
 import os, sys
@@ -40,7 +40,6 @@ _required_arguments = [
     "custom_name",
     "spr_measurement_name",
     "vcsel_chip",
-    "vcsel_to_bias"
     
 ]
 _optional_arguments = {
@@ -95,8 +94,7 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
     exposure_time = IPV_config["exposure_time"]
     
     vcsel_chip = IPV_config["vcsel_chip"]
-    vcsel_to_bias = IPV_config["vcsel_to_bias"]
-    
+
     # Create result dict
     Results = {
         "header": "Current[mA], Optical Power [mW], Voltage [V]",
@@ -110,15 +108,13 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
     SPR_data = []
     
     laser_control = aurora(vcsel_chip)
-    
+    lasers_on_chip = np.fromiter(laser_control.chip.keys(), dtype=int)
+
     # Send verbose_printing to instruments if not specified
     for instru_dict in [DC_config]:
         if "verbose_printing" not in instru_dict.keys():
             instru_dict["verbose_printing"] = verbose
 
-    
-    
-    # Plot = utils.AnimatedPlot("Current[mA]", "Optical Power [mW]", "IPV")
     Instrument_COM = communication.Communication()
 
     # Gets isntruments
@@ -139,7 +135,7 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
             DC_unit.set_output(True)
             
             # Check alignment of SPR line
-            laser_control.switch_to_laser(vcsel_to_bias)
+            laser_control.turn_on_all_lasers()
             utils.ramp_current(DC_unit, prev_end_current, check_bias)
             DC_unit.set_current(check_bias)
             if find_line_biased:
@@ -158,24 +154,26 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
             while (time.time() - measurement_time_start) < measurement_time:
                 start_time = time.time()
                 
-                print(f'Taking Picture No {len(frame_list)}')
-                laser_control.switch_to_laser(vcsel_to_bias)
-                utils.ramp_current(DC_unit, 0, measurement_bias)
-                # Grab picture from Hamamatsu
-                image = dcam_capture_image(exposure_time=exposure_time)
-                
-                frame_list.append(image)
-                # SPR_data.append(analyze_image(image, fig))
-                # frame_time.append(time.time() - measurement_time_start)
-                
-                # fig.axes[4].plot(frame_time, SPR_data, marker='o', linewidth=0.2, markersize=3) 
-                # plt.show(False)
-                
-                utils.ramp_current(DC_unit, measurement_bias, 0)
-                laser_control.turn_off_all_lasers()
-                
-                duration = time.time() - start_time
-                time.sleep(measurement_interval - duration if duration < measurement_interval else 0)
+                for laser in lasers_on_chip:
+                    
+                    print(f'Taking Picture No {len(frame_list)}')
+                    laser_control.switch_to_laser(laser)
+                    utils.ramp_current(DC_unit, 0, measurement_bias)
+                    # Grab picture from Hamamatsu
+                    image = dcam_capture_image(exposure_time=exposure_time)
+                    
+                    frame_list.append(image)
+                    # SPR_data.append(analyze_image(image, fig))
+                    # frame_time.append(time.time() - measurement_time_start)
+                    
+                    # fig.axes[4].plot(frame_time, SPR_data, marker='o', linewidth=0.2, markersize=3) 
+                    # plt.show(False)
+                    
+                    utils.ramp_current(DC_unit, measurement_bias, 0)
+                    laser_control.turn_off_all_lasers()
+                    
+                    duration = time.time() - start_time
+                    time.sleep(measurement_interval - duration if duration < measurement_interval else 0)
                 
         except KeyboardInterrupt:
             print("Keyboard interrupt detected, stopping.")
