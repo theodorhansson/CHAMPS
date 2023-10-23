@@ -2,24 +2,24 @@
 
 [measurement]
 Type = "spr_no_lam_vcsel_sweep"
-Save_folder = "C:/Users/Mindaugas Juodenas/Documents/GitHub/SPR_measurements/" 
-DC_unit = "keithley2400"    # Refers to the [] below only
-V_max = 5                   # Max allowed voltaged
+dc_unit = "keithley2400"    # DC power supply
+v_max = 5                   # Max allowed voltaged
 
-SPR_measurement_name = "erik_testing"
+save_folder = "SPR_measurements" # Save folder
+spr_measurement_name = "mindaugas_makes_everything_work_great"
 
-Current              = 1    # Current for measurement
-Check_bias           = 1    # Bias current to check the alignment
-Measurement_time     = 10    # Measurement time in seconds
-Measurement_interval = 1    # Take a picture every x sec
-Exposure_time        = 0.03 # Exposure time in sec
+check_bias           = 1    # Bias current to check the alignment
+measurement_time     = 10   # Measurement time in seconds
+measurement_interval = 1    # Take a picture every x sec
+exposure_time        = 0.03 # Exposure time in sec
 
-Find_det_lines       = 0    # Run live capturing to find detection line
-Find_line_biased     = 0    # Run live capturing with biased VCSEL
+find_det_lines       = 0    # Run live capturing to find detection line
+find_line_biased     = 0    # Run live capturing with biased VCSEL
 
-VCSEL_chip           = "johannes" # Which chip is being used
+vcsel_chip           = "johannes" # Which chip is being used
+vcsel_biases         = [1, 1, 1]  # mA
 
-Verbose_printing     = 1        # Flag for printing
+verbose_printing     = 1        # Flag for printing
 
 [keithley2400]
 Type = "keithley2400"       # The specific type of unit

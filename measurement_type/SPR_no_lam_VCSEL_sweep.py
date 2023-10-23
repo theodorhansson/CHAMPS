@@ -11,12 +11,13 @@ from drivers.arduino_giga_serial.aurora import aurora
 # Import meta-SPR
 from spr_functions.main_spr import process_image, init_figure, analyze_image
 
-# Python modules
+# # Python modules
 import traceback
 import numpy as np
 import matplotlib.pyplot as plt
 import time
 import os, sys
+import threading
 if os.path.dirname(os.path.dirname(os.path.realpath(__file__))) not in sys.path:
     sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
     
@@ -34,12 +35,12 @@ _DC_name_key = "dc_unit"
 _required_arguments = [
     "type",
     "dc_unit",
-    "current",
     "v_max",
     "save_folder",
     "custom_name",
     "spr_measurement_name",
     "vcsel_chip",
+    "vcsel_biases",
     
 ]
 _optional_arguments = {
@@ -71,19 +72,22 @@ def init(config: dict):
     DC_name = IPV_config[_DC_name_key]
     DC_config = config[DC_name]
 
-    Results = SPR_no_lam_sweep_main(IPV_config_opt, DC_config)
+    results = SPR_no_lam_sweep_main(IPV_config_opt, DC_config)
 
     # Get the used config and return it to main
     return_dict = {IPV_name: IPV_config_opt, DC_name: DC_config}
-    return Results, return_dict
+    return results, return_dict
 
+def process_image(laser, image, fig, results, measurement_time_start, widest_valley_search):
+    results['frame_list'][laser].append(image)
+    results['frame_time'][laser].append(time.time() - measurement_time_start)
+    results['spr_data'][laser].append(analyze_image(image, widest_valley_search, fig))
 
 def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
     
     # The main IPV function
     V_max = IPV_config["v_max"]
     check_bias = IPV_config["check_bias"]
-    measurement_bias = IPV_config["current"]
     verbose = IPV_config["verbose_printing"]
     measurement_time = IPV_config["measurement_time"]
     measurement_interval = IPV_config["measurement_interval"]
@@ -94,21 +98,31 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
     exposure_time = IPV_config["exposure_time"]
     
     vcsel_chip = IPV_config["vcsel_chip"]
+    vcsel_biases = IPV_config["vcsel_biases"]
+    
+    widest_valley_search = False
 
     # Create result dict
-    Results = {
-        "header": "Current[mA], Optical Power [mW], Voltage [V]",
-        "voltage": [],
-        "current": [],
-        "power": [],
-    }
-
-    frame_list = []
-    frame_time = []
-    SPR_data = []
+    results = {"frame_list" : {},
+               "frame_time" : {},
+               "spr_data"   : {},
+               }
+    
+    for i, biases in enumerate(vcsel_biases):
+        results[f"frame_list"][i] = []
+        results[f"frame_time"][i] = []
+        results[f"spr_data"][i]   = []
+        
+    # Initialize figure for plotting
+    # TODO: MAKE NUMBER OF FIGURES AS MANY AS VCSELS OR MERGE INTO ONE FIGURE ##
+    fig1 = init_figure()
+    fig2 = init_figure()
+    fig3 = init_figure()
+    fig_list = [fig1, fig2, fig3]
     
     laser_control = aurora(vcsel_chip)
     lasers_on_chip = np.fromiter(laser_control.chip.keys(), dtype=int)
+    # TODO: INCLUDE CHECK THAT BIASES AND NUMBER OF VCSELS ARE THE SAME ##
 
     # Send verbose_printing to instruments if not specified
     for instru_dict in [DC_config]:
@@ -123,8 +137,6 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
     ## Start live capturing stop with q and start measuring
     if find_det_lines:
         dcam_live_capturing(exposure_time=exposure_time)
-    
-    
     
     with DC_unit_obj(DC_config) as DC_unit:
         try:
@@ -144,9 +156,6 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
             utils.ramp_current(DC_unit, check_bias, 0)
             laser_control.turn_off_all_lasers()
             
-            # Initialize figure for plotting
-            fig = init_figure()
-            
             # Start time of measurement
             measurement_time_start = time.time()
             
@@ -154,36 +163,50 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
             while (time.time() - measurement_time_start) < measurement_time:
                 start_time = time.time()
                 
-                for laser in lasers_on_chip:
+                frame_counter = 0
+                print(f'Taking Picture No {frame_counter}')
+                for i, laser in enumerate(lasers_on_chip):
                     
-                    print(f'Taking Picture No {len(frame_list)}')
+                    # Active switch for current laser
                     laser_control.switch_to_laser(laser)
-                    utils.ramp_current(DC_unit, 0, measurement_bias)
+                    
+                    # Ramp current to set bias
+                    utils.ramp_current(DC_unit, 0, vcsel_biases[i])
+                    
                     # Grab picture from Hamamatsu
                     image = dcam_capture_image(exposure_time=exposure_time)
                     
-                    frame_list.append(image)
-                    # SPR_data.append(analyze_image(image, fig))
-                    # frame_time.append(time.time() - measurement_time_start)
+                    # Process with meta-SPR library
+                    process_image(laser, image, fig, results, measurement_time_start, widest_valley_search)
                     
-                    # fig.axes[4].plot(frame_time, SPR_data, marker='o', linewidth=0.2, markersize=3) 
-                    # plt.show(False)
+                    ## Include for threading for process images ## WARNING UNTESTED ##
+                    # image_processing_thread = threading.Thread(target=process_image(i, image, fig_list[i], results, measurement_time_start))
+                    # image_processing_thread.start()
                     
-                    utils.ramp_current(DC_unit, measurement_bias, 0)
+                    # Update inline plot with measurement status
+                    ## TODO: WILL ONLY SHOW FIGURE FROM FIRST VCSEL
+                    fig1.axes[4].plot(frame_time, SPR_data, marker='o', linewidth=0.2, markersize=3) 
+                    plt.show(False)
+                    
+                    # Ramp down current
+                    utils.ramp_current(DC_unit, vcsel_biases[i], 0)
+                    
+                    # Turn off switch to lasers
                     laser_control.turn_off_all_lasers()
                     
-                    duration = time.time() - start_time
-                    time.sleep(measurement_interval - duration if duration < measurement_interval else 0)
-                
+                # Wait until set time for the measurement
+                duration = time.time() - start_time
+                time.sleep(measurement_interval - duration if duration < measurement_interval else 0)
+                    
+                ## CLEAN UP OF STARTED THREADS MIGHT NOT BE NEEDED
+                # image_processing_thread.join()
+                    
+                frame_counter += 1
+                    
         except KeyboardInterrupt:
             print("Keyboard interrupt detected, stopping.")
         except:
             # print error if error isn't catched
             traceback.print_exc()
 
-    Results["frame_list"] = frame_list
-    Results["frame_time"] = frame_time
-    Results["SPR_data"] = SPR_data
-    Results["fig_object"] = fig
-
-    return Results
+    return results

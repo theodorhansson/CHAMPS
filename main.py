@@ -12,11 +12,13 @@ default_conf_path = "config.toml"
 import numpy as npq
 import matplotlib.pyplot as plt
 from PIL import Image
+from pathlib import Path
 
 def main(config_path):
     # Open the config file
     with open(config_path, "rb") as f:
         config = tomllib.load(f)
+        
     config_lower = utils.dict_2_lower(config)  # sanitize the config dict
     meas_name = config_lower["measurement"]["type"]
 
@@ -28,7 +30,7 @@ def main(config_path):
     print(f"Reading config {config_path} from disk") if verbose & 16 else None
 
     # get the current time in nice format
-    timestamp = time.strftime(rf"%Y%m%d-%H%M%S")
+    timestamp = time.strftime(rf"%Y%m%d_%H.%M.%S")
 
     # Set file name to current time if undefined
     if "custom_name" not in config_lower["measurement"].keys():
@@ -43,38 +45,45 @@ def main(config_path):
     result_dict, used_config = measurement_init(config_lower)
 
     # Logic on where to save file
-    save_folder = config_lower["measurement"]["save_folder"]
-    if save_folder[-1:] != "/":
-        save_folder = save_folder + "/"  # make sure it ends with /
+    parent_path = Path(__file__).resolve().parents[1]
+    save_folder_path = Path(parent_path, config_lower["measurement"]["save_folder"])
 
     # Create save folder if it doesn't exist
-    if not os.path.isdir(save_folder):
-        print("Woops, your folder doesn't exist. Creating one here: ", save_folder)
-        os.mkdir(save_folder)
-    save_file_name = save_folder + file_name
+    if not os.path.isdir(save_folder_path):
+        print("Woops, your folder doesn't exist. Creating one here: ", save_folder_path)
+        os.mkdir(save_folder_path)
+    save_file_name = Path(save_folder_path, file_name)
 
     # print(config_lower["type"])
     if config_lower["measurement"]["type"] == "missalignment" or config_lower["measurement"]["type"] == "spr_no_lam_sweep" or config_lower["measurement"]["type"] == "spr_lam_sweep" or config_lower["measurement"]["type"] == "spr_no_lam_vcsel_sweep":
 
         SPR_measurement_name = config_lower["measurement"]["spr_measurement_name"]
-        
-        save_path_current_measurement = os.path.join(save_folder, SPR_measurement_name)
+        measurement_timestamp = timestamp + '_' + SPR_measurement_name
+        save_path_current_measurement = os.path.join(save_folder_path, measurement_timestamp)
         if not os.path.isdir(save_path_current_measurement):
             os.mkdir(save_path_current_measurement)
-
-        frame_list = result_dict["frame_list"]
-        frame_time = result_dict["frame_time"]
-        SPR_data = result_dict["SPR_data"]
-        fig_object = result_dict["fig_object"]
-
-        print('Saving Images')
-        for i, im in enumerate(frame_list):      
-            iio.imwrite(os.path.join(save_path_current_measurement, f'{SPR_measurement_name}_image{i}.png'), im)
+        
+        
+        for laser in result_dict['frame_list'].items():
+            laser = laser[0]
             
-        print(f'Saving Data to {save_folder}')
-        xy = np.vstack((frame_time,SPR_data)).T
-        np.savetxt(os.path.join(save_path_current_measurement, f'{SPR_measurement_name}_data.txt'), xy, delimiter=',') 
-        fig_object.savefig(os.path.join(save_path_current_measurement, f'{SPR_measurement_name}_data.png'))
+            frame_list = result_dict['frame_list'][laser]
+            frame_time = result_dict['frame_time'][laser]
+            spr_data   = result_dict['spr_data'][laser]
+            fig_object = result_dict['fig_objects'][laser]
+            
+            save_folder_current_VCSEL = Path(save_path_current_measurement, f'VCSEL_{laser}')
+            if not os.path.isdir(save_folder_current_VCSEL):
+                os.mkdir(save_folder_current_VCSEL)
+        
+            print('Saving Images')
+            for i, im in enumerate(frame_list):      
+                iio.imwrite(os.path.join(save_folder_current_VCSEL, f'{SPR_measurement_name}_image{i}.png'), im)
+                
+            print(f'Saving Data to {save_folder_path}')
+            xy = np.vstack((frame_time, spr_data)).T
+            np.savetxt(os.path.join(save_folder_current_VCSEL, f'{SPR_measurement_name}_data.txt'), xy, delimiter=',') 
+            # fig_object.savefig(os.path.join(save_folder_current_VCSEL, f'{SPR_measurement_name}_data.png'))
 
     else:
         # Save the data as json

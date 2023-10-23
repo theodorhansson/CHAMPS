@@ -51,11 +51,16 @@ def find_valley_width_around_local_minima(data, local_minimum, width_threshold=0
     
     return valley_widths
     
-def find_peaks(coords, values, spacing = 15, px_avg = 3):
+def find_peaks(coords, values, widest_valley, spacing = 15, px_avg = 3, smoothing=True):
     ### takes in the integrated spectrum and returns just the peak values
     ### zero the spectrum to the max peak 
-    index_max_peak = 0
-    zeroed_values = values[index_max_peak:]    
+    if widest_valley:
+        index_max_peak = 0
+        zeroed_values = values[index_max_peak:]  
+    else:
+        zeroed_values = values[np.argmax(values[coords<750]):] 
+        SPR_coord = 0
+        
     zeroed_coords = np.arange(zeroed_values.size)*px_scale
     ### zeroed coordinates
     peak_coords = np.arange(0,max(zeroed_coords), spacing)
@@ -64,39 +69,43 @@ def find_peaks(coords, values, spacing = 15, px_avg = 3):
     for peak_x in peak_coords:
         peaks.append(np.max(zeroed_values[abs(zeroed_coords - peak_x) < px_scale*px_avg]) )
     
-    ### moving average
-    # window_size = 1
-    # window = np.ones(window_size) / window_size
-    # peaks = np.convolve(peaks, window, mode='same')
     ### butterworth
-    sampling_freq=1/15
-    cutoff_freq=1/200
-    order=2
-    nyquist_freq = 0.5 * sampling_freq
-    normalized_cutoff_freq = cutoff_freq / nyquist_freq
-    b, a = butter(order, normalized_cutoff_freq, btype='lowpass')
-    peaks = filtfilt(b, a, peaks)
-    peaks = np.array(peaks)
-    
-    ## Extract the localminimum
-    local_minimum = argrelextrema(peaks, np.less)[0]
-    
-    ## Omit last value since the last peak is a "false" local minimum
-    local_minimum = local_minimum[:-1]
-    
-    ## Find widths of dips in spectrum
-    valley_widths = find_valley_width_around_local_minima(peaks, local_minimum, width_threshold=0)
-    
-    ## Coordinate of the SPR dip
-    SPR_coord = int(local_minimum[np.argmax(valley_widths)])
+    if smoothing:
+        sampling_freq=1/15
+        cutoff_freq=1/200
+        order=2
+        nyquist_freq = 0.5 * sampling_freq
+        normalized_cutoff_freq = cutoff_freq / nyquist_freq
+        b, a = butter(order, normalized_cutoff_freq, btype='lowpass')
+        
+        peaks = filtfilt(b, a, peaks)
+        
+    if widest_valley:
+        peaks = np.array(peaks)
+        ## Extract the localminimum
+        local_minimum = argrelextrema(peaks, np.less)[0]
+        ## Omit last value since the last peak is a "false" local minimum
+        local_minimum = local_minimum[:-1]
+        ## Find widths of dips in spectrum
+        valley_widths = find_valley_width_around_local_minima(peaks, local_minimum, width_threshold=0)
+        ## Coordinate of the SPR dip
+        SPR_coord = int(local_minimum[np.argmax(valley_widths)])
     
     return peak_coords, peaks, SPR_coord
 
-def isolate_SPR(peak_coords, peak_values, SPR_coord, manual=None):
+def isolate_SPR(peak_coords, peak_values, SPR_coord, widest_valley, manual=None):
 
-    new_x = np.arange(peak_coords[SPR_coord]-210, peak_coords[SPR_coord]+210, 15)
-    new_y = peak_values[SPR_coord-new_x.size//2:SPR_coord+new_x.size//2]
-    # print(SPR_coord)
+    if manual:
+        SPR_x = np.argmin(abs(peak_coords - manual))
+    elif widest_valley:
+        new_x = np.arange(peak_coords[SPR_coord]-210, peak_coords[SPR_coord]+210, 15)
+        new_y = peak_values[SPR_coord-new_x.size//2:SPR_coord+new_x.size//2]
+    else:
+        SPR_x = np.argmin(peak_values[:50]) # provided SPR is the minimum...
+        # TODO: this sets the upper limit of measurement, extra important to fix!
+        new_x = np.arange(peak_coords[SPR_x]-150, peak_coords[SPR_x]+150, 15)
+        new_y = peak_values[SPR_x-new_x.size//2:SPR_x+new_x.size//2]
+    
     return new_x, new_y
    
 def find_centroid(x,y):
@@ -118,10 +127,10 @@ def init_figure():
     plt.tight_layout()
     return fig
 
-def analyze_image(im, fig=None):    
+def analyze_image(im, widest_valley, fig=None):    
     x, y, crp_img = process_image(image = im)
-    peak_x, peak_y, SPR_coord = find_peaks(x, y)
-    sprx, spry = isolate_SPR(peak_x, peak_y, SPR_coord, manual = None)
+    peak_x, peak_y, SPR_coord = find_peaks(x, y, widest_valley)
+    sprx, spry = isolate_SPR(peak_x, peak_y, SPR_coord, widest_valley, manual = None)
     x_c, y_cspry = find_centroid(sprx, np.max(spry)-spry)
     if fig is not None:
         for ax in fig.axes:
