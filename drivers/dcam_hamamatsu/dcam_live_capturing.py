@@ -5,6 +5,7 @@ if os.path.dirname(os.path.dirname(os.path.realpath(__file__))) not in sys.path:
 from dcam_hamamatsu.dcam import *
 import threading
 import cv2
+import time
 
 import numpy as np
 
@@ -26,7 +27,7 @@ def dcamtest_show_framedata(data, windowtitle, iShown):
         return (-1, cv2)  
     
     cv2.namedWindow(windowtitle, cv2.WINDOW_NORMAL)
-    cv2.resizeWindow(windowtitle, 800, 600)
+    cv2.resizeWindow(windowtitle, 1024, 1024)
     
     
     if data.dtype == np.uint16:
@@ -103,6 +104,7 @@ def dcam_live_capturing(iDevice=0, exposure_time=0.03):
         print('-NG: Dcamapi.init() fails with error {}'.format(Dcamapi.lasterr()))
 
     Dcamapi.uninit()
+    time.sleep(1)
 
 
 if __name__ == '__main__':

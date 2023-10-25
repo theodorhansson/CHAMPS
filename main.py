@@ -14,6 +14,8 @@ import matplotlib.pyplot as plt
 from PIL import Image
 from pathlib import Path
 
+
+
 def main(config_path):
     # Open the config file
     with open(config_path, "rb") as f:
@@ -41,6 +43,7 @@ def main(config_path):
 
     # Get the measurement object
     measurement_init = identify_measurement_type(meas_name)
+    
     # Begin the measurement!
     result_dict, used_config = measurement_init(config_lower)
 
@@ -54,36 +57,12 @@ def main(config_path):
         os.mkdir(save_folder_path)
     save_file_name = Path(save_folder_path, file_name)
 
-    # print(config_lower["type"])
-    if config_lower["measurement"]["type"] == "missalignment" or config_lower["measurement"]["type"] == "spr_no_lam_sweep" or config_lower["measurement"]["type"] == "spr_lam_sweep" or config_lower["measurement"]["type"] == "spr_no_lam_vcsel_sweep":
-
-        SPR_measurement_name = config_lower["measurement"]["spr_measurement_name"]
-        measurement_timestamp = timestamp + '_' + SPR_measurement_name
-        save_path_current_measurement = os.path.join(save_folder_path, measurement_timestamp)
-        if not os.path.isdir(save_path_current_measurement):
-            os.mkdir(save_path_current_measurement)
-        
-        
-        for laser in result_dict['frame_list'].items():
-            laser = laser[0]
-            
-            frame_list = result_dict['frame_list'][laser]
-            frame_time = result_dict['frame_time'][laser]
-            spr_data   = result_dict['spr_data'][laser]
-            fig_object = result_dict['fig_objects'][laser]
-            
-            save_folder_current_VCSEL = Path(save_path_current_measurement, f'VCSEL_{laser}')
-            if not os.path.isdir(save_folder_current_VCSEL):
-                os.mkdir(save_folder_current_VCSEL)
-        
-            print('Saving Images')
-            for i, im in enumerate(frame_list):      
-                iio.imwrite(os.path.join(save_folder_current_VCSEL, f'{SPR_measurement_name}_image{i}.png'), im)
-                
-            print(f'Saving Data to {save_folder_path}')
-            xy = np.vstack((frame_time, spr_data)).T
-            np.savetxt(os.path.join(save_folder_current_VCSEL, f'{SPR_measurement_name}_data.txt'), xy, delimiter=',') 
-            # fig_object.savefig(os.path.join(save_folder_current_VCSEL, f'{SPR_measurement_name}_data.png'))
+    if config_lower["measurement"]["type"] == "missalignment" or \
+       config_lower["measurement"]["type"] == "spr_no_lam_sweep" or \
+       config_lower["measurement"]["type"] == "spr_lam_sweep" or \
+       config_lower["measurement"]["type"] == "spr_no_lam_vcsel_sweep":
+           
+        pass
 
     else:
         # Save the data as json

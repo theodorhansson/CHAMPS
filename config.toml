@@ -1,23 +1,30 @@
-#Std units: mA, V, mW, nm
+# Std units: mA, V, mW, nm
 
 [measurement]
 Type = "spr_no_lam_vcsel_sweep"
 dc_unit = "keithley2400"    # DC power supply
 v_max = 5                   # Max allowed voltaged
 
-save_folder = "SPR_measurements" # Save folder
-spr_measurement_name = "mindaugas_makes_everything_work_great"
+# Saving stuff
+save_folder = "SPR_measurements_231025" # Save folder
+spr_measurement_name = "Testing_splitting_image"
+save_raw_images = 0
 
+# VCSEL parameters
 check_bias           = 1    # Bias current to check the alignment
-measurement_time     = 10   # Measurement time in seconds
-measurement_interval = 1    # Take a picture every x sec
-exposure_time        = 0.03 # Exposure time in sec
-
-find_det_lines       = 0    # Run live capturing to find detection line
-find_line_biased     = 0    # Run live capturing with biased VCSEL
-
 vcsel_chip           = "johannes" # Which chip is being used
-vcsel_biases         = [1, 1, 1]  # mA
+vcsel_biases         = [3, 3, 3]  # mA
+
+# Camera and measurement interval
+measurement_time     = 2400   # Measurement time in seconds
+measurement_interval = 5      # Take a picture every x sec
+exposure_time        = 0.01   # Exposure time in sec
+frame_average        = 10
+
+# Find detection lines before measurement
+find_det_lines       = 1    # Run live capturing to find detection line
+find_line_biased     = 1    # Run live capturing with biased VCSEL
+
 
 verbose_printing     = 1        # Flag for printing
 

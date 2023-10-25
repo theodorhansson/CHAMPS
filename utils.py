@@ -142,7 +142,7 @@ def ramp_current(DC_supply, start, stop, step=10):
 
     for current in current_steps:
         DC_supply.set_current(current)
-        time.sleep(5 * 1e-3)  # 5 ms
+        time.sleep(1 * 1e-3)  # 5 ms
 
 
 def dict_2_lower(indict: dict) -> dict:

@@ -77,6 +77,6 @@ class aurora:
         
         
 johannes = aurora('johannes')
-# johannes.switch_to_laser(0)
+johannes.switch_to_laser(0)
 # johannes.turn_on_all_lasers()
-johannes.turn_off_all_lasers()
+# johannes.turn_off_all_lasers()

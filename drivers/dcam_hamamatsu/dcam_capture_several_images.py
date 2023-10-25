@@ -7,7 +7,7 @@ import cv2
 from PIL import Image
 
     
-def dcam_capture_image(iDevice=0, exposure_time=0.03):
+def dcam_capture_average_image(frame_average, iDevice=0, exposure_time=0.03):
     """
     Capture and show a image
     """
@@ -18,14 +18,19 @@ def dcam_capture_image(iDevice=0, exposure_time=0.03):
             dcam.prop_setvalue(DCAM_IDPROP.EXPOSURETIME_CONTROL, 2)
             dcam.prop_setvalue(DCAM_IDPROP.EXPOSURETIME, exposure_time)
             
-            if dcam.buf_alloc(1) is not False:
-                
+            ## TODO(ERIK): Fix buf_alloc unboundlocalerror
+            if dcam.buf_alloc(frame_average) is not False:
                 if dcam.cap_snapshot() is not False:
                     
                     timeout_milisec = 100
                     while True:
                         if dcam.wait_capevent_frameready(timeout_milisec) is not False:
-                            data = dcam.buf_getlastframedata()
+                            
+                            data = dcam.buf_getframedata(-1)
+                            for i in range(2, frame_average + 1):
+                                data += dcam.buf_getframedata(-i)
+
+                            data = data/frame_average
                             break
                     
                         dcamerr = dcam.lasterr()
