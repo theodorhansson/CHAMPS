@@ -221,12 +221,15 @@ plt.show()
 
 #%% BSA EXPERIMENT
 
-spr_data_folder = 'spr_measurements'
-parent_path = Path(__file__).resolve().parents[2]
+spr_data_folder = 'spr_measurements_231025'
+parent_path = Path(__file__).resolve().parents[1]
 names=[
-       '20231024_19.32.18_three_channels',
+       '20231026_15.53.54_100_glycerol_3_channels',
+        '20231026_16.22.03_100_glycerol_3_channels',
+        '20231026_16.50.08_100_glycerol_3_channels',
+        '20231026_17.20.44_100_glycerol_3_channels',
        ]
-
+mov_avg_window = 16
 VCSEL = ['VCSEL_0', 'VCSEL_1', 'VCSEL_2']
 filename = 'data'
 
@@ -243,16 +246,15 @@ for name in names:
             data[i,1] = data[i,1] if data[i,1]>350 else data[i,1]+150
             # data[i,1] = data[i,1] if data[i,1]<420 else None
         ax.plot(data[:,0], mov_avg(data[:,1], 7), linewidth=1, label=f'Moving Average n={mov_avg_window}')
-        # ax.plot(data[:,0]+end_time, data[:,1], label=name, marker='o', linewidth=0.3, markersize=2, alpha=0.5)
-        # ax.plot(data[:,0]+end_time, mov_avg(data[:,1], 10), label=name+'_avg', linewidth=1)
-        
-    merged_data_x.append(data[:,0]+end_time)
-    merged_data_y.append(data[:,1])
+        ax.plot(data[:,0]+end_time, data[:,1], label=name, marker='o', linewidth=0.3, markersize=2, alpha=0.5)
+        ax.plot(data[:,0]+end_time, mov_avg(data[:,1], 10), label=name+'_avg', linewidth=1)
+        merged_data_x = data[:,0]
+        merged_data_y = data[:,1]
+    # merged_data_x.append(data[:,0]+end_time)
+    # merged_data_y.append(data[:,1])
     
     end_time += data[-1,0]
 
-
-mov_avg_window = 7
 sav_gol_window = 12
 sav_gol_order = 2
 
@@ -261,8 +263,8 @@ merged_data_y_raw = np.hstack(merged_data_y)
 merged_data_y_movavg = mov_avg(np.hstack(merged_data_y), mov_avg_window)
 # merged_data_y_savgol = savgol(np.hstack(merged_data_y), sav_gol_window, sav_gol_order)
 
-ax.scatter(merged_data_x, merged_data_y_raw, label='Raw Data', alpha=0.15, s=5, facecolor='none', edgecolor='b' )
-ax.plot(merged_data_x, merged_data_y_movavg, linewidth=1, label=f'Moving Average n={mov_avg_window}', color='r')
+ax.scatter(merged_data_x, merged_data_y_raw, label='Raw Data', alpha=0.7, s=5, facecolor='none', edgecolor='b' )
+# ax.plot(merged_data_x, merged_data_y_movavg, linewidth=1, label=f'Moving Average n={mov_avg_window}', color='r')
 # ax.plot(merged_data_x, merged_data_y_savgol, linewidth=1,label=f'Savitzky-Golay n={sav_gol_window} o={sav_gol_order}')
 
 # finding the levels`
@@ -270,22 +272,22 @@ ax.plot(merged_data_x, merged_data_y_movavg, linewidth=1, label=f'Moving Average
 # for i in range(5):
 #     mask = (merged_data_x > 12*60+interval*i) & (merged_data_x < 15*60+interval*i)
 #     ax.plot(merged_data_x[mask], merged_data_y_raw[mask])
-#     print(i, np.mean(merged_data_y_raw[mask]),
+#     print'(i, np.mean(merged_data_y_raw[mask]),
 #           ResonantN(theta_spr=SPR_ang((np.mean(merged_data_y_raw[mask])+3985)/1000)))
 # plt.show()
-# mask = (merged_data_x > 121*60) & (merged_data_x < 124*60)
+# mask = (merged_data_x > 25*60) & (merged_data_x < 20*60)
 # plt.plot(merged_data_x[mask], merged_data_y_raw[mask])
 # plt.plot(merged_data_x[mask], merged_data_y_movavg[mask])
-# print('Raw Mean: ', np.mean(merged_data_y_raw[mask]), 'Raw Std: ', np.std(merged_data_y_raw[mask]))
-# print('Averaged Mean: ', np.mean(merged_data_y_movavg[mask]), 'Averaged Std: ', np.std(merged_data_y_movavg[mask]))
+print('Raw Mean: ', np.mean(merged_data_y_raw[mask]), 'Raw Std: ', np.std(merged_data_y_raw[mask]))
+print('Averaged Mean: ', np.mean(merged_data_y_movavg[mask]), 'Averaged Std: ', np.std(merged_data_y_movavg[mask]))
 # print('SavGol Mean: ', np.mean(merged_data_y_savgol[mask]), 'SavGol Std: ', np.std(merged_data_y_savgol[mask]))
 
-ax.legend(loc='upper left', fontsize=10)
+# ax.legend(loc='upper left', fontsize=10)
     
 ax.set_xlabel('Time, min')
 ax.set_ylabel('SPR Coordinate, um')
-ax.set_xlim([0*60,30*60])
-ax.set_ylim([520,700])
+# ax.set_xlim([13*60,16*60])
+# ax.set_ylim([530.5,532.5])
 # ax.set_ylim([362,368])
 # ax.set_xlim([120*60,129*60])
 ax.grid(linewidth=1, alpha=0.3)
@@ -295,7 +297,7 @@ ax.set_xticklabels(np.array(ax.get_xticks()/60).astype(int), rotation=90)
 offset = 3820
 ax2 = ax.twinx()
 ax2.set_ylabel('Refractive Index')
-ax2.set_ylim(ax.get_ylim())
+# ax2.set_ylim(ax.get_ylim())
 ylabels = [ResonantN(theta_spr=SPR_ang((x+offset)/1000)) for x in ax2.get_yticks()]
 ax2.set_yticklabels(np.round(ylabels,5))
 
@@ -315,6 +317,6 @@ for c, clor in zip(concentrations,clrs):
 # # ax2.axhline(SPR_loc(ResonantAngle(e_analyte=ref_idx(0.026)**2))*1000-offset,color='y',linewidth=0.5,label='3% Glycerol', linestyle='--')
 # # ax2.axhline(SPR_loc(ResonantAngle(e_analyte=ref_idx(0.035)**2))*1000-offset,color='m',linewidth=0.5,label='4% Glycerol', linestyle='--')
 # # ax2.axhline(SPR_loc(ResonantAngle(e_analyte=ref_idx(0.043)**2))*1000-offset,color='k',linewidth=0.5,label='5% Glycerol', linestyle='--')
-ax2.legend(fontsize=10)
+# ax2.legend(fontsize=10)
 # fig.savefig('BSAExperiment.svg', dpi=300)
 plt.show()

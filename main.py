@@ -14,8 +14,6 @@ import matplotlib.pyplot as plt
 from PIL import Image
 from pathlib import Path
 
-
-
 def main(config_path):
     # Open the config file
     with open(config_path, "rb") as f:

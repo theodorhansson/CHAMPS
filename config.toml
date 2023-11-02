@@ -6,17 +6,17 @@ dc_unit = "keithley2400"    # DC power supply
 v_max = 5                   # Max allowed voltaged
 
 # Saving stuff
-save_folder = "SPR_measurements_231025" # Save folder
-spr_measurement_name = "Testing_splitting_image"
+save_folder = "SPR_measurements_231027" # Save folder
+spr_measurement_name = "BSA"
 save_raw_images = 0
 
 # VCSEL parameters
 check_bias           = 1    # Bias current to check the alignment
 vcsel_chip           = "johannes" # Which chip is being used
-vcsel_biases         = [3, 3, 3]  # mA
+vcsel_biases         = [3, 3,3]  # mA
 
 # Camera and measurement interval
-measurement_time     = 2400   # Measurement time in seconds
+measurement_time     = 3600   # Measurement time in seconds
 measurement_interval = 5      # Take a picture every x sec
 exposure_time        = 0.01   # Exposure time in sec
 frame_average        = 10

@@ -109,7 +109,7 @@ def find_laser_lines(image, manual=[]):
         image_shape = image.shape
         integrate_over = 100
         integrate_y = np.sum(image[:, image_shape[0]//2-integrate_over:image_shape[0]//2+integrate_over], axis=1)
-        peaks, _ = find_peaks(integrate_y, distance=50, width=22)
+        peaks, _ = find_peaks(integrate_y, distance=50, width=10, threshold=500)
         print('Found lasers with coordinates' + str(peaks))
     
     return peaks
@@ -117,6 +117,8 @@ def find_laser_lines(image, manual=[]):
 def SPR_process_image(laser, spr_figure, line, image, results, image_capture_time, measurement_time_start, frame_counter, IPV_config):
     # results['frame_list'][laser].append(image)
     results['frame_time'][laser].append(image_capture_time - measurement_time_start)
+    #TODO: There is an enormous memory leak somewhere, the measurement slows down
+    # it is somewhere in the plotting logic
     results['spr_data'][laser].append(spr_figure.analyze_image(image, frame_counter, line, IPV_config))
 
 def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
@@ -139,9 +141,16 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
     frame_average = IPV_config["frame_average"]
     
     find_laser_lines_bias = 3
+    # manual_lines = np.array([0])
+    # manual_lines = np.array([698])
+    manual_lines = np.array([698, 1174, 1487])
+        # 1579
+    bias_sweep = False
+    sweep_biases = np.array([3.3, 3.6, 3.9])
+    
     periodic_saving = True
     save_data = True
-    saving_interval = 10
+    saving_interval = 300
     save = 1
 
     # Create result dict
@@ -196,6 +205,7 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
             utils.ramp_current(DC_unit, check_bias, 0)
             laser_control.turn_off_all_lasers()
             
+            #TODO: What if we put camera into the main measurement while loop?
             with dcam:
                 camera = dcam[0]
                 
@@ -207,16 +217,15 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
                     
                     
                     laser_control.turn_on_all_lasers()
+
                     utils.ramp_current(DC_unit, 0, find_laser_lines_bias)
-                    
                     image = grab_image(camera, frame_avg=frame_average)
-                    manual_lines = np.array([661,1134,1456])
-                    laser_lines_index = find_laser_lines(image, manual=manual_lines)
-                    # laser_lines_index = find_laser_lines(image)
-                    print('Found ' + str(len(laser_lines_index)) + ' lasers')
-                    
+
                     utils.ramp_current(DC_unit, find_laser_lines_bias, 0)
                     laser_control.turn_off_all_lasers()
+                    
+                    laser_lines_index = find_laser_lines(image, manual=manual_lines)
+                    print('Found ' + str(len(laser_lines_index)) + ' lasers')
                     
                     # Start time of measurement
                     measurement_time_start = time.time()
@@ -237,17 +246,11 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
                         
                         # Ramp current to set bias
                         utils.ramp_current(DC_unit, 0, vcsel_biases[0])
+                        
                         print(f'Taking Picture No {frame_counter}')
                         # Grab picture from Hamamatsu
                         # image = dcam_capture_average_image(frame_average, exposure_time=exposure_time)
                         image = grab_image(camera, frame_avg=frame_average)
-                        image_capture_time = time.time()
-                        image_width_pixels = 100
-                        for i, line_index in enumerate(laser_lines_index):
-                            cropped_image = image[line_index-image_width_pixels//2:laser_lines_index[i]+image_width_pixels//2, :]
-                            SPR_process_image(i, spr_figure, i, cropped_image, results, image_capture_time, measurement_time_start, frame_counter, IPV_config)
-                            # image_processing_thread = threading.Thread(target=SPR_process_image(i, spr_figure, i, cropped_image, results, image_capture_time, measurement_time_start, frame_counter, IPV_config))
-                            # image_processing_thread.start()
                         
                         # Ramp down current
                         utils.ramp_current(DC_unit, vcsel_biases[0], 0)
@@ -255,16 +258,36 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
                         # Turn off switch to lasers
                         laser_control.turn_off_all_lasers()
                         
+                        image_capture_time = time.time()
+                        
+                        if bias_sweep:
+                            for i in range(len(sweep_biases)):
+                                DC_unit.set_current(sweep_biases[i])
+                                image += grab_image(camera, frame_avg=frame_average)
+                                
+                            image = image/len(sweep_biases)
+                            DC_unit.set_current(vcsel_biases[0])
+                            
+                 
+                        image_width_pixels = 100
+                        for i, line_index in enumerate(laser_lines_index):
+                            cropped_image = image[line_index-image_width_pixels//2:laser_lines_index[i]+image_width_pixels//2, :]
+                            SPR_process_image(i, spr_figure, i, cropped_image, results, image_capture_time, measurement_time_start, frame_counter, IPV_config)
+                            # image_processing_thread = threading.Thread(target=SPR_process_image(i, spr_figure, i, cropped_image, results, image_capture_time, measurement_time_start, frame_counter, IPV_config))
+                            # image_processing_thread.start()
+                        
+                        
                         # Update inline plot with measurement status
                         for channels in lasers_on_chip:
                             spr_figure.fig.axes[4].plot(results['frame_time'][channels], results['spr_data'][channels], 
                                                   marker='o', linewidth=0.2, markersize=3, 
                                                   color=COLORS[channels], label=f'Laser {channels}') 
+                            
                         
                             if frame_counter==0: 
                                 spr_figure.fig.axes[4].legend(loc='upper right')
                             
-                            
+                        plt.show(False)  
                         duration = time.time() - start_time
                         total_duration += duration
                         print(f'Picture grabbing and processing took: {duration:.2f} s')

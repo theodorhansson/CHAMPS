@@ -56,7 +56,7 @@ def find_peaks(coords, values, spacing=15, px_avg = 3, smoothing=True):
     ### zero the spectrum to the max peak    
     # zeroed_values = values[np.argmax(values[coords<750]):]      
     # zeroed_values = values[argrelextrema(values, np.greater)[0][5]:]
-    zeroed_values = values[3:]
+    zeroed_values = values[7:]
     
     
     ### find x number of largest peaks and select the one with the lowest index
@@ -99,11 +99,11 @@ def isolate_SPR(peak_coords, peak_values, manual=None):
     if manual:
         SPR_x = np.argmin(abs(peak_coords - manual))
     else:
-        SPR_x = np.argmin(peak_values[:1500//15]) # provided SPR is the minimum...
+        SPR_x = np.argmin(peak_values[:2150//15]) # provided SPR is the minimum...
         # TODO: this sets the upper limit of measurement, extra important to fix!
     
-    if SPR_x == 0:
-        SPR_x = 140
+    # if SPR_x == 0:
+    #     SPR_x = 140
         
     new_x = np.arange(peak_coords[SPR_x]-150, peak_coords[SPR_x]+150, 15)
     if np.any(new_x<0): return 0, 0
@@ -112,10 +112,15 @@ def isolate_SPR(peak_coords, peak_values, manual=None):
     return new_x, new_y
    
 def find_centroid(x,y):
-    area = simps(y,x)
-    x_centroid = simps(x * y, x) / area
-    y_centroid = simps(y * y, x) / (2 * area)
-    
+    try:
+        area = simps(y,x)
+        x_centroid = simps(x * y, x) / area
+        y_centroid = simps(y * y, x) / (2 * area)
+        
+    except:
+        x_centroid = 1000
+        y_centroid = 3000
+        print(f'Failed to find SPR Dip!')
     return x_centroid, y_centroid
 
 class SPR_figure():
@@ -171,7 +176,7 @@ class SPR_figure():
         peak_x, peak_y = find_peaks(x, y)
         sprx, spry = isolate_SPR(peak_x, peak_y, manual = None)
         x_c, y_cspry = find_centroid(sprx, np.max(spry)-spry)
-        
+        #TODO: put this on a separate thread from pictures and processing
         if frame_counter == 0 and line == 0 and laser:
             self.im_raw_data = self.ax_array[0].imshow(crp_img)
             self.line_integrated_spectrum, = self.ax_array[1].plot(x, y, linewidth=0.5)
@@ -182,8 +187,12 @@ class SPR_figure():
             self.ax_array[3].set_xlim([np.min(sprx), np.max(sprx)])
             self.ax_array[3].set_ylim([np.min(spry), np.max(spry)])
             plt.show(False)
-            
+        
         else:
+            #TODO: This is slowing down over time and takes way too much time
+            # in general
+            plot_start = time.time()
+            self.im_raw_data.set_data(crp_img)
             self.line_integrated_spectrum.set_data(x, y)
             self.ax_array[1].set_ylim([np.min(y), np.max(y)])
             self.filtered_peaks.set_data(peak_x, peak_y)
@@ -192,5 +201,6 @@ class SPR_figure():
             self.ax_array[3].set_xlim([np.min(sprx), np.max(sprx)])
             self.ax_array[3].set_ylim([np.min(spry), np.max(spry)])
             plt.show(False)
+            print(f'Plotting took: {time.time()-plot_start}')
 
         return x_c
