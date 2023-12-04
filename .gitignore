@@ -176,4 +176,7 @@ cython_debug/
 OphirComCP.py
 playground.py
 
+#Measurement folders
+camera_ipv_231204
+
 

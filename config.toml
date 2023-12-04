@@ -1,19 +1,19 @@
 # Std units: mA, V, mW, nm
 
 [measurement]
-Type = "spr_no_lam_vcsel_sweep"
+Type = "camera_ipv"
 dc_unit = "keithley2400"    # DC power supply
 v_max = 5                   # Max allowed voltaged
 
 # Saving stuff
-save_folder = "SPR_measurements_231027" # Save folder
-spr_measurement_name = "BSA"
+save_folder = "camera_ipv_231204" # Save folder
+spr_measurement_name = "04_07"
 save_raw_images = 0
 
 # VCSEL parameters
 check_bias           = 1    # Bias current to check the alignment
 vcsel_chip           = "johannes" # Which chip is being used
-vcsel_biases         = [3, 3,3]  # mA
+vcsel_biases         = [3, 3, 3]  # mA
 
 # Camera and measurement interval
 measurement_time     = 3600   # Measurement time in seconds

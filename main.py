@@ -58,7 +58,8 @@ def main(config_path):
     if config_lower["measurement"]["type"] == "missalignment" or \
        config_lower["measurement"]["type"] == "spr_no_lam_sweep" or \
        config_lower["measurement"]["type"] == "spr_lam_sweep" or \
-       config_lower["measurement"]["type"] == "spr_no_lam_vcsel_sweep":
+       config_lower["measurement"]["type"] == "spr_no_lam_vcsel_sweep" or \
+       config_lower["measurement"]["type"] == "camera_ipv":
            
         pass
 
@@ -111,6 +112,10 @@ def identify_measurement_type(measurement: str):
         case "spr_no_lam_vcsel_sweep":
             import measurement_type.SPR_no_lam_VCSEL_sweep
             return measurement_type.SPR_no_lam_VCSEL_sweep.init
+        
+        case "camera_ipv":
+            import measurement_type.camera_IPV
+            return measurement_type.camera_IPV.init
             
         case _:
             # TODO Change this

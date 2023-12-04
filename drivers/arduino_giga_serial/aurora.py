@@ -17,8 +17,36 @@ timeout = 0.1
 laser_to_pin = {
     'johannes' : {0 : '22',
                   1 : '24',
-                  2 : '26'}
+                  2 : '26'},
+    
+    'johannes2' : {0 : '33',
+                  1 : '37',
+                  2 : '25',
+                  3 : '29',
+                  4 : '27',},
+    
+    'sigge' : {0 : '37',
+               1 : '35',
+               2 : '33',
+               3 : '31',
+               4 : '29',
+               # 5 : '27',
+               # 5 : '25',
+               5 : '41',
+               6 : '43',
+               }
     }
+
+    # 'sigge' : {0 : '37',
+    #            1 : '33',
+    #            2 : '31',
+    #            3 : '29',
+    #            4 : '25',
+    #            5 : '27',
+    #            6 : '41',
+    #            7 : '43',
+    #            8 : '45',}
+    # }
 
 
 ## ArdUino contRoller fOR lAsers
@@ -63,7 +91,6 @@ class aurora:
             arduino.write(command)
         arduino.close()
         
-        
     def send_command(self, command):
         arduino = serial.Serial(COM_port, baud_rate, timeout=timeout)
         arduino.write(command.encode())
@@ -76,7 +103,7 @@ class aurora:
         
         
         
-johannes = aurora('johannes')
-# johannes.switch_to_laser(0)
+johannes = aurora('sigge')
+johannes.switch_to_laser(6)
 # johannes.turn_on_all_lasers()
-johannes.turn_off_all_lasers()
+# johannes.turn_off_all_lasers()
