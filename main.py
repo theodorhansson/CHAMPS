@@ -58,7 +58,8 @@ def main(config_path):
     if config_lower["measurement"]["type"] == "missalignment" or \
        config_lower["measurement"]["type"] == "spr_no_lam_sweep" or \
        config_lower["measurement"]["type"] == "spr_lam_sweep" or \
-       config_lower["measurement"]["type"] == "spr_no_lam_vcsel_sweep":
+       config_lower["measurement"]["type"] == "spr_no_lam_vcsel_sweep" or \
+       config_lower["measurement"]["type"] == "spr_alignment"  :
            
         pass
 
@@ -111,6 +112,14 @@ def identify_measurement_type(measurement: str):
         case "spr_no_lam_vcsel_sweep":
             import measurement_type.SPR_no_lam_VCSEL_sweep
             return measurement_type.SPR_no_lam_VCSEL_sweep.init
+        
+        case "spr_ref_spectrum":
+            import measurement_type.spr_ref_spectrum
+            return measurement_type.spr_ref_spectrum.init
+        
+        case "spr_alignment":
+            import measurement_type.spr_alignment
+            return measurement_type.spr_alignment.init
             
         case _:
             # TODO Change this

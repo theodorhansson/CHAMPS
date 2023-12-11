@@ -2,29 +2,26 @@
 
 [measurement]
 Type = "spr_no_lam_vcsel_sweep"
+#Type = "spr_alignment"
 dc_unit = "keithley2400"    # DC power supply
 v_max = 5                   # Max allowed voltaged
 
 # Saving stuff
-save_folder = "SPR_measurements_231027" # Save folder
-spr_measurement_name = "BSA"
+save_folder = "SPR_measurements_231211" # Save folder
+spr_measurement_name = "test_spectrum"
 save_raw_images = 0
 
 # VCSEL parameters
 check_bias           = 1    # Bias current to check the alignment
-vcsel_chip           = "johannes" # Which chip is being used
-vcsel_biases         = [3, 3,3]  # mA
+vcsel_chip           = "sigge" # Which chip is being used
+vcsel_biases         = [1.1, 1, 0.95, 1, 0.92, 0.86, 1.55]  # mA
+vcsel_array_bias     = 6
 
 # Camera and measurement interval
 measurement_time     = 3600   # Measurement time in seconds
 measurement_interval = 5      # Take a picture every x sec
 exposure_time        = 0.01   # Exposure time in sec
 frame_average        = 10
-
-# Find detection lines before measurement
-find_det_lines       = 1    # Run live capturing to find detection line
-find_line_biased     = 1    # Run live capturing with biased VCSEL
-
 
 verbose_printing     = 1        # Flag for printing
 

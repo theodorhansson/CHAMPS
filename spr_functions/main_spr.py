@@ -16,15 +16,15 @@ TIMESTAMP = datetime.datetime.now().strftime("%m%d_%H%M%S")
 PI  = np.pi
 DEG = PI/180
 px_scale = 1.5679 #um/px
+x_pixel  = 2048
+y_pixel  = 2048
+x_axis_um_4x = np.arange(0, x_pixel*px_scale, px_scale)
+y_axis_um_4x = np.arange(0, y_pixel*px_scale, px_scale)
+extent_raw_4x = np.array([0, x_pixel*px_scale, 0, y_pixel*px_scale])
 
-def process_image(image):
-    ### takes in the raw camera image and returns an integrated spectrum
-    ### find maximum value coordinate
-    image = np.flip(image, axis=1)
-    # max_coords = np.unravel_index(np.argmax(image), image.shape)
-    ### crop image
-    # cropped_image = image[max_coords[0]-100:max_coords[0]+100,:]
-    ### integrate vertically
+def process_image(cropped_image):
+
+    image = cropped_image
     values = np.mean(image, axis=0)
     coords = np.arange(image.shape[1])*px_scale    
     return coords, values, image
@@ -123,8 +123,60 @@ def find_centroid(x,y):
         print(f'Failed to find SPR Dip!')
     return x_centroid, y_centroid
 
+class alignment_figure():
+    def __init__(self, integrate_over_um):
+        self.integrate_over_pixel = int(integrate_over_um/px_scale)
+        
+        fig = plt.figure(figsize=(10,7))
+        ax0 = fig.add_subplot(211)
+        ax1 = fig.add_subplot(223)
+        ax2 = fig.add_subplot(224)
+        self.ax_array = [ax0, ax1, ax2]
+        
+        plt.suptitle('SPR alignment')
+        
+        fig.axes[0].set_title(r'Raw image')
+        fig.axes[0].set_xlabel(r'x [um]')
+        fig.axes[0].set_ylabel(r'y [um]')
+        
+        fig.axes[1].set_title(r'Find max spectrum')
+        fig.axes[1].set_xlabel(r'y [um]')
+        fig.axes[1].set_ylabel(r'Intensity [counts]')
+        
+        fig.axes[2].set_title(r'Find max spectrum')
+        fig.axes[2].set_xlabel(r'y [um]')
+        fig.axes[2].set_ylabel(r'Intensity [counts]')
+        
+        plt.tight_layout()
+        
+        self.fig = fig
+        
+    def update_alignment_image(self, image):
+        
+        self.ax_array[0].imshow(image, extent=extent_raw_4x, origin='lower')
+
+        y_cross = np.sum(image, axis=1)
+        y_max_index = np.argmax(y_cross)
+        self.ax_array[1].plot(y_cross, y_axis_um_4x)
+        self.ax_array[1].plot(y_cross[y_max_index], x_axis_um_4x[y_max_index],  'x', color='black')
+
+        self.ax_array[0].plot(np.array([0, np.max(x_axis_um_4x)]), np.array([y_axis_um_4x[y_max_index], y_axis_um_4x[y_max_index]]), color='red', linewidth=0.5)
+        self.ax_array[0].plot(np.array([0, np.max(x_axis_um_4x)]), np.array([y_axis_um_4x[y_max_index+self.integrate_over_pixel], y_axis_um_4x[y_max_index+self.integrate_over_pixel]]), color='red', linewidth=0.3)
+        self.ax_array[0].plot(np.array([0, np.max(x_axis_um_4x)]), np.array([y_axis_um_4x[y_max_index-self.integrate_over_pixel], y_axis_um_4x[y_max_index-self.integrate_over_pixel]]), '--', color='red', linewidth=0.3)
+       
+        
+        spr_spectrum = np.sum(image[y_max_index-self.integrate_over_pixel:y_max_index+self.integrate_over_pixel, :], axis=0)
+        self.ax_array[2].plot(x_axis_um_4x, spr_spectrum/np.max(spr_spectrum))
+        
+        return y_max_index, spr_spectrum
+        
+        
+        
+
 class SPR_figure():
-    def __init__(self):
+    def __init__(self, integrate_over_um):
+        self.integrate_over_pixel = int(integrate_over_um/px_scale)
+        
         # Initiate figure object
         fig = plt.figure(figsize=(10,7))
         ax0 = fig.add_subplot(231)
@@ -171,36 +223,40 @@ class SPR_figure():
         
         self.fig = fig
         
-    def analyze_image(self, im, frame_counter, line, config, laser=True):    
-        x, y, crp_img = process_image(im)
+    def analyze_image(self, im, y_max_index, frame_counter, line, config, laser=True): 
+        cropped_im = im[int(y_max_index-self.integrate_over_pixel):int(y_max_index+self.integrate_over_pixel), :]
+           
+        x, y, crp_img = process_image(cropped_im)
         peak_x, peak_y = find_peaks(x, y)
         sprx, spry = isolate_SPR(peak_x, peak_y, manual = None)
         x_c, y_cspry = find_centroid(sprx, np.max(spry)-spry)
-        #TODO: put this on a separate thread from pictures and processing
-        if frame_counter == 0 and line == 0 and laser:
-            self.im_raw_data = self.ax_array[0].imshow(crp_img)
-            self.line_integrated_spectrum, = self.ax_array[1].plot(x, y, linewidth=0.5)
-            self.ax_array[1].set_ylim([np.min(y), np.max(y)])
-            self.filtered_peaks, = self.ax_array[2].plot(peak_x, peak_y, color='black',marker='o',markersize=3)
-            self.ax_array[2].set_ylim([np.min(peak_y), np.max(peak_y)])
-            self.spr_dip, = self.ax_array[3].plot(sprx, spry, 'r', marker='o',markersize=3)
-            self.ax_array[3].set_xlim([np.min(sprx), np.max(sprx)])
-            self.ax_array[3].set_ylim([np.min(spry), np.max(spry)])
-            plt.show(False)
         
-        else:
-            #TODO: This is slowing down over time and takes way too much time
-            # in general
-            plot_start = time.time()
-            self.im_raw_data.set_data(crp_img)
-            self.line_integrated_spectrum.set_data(x, y)
-            self.ax_array[1].set_ylim([np.min(y), np.max(y)])
-            self.filtered_peaks.set_data(peak_x, peak_y)
-            self.ax_array[2].set_ylim([np.min(peak_y), np.max(peak_y)])
-            self.spr_dip.set_data(sprx, spry)
-            self.ax_array[3].set_xlim([np.min(sprx), np.max(sprx)])
-            self.ax_array[3].set_ylim([np.min(spry), np.max(spry)])
-            plt.show(False)
-            print(f'Plotting took: {time.time()-plot_start}')
+        #TODO: put this on a separate thread from pictures and processing
+        if frame_counter%10 == 0:
+            if frame_counter == 0 and line == 0 and laser:
+                self.im_raw_data = self.ax_array[0].imshow(im)
+                self.line_integrated_spectrum, = self.ax_array[1].plot(x, y, linewidth=0.5)
+                self.ax_array[1].set_ylim([np.min(y), np.max(y)])
+                self.filtered_peaks, = self.ax_array[2].plot(peak_x, peak_y, color='black',marker='o',markersize=3)
+                self.ax_array[2].set_ylim([np.min(peak_y), np.max(peak_y)])
+                self.spr_dip, = self.ax_array[3].plot(sprx, spry, 'r', marker='o',markersize=3)
+                self.ax_array[3].set_xlim([np.min(sprx), np.max(sprx)])
+                self.ax_array[3].set_ylim([np.min(spry), np.max(spry)])
+                plt.show(False)
+            
+            else:
+                #TODO: This is slowing down over time and takes way too much time
+                # in general
+                plot_start = time.time()
+                # self.im_raw_data.set_data(im)
+                self.line_integrated_spectrum.set_data(x, y)
+                self.ax_array[1].set_ylim([np.min(y), np.max(y)])
+                self.filtered_peaks.set_data(peak_x, peak_y)
+                self.ax_array[2].set_ylim([np.min(peak_y), np.max(peak_y)])
+                self.spr_dip.set_data(sprx, spry)
+                self.ax_array[3].set_xlim([np.min(sprx), np.max(sprx)])
+                self.ax_array[3].set_ylim([np.min(spry), np.max(spry)])
+                plt.show(False)
+                print(f'Plotting took: {time.time()-plot_start}')
 
         return x_c

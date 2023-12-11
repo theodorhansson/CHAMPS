@@ -101,14 +101,24 @@ def grab_image(camera, frame_avg=10):
     mean_frame = np.flip(np.mean(captured_frames, axis=0).astype(int), axis=1)
     return mean_frame
 
-def SPR_process_image(spr_figure, image, results, image_capture_time, measurement_time_start, frame_counter, IPV_config, y_max_index):
-                            
-    frame_time = image_capture_time - measurement_time_start
-    for i in range(len(y_max_index)):
-        results['frame_time'][i].append(frame_time)
-        #TODO: There is an enormous memory leak somewhere, the measurement slows down
-        # it is somewhere in the plotting logic
-        results['spr_data'][i].append(spr_figure.analyze_image(image, y_max_index[i], frame_counter, i, IPV_config))
+def find_laser_lines(image, manual=[]):
+    if len(manual) >= 1:
+        peaks = manual
+    else:
+        image_shape = image.shape
+        integrate_over = 100
+        integrate_y = np.sum(image[:, image_shape[0]//2-integrate_over:image_shape[0]//2+integrate_over], axis=1)
+        peaks, _ = find_peaks(integrate_y, distance=50, width=10, threshold=500)
+        print('Found lasers with coordinates' + str(peaks))
+    
+    return peaks
+
+def SPR_process_image(laser, spr_figure, line, image, results, image_capture_time, measurement_time_start, frame_counter, IPV_config):
+    # results['frame_list'][laser].append(image)
+    results['frame_time'][laser].append(image_capture_time - measurement_time_start)
+    #TODO: There is an enormous memory leak somewhere, the measurement slows down
+    # it is somewhere in the plotting logic
+    results['spr_data'][laser].append(spr_figure.analyze_image(image, frame_counter, line, IPV_config))
 
 def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
     
@@ -127,7 +137,7 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
     
     exposure_time = IPV_config["exposure_time"]
     frame_average = IPV_config["frame_average"]
-    integrate_over_um = 80
+    integrate_over_um = 40
     
     periodic_saving = True
     save_data = True
@@ -145,9 +155,13 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
         results["frame_time"][i] = []
         results["spr_data"][i]   = []
         
+    # Initialize figure for plotting
+    # TODO: MAKE NUMBER OF FIGURES AS MANY AS VCSELS OR MERGE INTO ONE FIGURE ##
+    a_figure   = alignment_figure(integrate_over_um)
     
     laser_control = aurora(vcsel_chip)
     lasers_on_chip = np.fromiter(laser_control.chip.keys(), dtype=int)
+    # TODO: INCLUDE CHECK THAT BIASES AND NUMBER OF VCSELS ARE THE SAME ##
 
     # Send verbose_printing to instruments if not specified
     for instru_dict in [DC_config]:
@@ -159,26 +173,10 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
     # Gets isntruments
     DC_unit_obj = Instrument_COM.get_DCsupply(DC_config)
 
-    # Start live capturing stop with q and start measuring
-    # if find_det_lines:
-    #     dcam_live_capturing(exposure_time=exposure_time)
-    
     # Start time of measurement
     measurement_time_start = time.time()
     measurement_timestamp = time.strftime(rf"%Y%m%d_%H.%M.%S")
     
-    parent_path = Path(__file__).resolve().parents[1]
-    save_folder_path = Path(parent_path, IPV_config["save_folder"])
-    hard_coded_reference_measurement = '20231211_23.17.31_y_max_ref'
-    
-    for folders in os.listdir(str(Path(parent_path,save_folder_path))):
-        if folders == hard_coded_reference_measurement:
-            ref_path = Path(save_folder_path, hard_coded_reference_measurement)
-            y_max_path = Path(ref_path, 'y_max.txt')
-            
-            y_max_index = np.loadtxt(y_max_path)
-            
-
     with DC_unit_obj(DC_config) as DC_unit:
         try:
             ## Set instrument to 0 for safety
@@ -187,78 +185,29 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
             DC_unit.set_voltage_limit(V_max)
             DC_unit.set_output(True)
             
-            spr_figure = SPR_figure(integrate_over_um)
-            results["fig_object"] = spr_figure.fig
+            ## Check alignment of SPR line
+            for laser in laser_indexing.keys():
+                laser_control.switch_to_laser(laser)
+                utils.ramp_current(DC_unit, 0, laser_indexing[laser])
 
-            
-            # Frame counter
-            frame_counter = 0
-            
-            # Main measurement loop
-            while (time.time() - measurement_time_start) < measurement_time:
                 with dcam:
                     camera = dcam[0]
                     
                     with camera:
- 
                         camera["exposure_time"] = exposure_time 
-                        total_duration = 0
-      
-                        start_time = time.time()
-                        # Active switch for current laser
-                        laser_control.turn_on_all_lasers()
                         
-                        # Ramp current to set bias
-                        utils.ramp_current(DC_unit, 0, vcsel_array_bias)
-                        
-                        print(f'Taking Picture No {frame_counter}')
-                        # Grab picture from Hamamatsu
-                        # image = dcam_capture_average_image(frame_average, exposure_time=exposure_time)
                         image = grab_image(camera, frame_avg=frame_average)
-                        
-                        # Ramp down current
-                        utils.ramp_current(DC_unit, vcsel_array_bias, 0)
-                        
-                        # Turn off switch to lasers
-                        laser_control.turn_off_all_lasers()
-                        
-                        image_capture_time = time.time()
-                            
-                        SPR_process_image(spr_figure,\
-                                          image, results, \
-                                          image_capture_time, \
-                                          measurement_time_start, frame_counter, IPV_config,\
-                                          y_max_index)
-
-                    
-                        # Update inline plot with measurement status
-                        for channels in lasers_on_chip:
-                            spr_figure.fig.axes[4].plot(results['frame_time'][channels], results['spr_data'][channels], 
-                                                  marker='o', linewidth=0.2, markersize=3, 
-                                                  color=COLORS[channels], label=f'Laser {channels}') 
-                            
-                        
-                            if frame_counter==0: 
-                                spr_figure.fig.axes[4].legend(loc='upper right')
-                            
-                        plt.show(False)  
-                        duration = time.time() - start_time
-                        total_duration += duration
-                        print(f'Picture grabbing and processing took: {duration:.2f} s')
-                        
-                        # Wait until set time for the measurement
-                        print(f'Will sleep for: {(measurement_interval - total_duration if total_duration < measurement_interval else 0):.2f} s')
-                        print('----------------------------------')
-                        time.sleep(measurement_interval - total_duration if total_duration < measurement_interval else 0)
-                        frame_counter += 1  
-                        
-                        
-                        if (save_data) and (periodic_saving) and ((time.time() - measurement_time_start)>saving_interval*save):
-                            saving_results(IPV_config, results, measurement_timestamp)
-                            save+=1
-                        # Clean up of all started threads after each round of pictures
-                        # image_processing_thread.join()
-                    
+                        y_max_index, ref_spectrum = a_figure.update_alignment_image(image)
+                        ref_spectrums[laser] = {'ref_spectrum' : ref_spectrum,
+                                                'y_max_index'  : y_max_index,
+                                                'raw_image'    : image}
+                        plt.show(False)
+                
+                utils.ramp_current(DC_unit, laser_indexing[laser], 0)
+                
+            # time.sleep(3)
+            laser_control.turn_off_all_lasers()
+            
                     
         except KeyboardInterrupt:
             print("Keyboard interrupt detected, stopping.")
@@ -266,10 +215,10 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
             # print error if error isn't catched
             traceback.print_exc()
 
-    saving_results(IPV_config, results, measurement_timestamp)
+    saving_results(IPV_config, ref_spectrums, a_figure, measurement_timestamp)
     return results
 
-def saving_results(IPV_config, results, measurement_timestamp):
+def saving_results(IPV_config, ref_spectrums, a_figure, measurement_timestamp):
             
     parent_path = Path(__file__).resolve().parents[1]
     save_folder_path = Path(parent_path, IPV_config["save_folder"])
@@ -285,35 +234,23 @@ def saving_results(IPV_config, results, measurement_timestamp):
     
     print('Saving Images')
     print(f'Saving Data to {save_path_current_measurement}')
-    for laser in results['frame_list'].items():
-        laser = laser[0]
-        
-        frame_list = results['frame_list'][laser]
-        frame_time = results['frame_time'][laser]
-        spr_data   = results['spr_data'][laser]
-        
-        save_folder_current_VCSEL = Path(save_path_current_measurement,
-                                          f'VCSEL_{laser}')
+    
+    all_y_max = []
+    for ref in ref_spectrums.keys():
+
+        save_folder_current_VCSEL = Path(save_path_current_measurement, f'VCSEL_{ref}')
         
         if not os.path.isdir(save_folder_current_VCSEL):
             os.mkdir(save_folder_current_VCSEL)
-            
-        if IPV_config["save_raw_images"]:
-            for i, im in enumerate(frame_list):      
-                iio.imwrite(os.path.join(save_folder_current_VCSEL, 
-                                          f'{SPR_measurement_name}_image{i}.png'), im)
-        
-        if not len(frame_time) == len(spr_data):
-            if len(frame_time) > len(spr_data):
-                frame_time = frame_time[:-1]
-            else:
-                spr_data = spr_data[:-1]
-                
-        xy = np.vstack((frame_time, spr_data)).T
-        np.savetxt(os.path.join(save_folder_current_VCSEL, 'data.txt'), xy, 
-                    delimiter=',') 
-        
-    fig_object = results['fig_object']
-    fig_object.savefig(os.path.join(save_path_current_measurement, 
+
+        iio.imwrite(os.path.join(save_folder_current_VCSEL, f'{SPR_measurement_name}_image{ref}.png'), ref_spectrums[ref]["raw_image"])
+
+        np.savetxt(os.path.join(save_folder_current_VCSEL, 'ref_spectrum.txt'), ref_spectrums[ref]["ref_spectrum"], delimiter=',') 
+        all_y_max.append(ref_spectrums[ref]["y_max_index"])
+    
+    
+    np.savetxt(os.path.join(save_path_current_measurement, 'y_max.txt'), np.array(all_y_max))
+
+    a_figure.fig.savefig(os.path.join(save_path_current_measurement, 
                                     f'{SPR_measurement_name}_data.png'))
     

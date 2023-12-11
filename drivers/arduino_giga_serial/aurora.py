@@ -17,7 +17,15 @@ timeout = 0.1
 laser_to_pin = {
     'johannes' : {0 : '22',
                   1 : '24',
-                  2 : '26'}
+                  2 : '26'},
+    'sigge' : {0 : '37',
+               1 : '35',
+               2 : '33',
+               3 : '31',
+               4 : '29',
+               5 : '41',
+               6 : '43',
+               }
     }
 
 
@@ -76,7 +84,7 @@ class aurora:
         
         
         
-johannes = aurora('johannes')
+johannes = aurora('sigge')
 # johannes.switch_to_laser(0)
-# johannes.turn_on_all_lasers()
-johannes.turn_off_all_lasers()
+johannes.turn_on_all_lasers()
+# johannes.turn_off_all_lasers()
