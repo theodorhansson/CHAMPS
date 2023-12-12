@@ -15,19 +15,18 @@ from hamamatsu.dcam import copy_frame, dcam, Stream
 from drivers.arduino_giga_serial.aurora import aurora
 
 # Import meta-SPR
-from spr_functions.main_spr import SPR_figure, alignment_figure
+from spr_functions.main_spr import SPR_figure
 
 # Python modules
 import traceback
 import numpy as np
 import matplotlib.pyplot as plt
 import time
-import threading
-from scipy.signal import find_peaks
 from pathlib import Path
 import imageio.v3 as iio
+import gc
     
-COLORS = ['r','g','b','y','cyan','magenta','aqua']
+COLORS = ['r','g','b','y','cyan','magenta','lightgreen']
     
 # Dumb code to import utils
 try:
@@ -101,14 +100,14 @@ def grab_image(camera, frame_avg=10):
     mean_frame = np.flip(np.mean(captured_frames, axis=0).astype(int), axis=1)
     return mean_frame
 
-def SPR_process_image(spr_figure, image, results, image_capture_time, measurement_time_start, frame_counter, IPV_config, y_max_index):
+def SPR_process_image(spr_figure, image, results, image_capture_time, measurement_time_start, frame_counter, IPV_config, y_max_index, ref_spectrums, use_reference_spectrum):
                             
     frame_time = image_capture_time - measurement_time_start
     for i in range(len(y_max_index)):
         results['frame_time'][i].append(frame_time)
         #TODO: There is an enormous memory leak somewhere, the measurement slows down
         # it is somewhere in the plotting logic
-        results['spr_data'][i].append(spr_figure.analyze_image(image, y_max_index[i], frame_counter, i, IPV_config))
+        results['spr_data'][i].append(spr_figure.analyze_image(image, y_max_index[i], frame_counter, i, IPV_config, ref_spectrums[i], use_reference_spectrum))
 
 def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
     
@@ -122,12 +121,14 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
     vcsel_chip = IPV_config["vcsel_chip"]
     vcsel_biases = IPV_config["vcsel_biases"]
     laser_indexing = {index: value for index, value in enumerate(vcsel_biases)}
-    ref_spectrums = {}
     vcsel_array_bias = IPV_config["vcsel_array_bias"]
+    ref_spectrums = {}
     
     exposure_time = IPV_config["exposure_time"]
     frame_average = IPV_config["frame_average"]
     integrate_over_um = 80
+    
+    use_reference_spectrum = False
     
     periodic_saving = True
     save_data = True
@@ -169,8 +170,9 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
     
     parent_path = Path(__file__).resolve().parents[1]
     save_folder_path = Path(parent_path, IPV_config["save_folder"])
-    hard_coded_reference_measurement = '20231211_23.17.31_y_max_ref'
+    hard_coded_reference_measurement = '20231211_23.34.51_y_max_ref'
     
+    counter = 0
     for folders in os.listdir(str(Path(parent_path,save_folder_path))):
         if folders == hard_coded_reference_measurement:
             ref_path = Path(save_folder_path, hard_coded_reference_measurement)
@@ -178,7 +180,16 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
             
             y_max_index = np.loadtxt(y_max_path)
             
-
+        for spectrum_folder in os.listdir(ref_path):
+            
+            vcsel_path = Path(ref_path, spectrum_folder)
+            spectrum_path = Path(vcsel_path, 'ref_spectrum.txt')
+            
+            if os.path.isdir(str(vcsel_path)):
+                ref_spectrums[counter] = np.loadtxt(spectrum_path)
+                counter += 1
+                # print(counter)
+            
     with DC_unit_obj(DC_config) as DC_unit:
         try:
             ## Set instrument to 0 for safety
@@ -228,7 +239,7 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
                                           image, results, \
                                           image_capture_time, \
                                           measurement_time_start, frame_counter, IPV_config,\
-                                          y_max_index)
+                                          y_max_index, ref_spectrums, use_reference_spectrum)
 
                     
                         # Update inline plot with measurement status
@@ -256,6 +267,8 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
                         if (save_data) and (periodic_saving) and ((time.time() - measurement_time_start)>saving_interval*save):
                             saving_results(IPV_config, results, measurement_timestamp)
                             save+=1
+                            gc.collect()
+                            
                         # Clean up of all started threads after each round of pictures
                         # image_processing_thread.join()
                     

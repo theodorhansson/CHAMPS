@@ -39,11 +39,12 @@ names=[
        # '1003_152419_Flushing400',
        # '1003_152924_Flushing400',
        # '1003_153434_Flushing400',
-       '1003_154102_Flushing400',
-       '1003_154706_Flushing400',
-       '1003_155400_Stepsv2_400',
-       '1003_165424_SmallSteps_400',
-       '1003_172429_Flushing_400',
+       # '1003_154102_Flushing400',
+       # '1003_154706_Flushing400',
+       # '1003_155400_Stepsv2_400',
+       # '1003_165424_SmallSteps_400',
+       # '1003_172429_Flushing_400',
+       # '20231212_00.04.55_test_spectrum'
        ]
 
 fig = plt.figure(figsize=(8,5))
@@ -219,9 +220,9 @@ ax2.set_yticklabels(np.round(ylabels,5))
 # fig.savefig('BSAExperiment.svg', dpi=300)
 plt.show()
 
-#%% BSA EXPERIMENT
+#%% Three glycerol pyramids EXPERIMENT
 
-spr_data_folder = 'spr_measurements_231025'
+spr_data_folder = 'spr_measurements_231026'
 parent_path = Path(__file__).resolve().parents[1]
 names=[
        '20231026_15.53.54_100_glycerol_3_channels',
@@ -229,8 +230,113 @@ names=[
         '20231026_16.50.08_100_glycerol_3_channels',
         '20231026_17.20.44_100_glycerol_3_channels',
        ]
+
+
 mov_avg_window = 16
 VCSEL = ['VCSEL_0', 'VCSEL_1', 'VCSEL_2']
+filename = 'data'
+
+fig = plt.figure(figsize=(8,5))
+ax = fig.add_subplot(111)
+end_time = 0
+merged_data_x = []
+merged_data_y = []
+for name in names:
+    for vcs in VCSEL:
+        data_path = Path(parent_path, spr_data_folder, name, vcs, filename)
+        data = np.genfromtxt(str(data_path) + '.txt', delimiter=',')
+        for i, datapoint in enumerate(data):
+            data[i,1] = data[i,1] if data[i,1]>350 else data[i,1]+150
+            # data[i,1] = data[i,1] if data[i,1]<420 else None
+        ax.plot(data[:,0], mov_avg(data[:,1], 7), linewidth=1, label=f'Moving Average n={mov_avg_window}')
+        ax.plot(data[:,0]+end_time, data[:,1], label=name, marker='o', linewidth=0.3, markersize=2, alpha=0.5)
+        ax.plot(data[:,0]+end_time, mov_avg(data[:,1], 10), label=name+'_avg', linewidth=1)
+        merged_data_x = data[:,0]
+        merged_data_y = data[:,1]
+    # merged_data_x.append(data[:,0]+end_time)
+    # merged_data_y.append(data[:,1])
+    
+    end_time += data[-1,0]
+
+sav_gol_window = 12
+sav_gol_order = 2
+
+merged_data_x = np.hstack(merged_data_x)
+merged_data_y_raw = np.hstack(merged_data_y)
+merged_data_y_movavg = mov_avg(np.hstack(merged_data_y), mov_avg_window)
+# merged_data_y_savgol = savgol(np.hstack(merged_data_y), sav_gol_window, sav_gol_order)
+
+ax.scatter(merged_data_x, merged_data_y_raw, label='Raw Data', alpha=0.7, s=5, facecolor='none', edgecolor='b' )
+# ax.plot(merged_data_x, merged_data_y_movavg, linewidth=1, label=f'Moving Average n={mov_avg_window}', color='r')
+# ax.plot(merged_data_x, merged_data_y_savgol, linewidth=1,label=f'Savitzky-Golay n={sav_gol_window} o={sav_gol_order}')
+
+# finding the levels`
+# interval = 1365
+# for i in range(5):
+#     mask = (merged_data_x > 12*60+interval*i) & (merged_data_x < 15*60+interval*i)
+#     ax.plot(merged_data_x[mask], merged_data_y_raw[mask])
+#     print'(i, np.mean(merged_data_y_raw[mask]),
+#           ResonantN(theta_spr=SPR_ang((np.mean(merged_data_y_raw[mask])+3985)/1000)))
+# plt.show()
+# mask = (merged_data_x > 25*60) & (merged_data_x < 20*60)
+# plt.plot(merged_data_x[mask], merged_data_y_raw[mask])
+# plt.plot(merged_data_x[mask], merged_data_y_movavg[mask])
+print('Raw Mean: ', np.mean(merged_data_y_raw[mask]), 'Raw Std: ', np.std(merged_data_y_raw[mask]))
+print('Averaged Mean: ', np.mean(merged_data_y_movavg[mask]), 'Averaged Std: ', np.std(merged_data_y_movavg[mask]))
+# print('SavGol Mean: ', np.mean(merged_data_y_savgol[mask]), 'SavGol Std: ', np.std(merged_data_y_savgol[mask]))
+
+# ax.legend(loc='upper left', fontsize=10)
+    
+ax.set_xlabel('Time, min')
+ax.set_ylabel('SPR Coordinate, um')
+# ax.set_xlim([13*60,16*60])
+# ax.set_ylim([530.5,532.5])
+# ax.set_ylim([362,368])
+# ax.set_xlim([120*60,129*60])
+ax.grid(linewidth=1, alpha=0.3)
+ax.set_xticks(np.arange(ax.get_xlim()[0],ax.get_xlim()[1]+300,300))
+ax.set_xticklabels(np.array(ax.get_xticks()/60).astype(int), rotation=90)
+
+offset = 3820
+ax2 = ax.twinx()
+ax2.set_ylabel('Refractive Index')
+# ax2.set_ylim(ax.get_ylim())
+ylabels = [ResonantN(theta_spr=SPR_ang((x+offset)/1000)) for x in ax2.get_yticks()]
+ax2.set_yticklabels(np.round(ylabels,5))
+
+### REJECTING POINTS WITH HIGH ERROR FROM MEAN
+# condition = np.abs(merged_data_y_raw-merged_data_y_movavg)/merged_data_y_movavg < 0.005
+# clean_data_y_raw = np.where(condition, merged_data_y_raw, None)
+# plt.show()
+# plt.plot(merged_data_x, clean_data_y_raw)
+
+concentrations = [0,0.01,0.02,0.03,0.04,0.05]
+clrs = ['r','g','b','m','y','k']
+
+for c, clor in zip(concentrations,clrs):
+    ax2.axhline(SPR_loc(ResonantAngle(e_analyte=ref_idx(c)**2))*1000-offset, color=clor,linewidth=0.5,label=f'Glycerol {c*100:.1f}%',linestyle='--')
+# # ax2.axhline(SPR_loc(ResonantAngle(e_analyte=ref_idx(0.008)**2))*1000-offset,color='g',linewidth=0.5,label='1% Glycerol', linestyle='--')
+# # ax2.axhline(SPR_loc(ResonantAngle(e_analyte=ref_idx(0.020)**2))*1000-offset,color='b',linewidth=0.5,label='2% Glycerol', linestyle='--')
+# # ax2.axhline(SPR_loc(ResonantAngle(e_analyte=ref_idx(0.026)**2))*1000-offset,color='y',linewidth=0.5,label='3% Glycerol', linestyle='--')
+# # ax2.axhline(SPR_loc(ResonantAngle(e_analyte=ref_idx(0.035)**2))*1000-offset,color='m',linewidth=0.5,label='4% Glycerol', linestyle='--')
+# # ax2.axhline(SPR_loc(ResonantAngle(e_analyte=ref_idx(0.043)**2))*1000-offset,color='k',linewidth=0.5,label='5% Glycerol', linestyle='--')
+# ax2.legend(fontsize=10)
+# fig.savefig('BSAExperiment.svg', dpi=300)
+plt.show()
+
+#%% Flushing
+
+spr_data_folder = 'spr_measurements_231212'
+parent_path = Path(__file__).resolve().parents[1]
+names=[
+        '20231212_00.43.49_test_spectrum',
+        '20231212_01.01.39_test_spectrum',
+        # '20231212_00.17.43_test_spectrum',
+       ]
+
+
+mov_avg_window = 16
+VCSEL = ['VCSEL_0', 'VCSEL_1', 'VCSEL_2', 'VCSEL_3', 'VCSEL_4', 'VCSEL_5', 'VCSEL_6',]
 filename = 'data'
 
 fig = plt.figure(figsize=(8,5))

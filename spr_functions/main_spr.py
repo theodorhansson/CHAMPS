@@ -22,41 +22,47 @@ x_axis_um_4x = np.arange(0, x_pixel*px_scale, px_scale)
 y_axis_um_4x = np.arange(0, y_pixel*px_scale, px_scale)
 extent_raw_4x = np.array([0, x_pixel*px_scale, 0, y_pixel*px_scale])
 
-def process_image(cropped_image):
-
-    image = cropped_image
-    values = np.mean(image, axis=0)
-    coords = np.arange(image.shape[1])*px_scale    
+def process_image(cropped_image, reference_spectrum, use_reference_spectrum):
+    if use_reference_spectrum:
+        image = cropped_image
+        values = np.mean(cropped_image, axis=0)
+        coords = np.arange(cropped_image.shape[1])*px_scale 
+    else:
+        image = cropped_image
+        values = np.mean(cropped_image, axis=0)
+        coords = np.arange(cropped_image.shape[1])*px_scale  
     return coords, values, image
 
-def find_valley_width_around_local_minima(data, local_minimum, width_threshold=0):
-    valley_widths = []
-    valley_average = []
+# def find_valley_width_around_local_minima(data, local_minimum, width_threshold=0):
+#     valley_widths = []
+#     valley_average = []
 
-    for peak_index in local_minimum:
-        left_index = peak_index
-        right_index = peak_index
+#     for peak_index in local_minimum:
+#         left_index = peak_index
+#         right_index = peak_index
         
-        while left_index > 0 and data[left_index] <= data[left_index - 1]:
-            left_index -= 1
+#         while left_index > 0 and data[left_index] <= data[left_index - 1]:
+#             left_index -= 1
         
-        while right_index < len(data) - 1 and data[right_index] <= data[right_index + 1]:
-            right_index += 1
+#         while right_index < len(data) - 1 and data[right_index] <= data[right_index + 1]:
+#             right_index += 1
         
-        valley_width = right_index - left_index + 1
+#         valley_width = right_index - left_index + 1
         
-        if valley_width > width_threshold:
-            valley_widths.append(valley_width)
-            valley_average.append(np.sum(data[peak_index-left_index:peak_index+right_index])/valley_width)
+#         if valley_width > width_threshold:
+#             valley_widths.append(valley_width)
+#             valley_average.append(np.sum(data[peak_index-left_index:peak_index+right_index])/valley_width)
     
-    return (valley_widths, valley_average)
+#     return (valley_widths, valley_average)
     
-def find_peaks(coords, values, spacing=15, px_avg = 3, smoothing=True):
+def find_peaks(coords, values, reference_spectrum, use_reference_spectrum, spacing=15, px_avg = 3, smoothing=True):
     ### takes in the integrated spectrum and returns just the peak values
     ### zero the spectrum to the max peak    
     # zeroed_values = values[np.argmax(values[coords<750]):]      
     # zeroed_values = values[argrelextrema(values, np.greater)[0][5]:]
-    zeroed_values = values[7:]
+    zeroed_values = values[14:]
+    if use_reference_spectrum:
+        zeroed_ref_values = reference_spectrum[7:]
     
     
     ### find x number of largest peaks and select the one with the lowest index
@@ -66,12 +72,16 @@ def find_peaks(coords, values, spacing=15, px_avg = 3, smoothing=True):
     # zeroed_values = values[largest_indices.min():]
     zeroed_coords = np.arange(zeroed_values.size)*px_scale
     ### zeroed coordinates
-    peak_coords = np.arange(0,max(zeroed_coords),spacing)
+    peak_coords = np.arange(0, max(zeroed_coords),spacing)
     ### find peaks at the line coordinates within px_avg number of pixels
     peaks = []
+    ref_peaks = []
     for peak_x in peak_coords:
-        peaks.append( np.max(zeroed_values[abs(zeroed_coords - peak_x) < px_scale*px_avg]) )
-    ### DEBUGGING START
+        peaks.append(np.max(zeroed_values[abs(zeroed_coords - peak_x) < px_scale*px_avg]))
+        if use_reference_spectrum:
+            ref_peaks.append(np.max(zeroed_ref_values[abs(zeroed_coords - peak_x) < px_scale*px_avg]))
+    
+   ### DEBUGGING START
     # plt.show()
     # fig = plt.figure()
     # fig.plot(zeroed_coords[:200], zeroed_values[:200], linewidth=0.5)
@@ -92,7 +102,13 @@ def find_peaks(coords, values, spacing=15, px_avg = 3, smoothing=True):
         normalized_cutoff_freq = cutoff_freq / nyquist_freq
         b, a = butter(order, normalized_cutoff_freq, btype='lowpass')
         peaks = filtfilt(b, a, peaks)
-    return peak_coords, np.array(peaks)
+        if use_reference_spectrum:
+            ref_peaks = filtfilt(b, a, ref_peaks)
+        
+    if use_reference_spectrum:
+        return peak_coords, (np.array(peaks) - np.array(ref_peaks)/2)/np.array(peaks)
+    else:
+        return peak_coords, np.array(peaks)
 
 def isolate_SPR(peak_coords, peak_values, manual=None):
     ### takes in the peak spectrum and isolates the SPR dip only
@@ -217,24 +233,25 @@ class SPR_figure():
         fig.axes[4].set_xlabel(r'Time [s]')
         fig.axes[4].set_ylabel(r'x [$\mu$m]')
         fig.axes[4].grid(True)
-        fig.axes[4].legend()
+        fig.axes[4].legend(loc='lower left')
         
         plt.tight_layout()
         
         self.fig = fig
         
-    def analyze_image(self, im, y_max_index, frame_counter, line, config, laser=True): 
+    def analyze_image(self, im, y_max_index, frame_counter, line, config, reference_spectrum, use_reference_spectrum, laser=True): 
         cropped_im = im[int(y_max_index-self.integrate_over_pixel):int(y_max_index+self.integrate_over_pixel), :]
-           
-        x, y, crp_img = process_image(cropped_im)
-        peak_x, peak_y = find_peaks(x, y)
+
+        
+        x, y, crp_img = process_image(cropped_im, reference_spectrum, use_reference_spectrum)
+        peak_x, peak_y = find_peaks(x, y, reference_spectrum, use_reference_spectrum)
         sprx, spry = isolate_SPR(peak_x, peak_y, manual = None)
         x_c, y_cspry = find_centroid(sprx, np.max(spry)-spry)
         
         #TODO: put this on a separate thread from pictures and processing
         if frame_counter%10 == 0:
             if frame_counter == 0 and line == 0 and laser:
-                self.im_raw_data = self.ax_array[0].imshow(im)
+                self.im_raw_data = self.ax_array[0].imshow(cropped_im)
                 self.line_integrated_spectrum, = self.ax_array[1].plot(x, y, linewidth=0.5)
                 self.ax_array[1].set_ylim([np.min(y), np.max(y)])
                 self.filtered_peaks, = self.ax_array[2].plot(peak_x, peak_y, color='black',marker='o',markersize=3)

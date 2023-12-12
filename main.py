@@ -84,7 +84,6 @@ def identify_measurement_type(measurement: str):
         case "ipv":
             import measurement_type.ipv
             return measurement_type.ipv.init
-
         case "spectrum":
             import measurement_type.spectrum
             return measurement_type.spectrum.init
@@ -112,10 +111,6 @@ def identify_measurement_type(measurement: str):
         case "spr_no_lam_vcsel_sweep":
             import measurement_type.SPR_no_lam_VCSEL_sweep
             return measurement_type.SPR_no_lam_VCSEL_sweep.init
-        
-        case "spr_ref_spectrum":
-            import measurement_type.spr_ref_spectrum
-            return measurement_type.spr_ref_spectrum.init
         
         case "spr_alignment":
             import measurement_type.spr_alignment

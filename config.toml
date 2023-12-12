@@ -7,8 +7,9 @@ dc_unit = "keithley2400"    # DC power supply
 v_max = 5                   # Max allowed voltaged
 
 # Saving stuff
-save_folder = "SPR_measurements_231211" # Save folder
+save_folder = "SPR_measurements_231212" # Save folder
 spr_measurement_name = "test_spectrum"
+#spr_measurement_name = "y_max_ref"
 save_raw_images = 0
 
 # VCSEL parameters
