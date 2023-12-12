@@ -1,15 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 from scipy.integrate import simps
-import imageio.v3 as iio
-from PIL import Image
-from hamamatsu.dcam import copy_frame, dcam, Stream
-import logging
-import os
+
 import time
-import cv2
-from scipy.signal import convolve, butter, filtfilt, argrelextrema
+
+from scipy.signal import butter, filtfilt
 import datetime
 
 TIMESTAMP = datetime.datetime.now().strftime("%m%d_%H%M%S")
@@ -60,7 +55,7 @@ def find_peaks(coords, values, reference_spectrum, use_reference_spectrum, spaci
     ### zero the spectrum to the max peak    
     # zeroed_values = values[np.argmax(values[coords<750]):]      
     # zeroed_values = values[argrelextrema(values, np.greater)[0][5]:]
-    zeroed_values = values[14:]
+    zeroed_values = values[60:]
     if use_reference_spectrum:
         zeroed_ref_values = reference_spectrum[7:]
     
@@ -115,13 +110,13 @@ def isolate_SPR(peak_coords, peak_values, manual=None):
     if manual:
         SPR_x = np.argmin(abs(peak_coords - manual))
     else:
-        SPR_x = np.argmin(peak_values[:2150//15]) # provided SPR is the minimum...
+        SPR_x = np.argmin(peak_values[:2700//15]) # provided SPR is the minimum...
         # TODO: this sets the upper limit of measurement, extra important to fix!
     
     # if SPR_x == 0:
     #     SPR_x = 140
         
-    new_x = np.arange(peak_coords[SPR_x]-150, peak_coords[SPR_x]+150, 15)
+    new_x = np.arange(peak_coords[SPR_x] - 150, peak_coords[SPR_x] + 150, 15)
     if np.any(new_x<0): return 0, 0
     # new_y = np.zeros_like(new_x)
     new_y = peak_values[SPR_x-new_x.size//2:SPR_x+new_x.size//2]
@@ -136,7 +131,8 @@ def find_centroid(x,y):
     except:
         x_centroid = 1000
         y_centroid = 3000
-        print(f'Failed to find SPR Dip!')
+        print('Failed to find SPR Dip!')
+        
     return x_centroid, y_centroid
 
 class alignment_figure():

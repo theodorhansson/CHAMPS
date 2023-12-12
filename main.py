@@ -1,17 +1,12 @@
 import tomllib
 import sys
-import numpy as np
 import time
 import tomli_w
 import utils
 import json
 import os
-import imageio.v3 as iio
 
 default_conf_path = "config.toml"
-import numpy as npq
-import matplotlib.pyplot as plt
-from PIL import Image
 from pathlib import Path
 
 def main(config_path):

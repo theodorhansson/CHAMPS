@@ -170,10 +170,11 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
     
     parent_path = Path(__file__).resolve().parents[1]
     save_folder_path = Path(parent_path, IPV_config["save_folder"])
-    hard_coded_reference_measurement = '20231211_23.34.51_y_max_ref'
+    hard_coded_reference_measurement = '20231212_11.03.42_y_max_ref'
     
     counter = 0
-    for folders in os.listdir(str(Path(parent_path,save_folder_path))):
+    for folders in os.listdir(str(Path(parent_path, save_folder_path))):
+
         if folders == hard_coded_reference_measurement:
             ref_path = Path(save_folder_path, hard_coded_reference_measurement)
             y_max_path = Path(ref_path, 'y_max.txt')
@@ -250,7 +251,7 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
                             
                         
                             if frame_counter==0: 
-                                spr_figure.fig.axes[4].legend(loc='upper right')
+                                spr_figure.fig.axes[4].legend(loc='lower left')
                             
                         plt.show(False)  
                         duration = time.time() - start_time

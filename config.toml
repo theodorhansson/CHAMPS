@@ -8,14 +8,14 @@ v_max = 5                   # Max allowed voltaged
 
 # Saving stuff
 save_folder = "SPR_measurements_231212" # Save folder
-spr_measurement_name = "test_spectrum"
+spr_measurement_name = "bsa_ds_attempt_3"
 #spr_measurement_name = "y_max_ref"
 save_raw_images = 0
 
 # VCSEL parameters
 check_bias           = 1    # Bias current to check the alignment
 vcsel_chip           = "sigge" # Which chip is being used
-vcsel_biases         = [1.1, 1, 0.95, 1, 0.92, 0.86, 1.55]  # mA
+vcsel_biases         = [1, 0.95, 1, 0.92, 0.86, 1.55]  # mA
 vcsel_array_bias     = 6
 
 # Camera and measurement interval
