@@ -7,22 +7,23 @@ dc_unit = "keithley2400"    # DC power supply
 v_max = 5                   # Max allowed voltaged
 
 # Saving stuff
-save_folder = "SPR_measurements_231212" # Save folder
-spr_measurement_name = "bsa_ds_attempt_3"
+save_folder = "SPR_measurements_231213" # Save folder
+spr_measurement_name = "finding_memory_leak"
 #spr_measurement_name = "y_max_ref"
 save_raw_images = 0
 
 # VCSEL parameters
-check_bias           = 1    # Bias current to check the alignment
 vcsel_chip           = "sigge" # Which chip is being used
 vcsel_biases         = [1, 0.95, 1, 0.92, 0.86, 1.55]  # mA
 vcsel_array_bias     = 6
 
 # Camera and measurement interval
-measurement_time     = 3600   # Measurement time in seconds
-measurement_interval = 5      # Take a picture every x sec
-exposure_time        = 0.01   # Exposure time in sec
-frame_average        = 10
+measurement_time            = 3600   # Measurement time in seconds
+measurement_interval        = 1      # Take a picture every x sec
+measurement_subinterval     = 0.001  
+exposure_time               = 0.01   # Exposure time in sec
+frame_average_buffer        = 10
+frame_average               = 10
 
 verbose_printing     = 1        # Flag for printing
 

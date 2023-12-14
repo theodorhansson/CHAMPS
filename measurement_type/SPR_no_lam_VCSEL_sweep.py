@@ -20,13 +20,16 @@ from spr_functions.main_spr import SPR_figure
 # Python modules
 import traceback
 import numpy as np
-import matplotlib.pyplot as plt
 import time
 from pathlib import Path
 import imageio.v3 as iio
 import gc
+# import threading
     
-COLORS = ['r','g','b','y','cyan','magenta','lightgreen']
+COLORS = ['blue','aqua','red','lightcoral','green','lightgreen']
+
+x_pixel  = 2048
+y_pixel  = 2048
     
 # Dumb code to import utils
 try:
@@ -49,6 +52,7 @@ _required_arguments = [
     "vcsel_chip",
     "vcsel_biases",
     "vcsel_array_bias",
+    "frame_average_buffer",
     "frame_average",
     
 ]
@@ -58,11 +62,11 @@ _optional_arguments = {
     "verbose_printing": 0,
     "keep_plot": False,
     "offset_background": 0,
-    "check_bias": 1,
     "measurement_time": 1,
     "measurement_interval": 1,
     "exposure_time": 0.03,
     "save_raw_images": 0,
+    "measurement_subinterval": 0.01
 }
 
 
@@ -86,37 +90,48 @@ def init(config: dict):
     return_dict = {IPV_name: IPV_config_opt, DC_name: DC_config}
     return results, return_dict
 
-def grab_image(camera, frame_avg=10):
-    captured_frames = []
-    with Stream(camera, frame_avg) as stream:
-        # logging.info("start acquisition")
-        camera.start()                       
-        for i, frame_buffer in enumerate(stream): 
-            fr = copy_frame(frame_buffer)
-            captured_frames.append(fr)                         
-            # logging.info(f"acquired frame #%d/%d", i+1, frame_avg)                        
-        camera.stop()    
-        # logging.info("finished acquisition")   
-    mean_frame = np.flip(np.mean(captured_frames, axis=0).astype(int), axis=1)
-    return mean_frame
+def grab_image(camera, frame_average, measurement_subinterval, frame_average_buffer):
+    average_buffer  = np.zeros(shape=(x_pixel, y_pixel))
+    captured_frames = np.zeros(shape=(x_pixel, y_pixel))
+    temp_avg_1 = np.zeros(shape=(x_pixel, y_pixel))
+    temp_avg_2 = np.zeros(shape=(x_pixel, y_pixel))
+    temp_avg_3 = np.zeros(shape=(x_pixel, y_pixel))
+
+    with Stream(camera, frame_average_buffer) as stream:
+        camera.start()
+        
+        for k in range(frame_average):  
+            # start_time = time.time()
+            for i, frame_buffer in enumerate(stream): 
+                fr = copy_frame(frame_buffer).astype(int)
+
+                average_buffer += fr
+                
+            captured_frames += average_buffer/frame_average_buffer
+            time.sleep(measurement_subinterval)  
+            
+            # stop_time = time.time()
+            # print(stop_time - start_time)
+                
+        camera.stop()                        
+                    
+    return np.flip(captured_frames/frame_average)
 
 def SPR_process_image(spr_figure, image, results, image_capture_time, measurement_time_start, frame_counter, IPV_config, y_max_index, ref_spectrums, use_reference_spectrum):
                             
     frame_time = image_capture_time - measurement_time_start
     for i in range(len(y_max_index)):
         results['frame_time'][i].append(frame_time)
-        #TODO: There is an enormous memory leak somewhere, the measurement slows down
-        # it is somewhere in the plotting logic
         results['spr_data'][i].append(spr_figure.analyze_image(image, y_max_index[i], frame_counter, i, IPV_config, ref_spectrums[i], use_reference_spectrum))
 
 def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
     
     # The main IPV function
     V_max = IPV_config["v_max"]
-    check_bias = IPV_config["check_bias"]
     verbose = IPV_config["verbose_printing"]
     measurement_time = IPV_config["measurement_time"]
     measurement_interval = IPV_config["measurement_interval"]
+    measurement_subinterval = IPV_config["measurement_subinterval"]
 
     vcsel_chip = IPV_config["vcsel_chip"]
     vcsel_biases = IPV_config["vcsel_biases"]
@@ -126,6 +141,7 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
     
     exposure_time = IPV_config["exposure_time"]
     frame_average = IPV_config["frame_average"]
+    frame_average_buffer = IPV_config["frame_average_buffer"]
     integrate_over_um = 80
     
     use_reference_spectrum = False
@@ -170,6 +186,9 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
     
     parent_path = Path(__file__).resolve().parents[1]
     save_folder_path = Path(parent_path, IPV_config["save_folder"])
+    if not os.path.isdir(save_folder_path):
+        print("Woops, your folder doesn't exist. Creating one here: ", save_folder_path)
+        os.mkdir(save_folder_path)
     hard_coded_reference_measurement = '20231212_11.03.42_y_max_ref'
     
     counter = 0
@@ -191,94 +210,86 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
                 counter += 1
                 # print(counter)
             
-    with DC_unit_obj(DC_config) as DC_unit:
-        try:
-            ## Set instrument to 0 for safety
-            prev_end_current = 0.0
-            DC_unit.set_current(prev_end_current)
-            DC_unit.set_voltage_limit(V_max)
-            DC_unit.set_output(True)
+    # with DC_unit_obj(DC_config) as DC_unit:
+    #     try:
+    #         ## Set instrument to 0 for safety
+    #         prev_end_current = 0.0
+    #         DC_unit.set_current(prev_end_current)
+    #         DC_unit.set_voltage_limit(V_max)
+    #         DC_unit.set_output(True)
             
-            spr_figure = SPR_figure(integrate_over_um)
-            results["fig_object"] = spr_figure.fig
+    spr_figure = SPR_figure(integrate_over_um)
+    results["fig_object"] = spr_figure.fig
 
             
-            # Frame counter
-            frame_counter = 0
-            
-            # Main measurement loop
-            while (time.time() - measurement_time_start) < measurement_time:
-                with dcam:
-                    camera = dcam[0]
-                    
-                    with camera:
- 
-                        camera["exposure_time"] = exposure_time 
-                        total_duration = 0
+    # Frame counter
+    frame_counter = 0
+    
+    # Main measurement loop
+    while (time.time() - measurement_time_start) < measurement_time:
+        with dcam:
+            try:
+                camera = dcam[0]
+                
+                with camera:
+     
+                    camera["exposure_time"] = exposure_time 
+                    total_duration = 0
       
-                        start_time = time.time()
-                        # Active switch for current laser
-                        laser_control.turn_on_all_lasers()
+                    start_time = time.time()
+                    # Active switch for current laser
+                    # laser_control.turn_on_all_lasers()
+                    
+                    # Ramp current to set bias
+                    # utils.ramp_current(DC_unit, 0, vcsel_array_bias)
+                    
+                    print(f'Taking Picture No {frame_counter}')
+                    # Grab picture from Hamamatsu
+                    image = grab_image(camera, frame_average, measurement_subinterval, frame_average_buffer)
+                        # 
+                    # threading.Thread(target=thread_function, args=(1,))
+                    # Ramp down current
+                    # utils.ramp_current(DC_unit, vcsel_array_bias, 0)
+                    
+                    # Turn off switch to lasers
+                    laser_control.turn_off_all_lasers()
+                    
+                    image_capture_time = time.time()
                         
-                        # Ramp current to set bias
-                        utils.ramp_current(DC_unit, 0, vcsel_array_bias)
-                        
-                        print(f'Taking Picture No {frame_counter}')
-                        # Grab picture from Hamamatsu
-                        # image = dcam_capture_average_image(frame_average, exposure_time=exposure_time)
-                        image = grab_image(camera, frame_avg=frame_average)
-                        
-                        # Ramp down current
-                        utils.ramp_current(DC_unit, vcsel_array_bias, 0)
-                        
-                        # Turn off switch to lasers
-                        laser_control.turn_off_all_lasers()
-                        
-                        image_capture_time = time.time()
-                            
-                        SPR_process_image(spr_figure,\
-                                          image, results, \
-                                          image_capture_time, \
-                                          measurement_time_start, frame_counter, IPV_config,\
-                                          y_max_index, ref_spectrums, use_reference_spectrum)
+                    SPR_process_image(spr_figure,\
+                                      image, results, \
+                                      image_capture_time, \
+                                      measurement_time_start, frame_counter, IPV_config,\
+                                      y_max_index, ref_spectrums, use_reference_spectrum)
+    
+                    spr_figure.update_spr_trace(lasers_on_chip, results, COLORS, frame_counter)
 
+                    duration = time.time() - start_time
+                    total_duration += duration
+                    print(f'Picture grabbing and processing took: {duration:.2f} s')
                     
-                        # Update inline plot with measurement status
-                        for channels in lasers_on_chip:
-                            spr_figure.fig.axes[4].plot(results['frame_time'][channels], results['spr_data'][channels], 
-                                                  marker='o', linewidth=0.2, markersize=3, 
-                                                  color=COLORS[channels], label=f'Laser {channels}') 
-                            
-                        
-                            if frame_counter==0: 
-                                spr_figure.fig.axes[4].legend(loc='lower left')
-                            
-                        plt.show(False)  
-                        duration = time.time() - start_time
-                        total_duration += duration
-                        print(f'Picture grabbing and processing took: {duration:.2f} s')
-                        
-                        # Wait until set time for the measurement
-                        print(f'Will sleep for: {(measurement_interval - total_duration if total_duration < measurement_interval else 0):.2f} s')
-                        print('----------------------------------')
-                        time.sleep(measurement_interval - total_duration if total_duration < measurement_interval else 0)
-                        frame_counter += 1  
-                        
-                        
-                        if (save_data) and (periodic_saving) and ((time.time() - measurement_time_start)>saving_interval*save):
-                            saving_results(IPV_config, results, measurement_timestamp)
-                            save+=1
-                            gc.collect()
-                            
-                        # Clean up of all started threads after each round of pictures
-                        # image_processing_thread.join()
+                    # Wait until set time for the measurement
+                    print(f'Will sleep for: {(measurement_interval - total_duration if total_duration < measurement_interval else 0):.2f} s')
+                    print('----------------------------------')
+                    time.sleep(measurement_interval - total_duration if total_duration < measurement_interval else 0)
+                    frame_counter += 1  
                     
                     
-        except KeyboardInterrupt:
-            print("Keyboard interrupt detected, stopping.")
-        except:
-            # print error if error isn't catched
-            traceback.print_exc()
+                    if (save_data) and (periodic_saving) and ((time.time() - measurement_time_start)>saving_interval*save):
+                        saving_results(IPV_config, results, measurement_timestamp)
+                        save+=1
+                        gc.collect()
+                    
+                # Clean up of all started threads after each round of pictures
+                # image_processing_thread.join()
+                    
+                    
+            except KeyboardInterrupt:
+                print("Keyboard interrupt detected, stopping.")
+                break
+            except:
+                # print error if error isn't catched
+                traceback.print_exc()
 
     saving_results(IPV_config, results, measurement_timestamp)
     return results

@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 import numpy as np
 from scipy.integrate import simps
 
@@ -27,28 +28,6 @@ def process_image(cropped_image, reference_spectrum, use_reference_spectrum):
         values = np.mean(cropped_image, axis=0)
         coords = np.arange(cropped_image.shape[1])*px_scale  
     return coords, values, image
-
-# def find_valley_width_around_local_minima(data, local_minimum, width_threshold=0):
-#     valley_widths = []
-#     valley_average = []
-
-#     for peak_index in local_minimum:
-#         left_index = peak_index
-#         right_index = peak_index
-        
-#         while left_index > 0 and data[left_index] <= data[left_index - 1]:
-#             left_index -= 1
-        
-#         while right_index < len(data) - 1 and data[right_index] <= data[right_index + 1]:
-#             right_index += 1
-        
-#         valley_width = right_index - left_index + 1
-        
-#         if valley_width > width_threshold:
-#             valley_widths.append(valley_width)
-#             valley_average.append(np.sum(data[peak_index-left_index:peak_index+right_index])/valley_width)
-    
-#     return (valley_widths, valley_average)
     
 def find_peaks(coords, values, reference_spectrum, use_reference_spectrum, spacing=15, px_avg = 3, smoothing=True):
     ### takes in the integrated spectrum and returns just the peak values
@@ -112,13 +91,10 @@ def isolate_SPR(peak_coords, peak_values, manual=None):
     else:
         SPR_x = np.argmin(peak_values[:2700//15]) # provided SPR is the minimum...
         # TODO: this sets the upper limit of measurement, extra important to fix!
-    
-    # if SPR_x == 0:
-    #     SPR_x = 140
         
     new_x = np.arange(peak_coords[SPR_x] - 150, peak_coords[SPR_x] + 150, 15)
-    if np.any(new_x<0): return 0, 0
-    # new_y = np.zeros_like(new_x)
+    if np.any(new_x<0): 
+        return 0, 0
     new_y = peak_values[SPR_x-new_x.size//2:SPR_x+new_x.size//2]
     return new_x, new_y
    
@@ -139,7 +115,7 @@ class alignment_figure():
     def __init__(self, integrate_over_um):
         self.integrate_over_pixel = int(integrate_over_um/px_scale)
         
-        fig = plt.figure(figsize=(10,7))
+        fig = plt.figure(figsize=(10,7), num=1, clear=True)
         ax0 = fig.add_subplot(211)
         ax1 = fig.add_subplot(223)
         ax2 = fig.add_subplot(224)
@@ -190,6 +166,8 @@ class SPR_figure():
         self.integrate_over_pixel = int(integrate_over_um/px_scale)
         
         # Initiate figure object
+        # fig = plt.figure(figsize=(10,7))
+        plt.ion()
         fig = plt.figure(figsize=(10,7))
         ax0 = fig.add_subplot(231)
         ax1 = fig.add_subplot(232)
@@ -238,14 +216,12 @@ class SPR_figure():
     def analyze_image(self, im, y_max_index, frame_counter, line, config, reference_spectrum, use_reference_spectrum, laser=True): 
         cropped_im = im[int(y_max_index-self.integrate_over_pixel):int(y_max_index+self.integrate_over_pixel), :]
 
-        
         x, y, crp_img = process_image(cropped_im, reference_spectrum, use_reference_spectrum)
         peak_x, peak_y = find_peaks(x, y, reference_spectrum, use_reference_spectrum)
         sprx, spry = isolate_SPR(peak_x, peak_y, manual = None)
         x_c, y_cspry = find_centroid(sprx, np.max(spry)-spry)
         
-        #TODO: put this on a separate thread from pictures and processing
-        if frame_counter%10 == 0:
+        if frame_counter%100 == 0:    
             if frame_counter == 0 and line == 0 and laser:
                 self.im_raw_data = self.ax_array[0].imshow(cropped_im)
                 self.line_integrated_spectrum, = self.ax_array[1].plot(x, y, linewidth=0.5)
@@ -255,7 +231,7 @@ class SPR_figure():
                 self.spr_dip, = self.ax_array[3].plot(sprx, spry, 'r', marker='o',markersize=3)
                 self.ax_array[3].set_xlim([np.min(sprx), np.max(sprx)])
                 self.ax_array[3].set_ylim([np.min(spry), np.max(spry)])
-                plt.show(False)
+                # plt.pause(0.0001)
             
             else:
                 #TODO: This is slowing down over time and takes way too much time
@@ -269,7 +245,27 @@ class SPR_figure():
                 self.spr_dip.set_data(sprx, spry)
                 self.ax_array[3].set_xlim([np.min(sprx), np.max(sprx)])
                 self.ax_array[3].set_ylim([np.min(spry), np.max(spry)])
-                plt.show(False)
+                # plt.pause(0.0001)
                 print(f'Plotting took: {time.time()-plot_start}')
-
+                
+            self.fig.canvas.draw()
+            self.fig.canvas.flush_events()
+                
         return x_c
+    
+    def update_spr_trace(self, lasers_on_chip, results, COLORS, frame_counter):
+        # Update inline plot with measurement status
+        for channels in lasers_on_chip:
+            self.fig.axes[4].plot(results['frame_time'][channels], results['spr_data'][channels], 
+                                  marker='o', linewidth=0.2, markersize=3, 
+                                  color=COLORS[channels], label=f'Laser {channels}') 
+            
+        
+            if frame_counter==0: 
+                self.fig.axes[4].legend(loc='lower left')
+                
+        self.fig.canvas.draw()
+        self.fig.canvas.flush_events()
+        
+    
+    
