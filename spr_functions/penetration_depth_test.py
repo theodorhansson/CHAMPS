@@ -26,7 +26,6 @@ for i, rii in enumerate(ri):
     ldep[i] = ld(984, ResonantAngle(e_analyte = rii**2)*PI/180, 1.51, rii)
 
 
-
 plt.scatter(ri, ldep)
 
 #%%
@@ -34,4 +33,4 @@ plt.scatter(ri, ldep)
 beta_sp = 2*PI/wl * np.sqrt((eps2*eps1)/(eps2+eps1))
 
 sintet = np.real(beta_sp)*wl/2/PI/(1.51**2)
-print(np.arcsin(sintet)*180/PI)
+print(np.arcsin(sintet)*180/PI) 
