@@ -29,6 +29,9 @@ import imageio.v3 as iio
     
 COLORS = ['r','g','b','y','cyan','magenta','aqua']
     
+x_pixel  = 2048
+y_pixel  = 2048
+
 # Dumb code to import utils
 try:
     import utils
@@ -87,19 +90,24 @@ def init(config: dict):
     return_dict = {IPV_name: IPV_config_opt, DC_name: DC_config}
     return results, return_dict
 
-def grab_image(camera, frame_avg=10):
-    captured_frames = []
-    with Stream(camera, frame_avg) as stream:
-        # logging.info("start acquisition")
-        camera.start()                       
-        for i, frame_buffer in enumerate(stream): 
-            fr = copy_frame(frame_buffer)
-            captured_frames.append(fr)                         
-            # logging.info(f"acquired frame #%d/%d", i+1, frame_avg)                        
-        camera.stop()    
-        # logging.info("finished acquisition")   
-    mean_frame = np.flip(np.mean(captured_frames, axis=0).astype(int), axis=1)
-    return mean_frame
+def grab_image(camera, frame_average, measurement_subinterval, frame_average_buffer):
+    average_buffer  = np.zeros(shape=(x_pixel, y_pixel))
+    captured_frames = np.zeros(shape=(x_pixel, y_pixel))
+
+
+    with Stream(camera, frame_average_buffer) as stream:
+        camera.start()
+        
+        for k in range(frame_average):  
+            for i, frame_buffer in enumerate(stream): 
+                fr = copy_frame(frame_buffer).astype(int)
+                average_buffer += fr
+                
+            captured_frames += average_buffer/frame_average_buffer
+            time.sleep(measurement_subinterval)  
+            
+        camera.stop()                        
+    return np.flip(captured_frames/frame_average)
 
 def find_laser_lines(image, manual=[]):
     if len(manual) >= 1:
@@ -128,7 +136,8 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
     verbose = IPV_config["verbose_printing"]
     measurement_time = IPV_config["measurement_time"]
     measurement_interval = IPV_config["measurement_interval"]
-
+    measurement_subinterval = IPV_config["measurement_subinterval"]
+    
     vcsel_chip = IPV_config["vcsel_chip"]
     vcsel_biases = IPV_config["vcsel_biases"]
     laser_indexing = {index: value for index, value in enumerate(vcsel_biases)}
@@ -137,7 +146,8 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
     
     exposure_time = IPV_config["exposure_time"]
     frame_average = IPV_config["frame_average"]
-    integrate_over_um = 40
+    frame_average_buffer = IPV_config["frame_average_buffer"]
+    integrate_over_um = 80
     
     periodic_saving = True
     save_data = True
@@ -196,12 +206,12 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
                     with camera:
                         camera["exposure_time"] = exposure_time 
                         
-                        image = grab_image(camera, frame_avg=frame_average)
+                        image = grab_image(camera, frame_average, measurement_subinterval, frame_average_buffer)
                         y_max_index, ref_spectrum = a_figure.update_alignment_image(image)
                         ref_spectrums[laser] = {'ref_spectrum' : ref_spectrum,
                                                 'y_max_index'  : y_max_index,
                                                 'raw_image'    : image}
-                        plt.show(False)
+                        # plt.show(False)
                 
                 utils.ramp_current(DC_unit, laser_indexing[laser], 0)
                 
@@ -243,7 +253,7 @@ def saving_results(IPV_config, ref_spectrums, a_figure, measurement_timestamp):
         if not os.path.isdir(save_folder_current_VCSEL):
             os.mkdir(save_folder_current_VCSEL)
 
-        iio.imwrite(os.path.join(save_folder_current_VCSEL, f'{SPR_measurement_name}_image{ref}.png'), ref_spectrums[ref]["raw_image"])
+        # iio.imwrite(os.path.join(save_folder_current_VCSEL, f'{SPR_measurement_name}_image{ref}.png'), ref_spectrums[ref]["raw_image"])
 
         np.savetxt(os.path.join(save_folder_current_VCSEL, 'ref_spectrum.txt'), ref_spectrums[ref]["ref_spectrum"], delimiter=',') 
         all_y_max.append(ref_spectrums[ref]["y_max_index"])

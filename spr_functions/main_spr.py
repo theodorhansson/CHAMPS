@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import numpy as np
-from scipy.integrate import simps
-
+from scipy.integrate import simpson 
+from scipy.interpolate import CubicSpline
 import time
 
 from scipy.signal import butter, filtfilt
@@ -30,14 +30,10 @@ def process_image(cropped_image, reference_spectrum, use_reference_spectrum):
     return coords, values, image
     
 def find_peaks(coords, values, reference_spectrum, use_reference_spectrum, spacing=15, px_avg = 3, smoothing=True):
-    ### takes in the integrated spectrum and returns just the peak values
-    ### zero the spectrum to the max peak    
-    # zeroed_values = values[np.argmax(values[coords<750]):]      
-    # zeroed_values = values[argrelextrema(values, np.greater)[0][5]:]
-    zeroed_values = values[60:]
+
+    zeroed_values = values[120:]
     if use_reference_spectrum:
         zeroed_ref_values = reference_spectrum[7:]
-    
     
     ### find x number of largest peaks and select the one with the lowest index
     ### TODO: Not sure if this works correctly yet but might be better in the
@@ -46,7 +42,7 @@ def find_peaks(coords, values, reference_spectrum, use_reference_spectrum, spaci
     # zeroed_values = values[largest_indices.min():]
     zeroed_coords = np.arange(zeroed_values.size)*px_scale
     ### zeroed coordinates
-    peak_coords = np.arange(0, max(zeroed_coords),spacing)
+    peak_coords = np.arange(0, max(zeroed_coords), spacing)
     ### find peaks at the line coordinates within px_avg number of pixels
     peaks = []
     ref_peaks = []
@@ -55,13 +51,6 @@ def find_peaks(coords, values, reference_spectrum, use_reference_spectrum, spaci
         if use_reference_spectrum:
             ref_peaks.append(np.max(zeroed_ref_values[abs(zeroed_coords - peak_x) < px_scale*px_avg]))
     
-   ### DEBUGGING START
-    # plt.show()
-    # fig = plt.figure()
-    # fig.plot(zeroed_coords[:200], zeroed_values[:200], linewidth=0.5)
-    # fig.scatter(peak_coords[:25], peaks[:25], marker='x', color='r')
-    # plt.show()
-    ### DEBUGGING END
     ### smoothing
     if smoothing:
         ### moving average
@@ -86,23 +75,37 @@ def find_peaks(coords, values, reference_spectrum, use_reference_spectrum, spaci
 
 def isolate_SPR(peak_coords, peak_values, manual=None):
     ### takes in the peak spectrum and isolates the SPR dip only
+    right_shift = 3
+        
     if manual:
         SPR_x = np.argmin(abs(peak_coords - manual))
     else:
-        SPR_x = np.argmin(peak_values[:2700//15]) # provided SPR is the minimum...
-        # TODO: this sets the upper limit of measurement, extra important to fix!
+        SPR_x = np.argmin(peak_values[right_shift:1300//15]) # provided SPR is the minimum...
         
-    new_x = np.arange(peak_coords[SPR_x] - 150, peak_coords[SPR_x] + 150, 15)
-    if np.any(new_x<0): 
-        return 0, 0
-    new_y = peak_values[SPR_x-new_x.size//2:SPR_x+new_x.size//2]
-    return new_x, new_y
+    new_x = np.arange(peak_coords[SPR_x+right_shift] - 150, peak_coords[SPR_x+right_shift] + 150, 15)
+    
+    if np.any(new_x < 0): 
+        return 0, 0, 0
+    
+    new_y = peak_values[SPR_x-new_x.size//2+right_shift:SPR_x+new_x.size//2+right_shift]
+    return new_x, new_y, peak_coords[SPR_x + right_shift]
    
 def find_centroid(x,y):
+    spline_values = 0
     try:
-        area = simps(y,x)
-        x_centroid = simps(x * y, x) / area
-        y_centroid = simps(y * y, x) / (2 * area)
+        # area = simpson(y,x)
+        # x_centroid = simpson(x * y, x) / area
+        # y_centroid = simpson(y * y, x) / (2 * area)
+        x_fit = np.linspace(np.min(x), np.max(x), 10000)
+        spline = CubicSpline(x, y)
+        # print(spline(x_fit))
+        # spline_values = spline(x_fit)
+        
+        x_centroid = x_fit[np.argmax(spline(x_fit))]
+        # print(x_centroid)
+        y_centroid = 0
+        # 
+        
         
     except:
         x_centroid = 1000
@@ -156,6 +159,9 @@ class alignment_figure():
         spr_spectrum = np.sum(image[y_max_index-self.integrate_over_pixel:y_max_index+self.integrate_over_pixel, :], axis=0)
         self.ax_array[2].plot(x_axis_um_4x, spr_spectrum/np.max(spr_spectrum))
         
+        self.fig.canvas.draw()
+        self.fig.canvas.flush_events()
+            
         return y_max_index, spr_spectrum
         
         
@@ -218,34 +224,44 @@ class SPR_figure():
 
         x, y, crp_img = process_image(cropped_im, reference_spectrum, use_reference_spectrum)
         peak_x, peak_y = find_peaks(x, y, reference_spectrum, use_reference_spectrum)
-        sprx, spry = isolate_SPR(peak_x, peak_y, manual = None)
+        sprx, spry, SPR_x = isolate_SPR(peak_x, peak_y, manual = None)
         x_c, y_cspry = find_centroid(sprx, np.max(spry)-spry)
         
         if frame_counter%100 == 0:    
+            plot_start = time.time()
             if frame_counter == 0 and line == 0 and laser:
+                ## First cropped image
                 self.im_raw_data = self.ax_array[0].imshow(cropped_im)
+
+                ## Integrated detected spectrum
                 self.line_integrated_spectrum, = self.ax_array[1].plot(x, y, linewidth=0.5)
                 self.ax_array[1].set_ylim([np.min(y), np.max(y)])
-                self.filtered_peaks, = self.ax_array[2].plot(peak_x, peak_y, color='black',marker='o',markersize=3)
+                
+                ## Filtered spectrum
+                self.filtered_spectrum, = self.ax_array[2].plot(peak_x, peak_y, color='black',marker='o',markersize=3)
                 self.ax_array[2].set_ylim([np.min(peak_y), np.max(peak_y)])
-                self.spr_dip, = self.ax_array[3].plot(sprx, spry, 'r', marker='o',markersize=3)
-                self.ax_array[3].set_xlim([np.min(sprx), np.max(sprx)])
-                self.ax_array[3].set_ylim([np.min(spry), np.max(spry)])
-                # plt.pause(0.0001)
-            
+                # self.spr_dip, = self.ax_array[2].plot(sprx, spry, 'r', marker='o',markersize=3)
+                
+                self.dip_spectrum, = self.ax_array[3].plot(sprx, spry, 'r', marker='o',markersize=3)
+                # self.ax_array[3].plot(np.array([x_c, x_c]), np.array([np.min(spry), np.max(spry)]), 'r', marker='o',markersize=3)
+
+
+                time.sleep(0.1)
+
             else:
-                #TODO: This is slowing down over time and takes way too much time
-                # in general
-                plot_start = time.time()
-                # self.im_raw_data.set_data(im)
                 self.line_integrated_spectrum.set_data(x, y)
                 self.ax_array[1].set_ylim([np.min(y), np.max(y)])
-                self.filtered_peaks.set_data(peak_x, peak_y)
+                
+                self.filtered_spectrum.set_data(peak_x, peak_y)
                 self.ax_array[2].set_ylim([np.min(peak_y), np.max(peak_y)])
-                self.spr_dip.set_data(sprx, spry)
+                
+                self.dip_spectrum.set_data(sprx, spry)
                 self.ax_array[3].set_xlim([np.min(sprx), np.max(sprx)])
                 self.ax_array[3].set_ylim([np.min(spry), np.max(spry)])
-                # plt.pause(0.0001)
+
+                # self.dip_spectrum.set_data(sprx, spry)
+   
+                time.sleep(0.1)
                 print(f'Plotting took: {time.time()-plot_start}')
                 
             self.fig.canvas.draw()
@@ -253,10 +269,20 @@ class SPR_figure():
                 
         return x_c
     
-    def update_spr_trace(self, lasers_on_chip, results, COLORS, frame_counter):
-        # Update inline plot with measurement status
+    def update_spr_trace(self, lasers_on_chip, results, COLORS, frame_counter, start_trace, clear_trace):
+        # Update spr trace
+        if clear_trace:
+            self.fig.axes[4].clear()
+            self.fig.axes[4].set_title(r'SPR trace')
+            self.fig.axes[4].set_xlabel(r'Time [s]')
+            self.fig.axes[4].set_ylabel(r'x [$\mu$m]')
+            self.fig.axes[4].grid(True)
+            self.fig.axes[4].legend(loc='lower left')
+            
         for channels in lasers_on_chip:
-            self.fig.axes[4].plot(results['frame_time'][channels], results['spr_data'][channels], 
+            frame_time = results['frame_time'][channels][start_trace:]
+            spr_trace  = results['spr_data'][channels][start_trace:]
+            self.fig.axes[4].plot(frame_time, spr_trace, 
                                   marker='o', linewidth=0.2, markersize=3, 
                                   color=COLORS[channels], label=f'Laser {channels}') 
             
