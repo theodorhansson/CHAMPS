@@ -184,7 +184,7 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
     if not os.path.isdir(save_folder_path):
         print("Woops, your folder doesn't exist. Creating one here: ", save_folder_path)
         os.mkdir(save_folder_path)
-    hard_coded_reference_measurement = '20231220_15.09.03_y_max_ref'
+    hard_coded_reference_measurement = '20240123_08.54.20_y_max_ref'
     
     counter = 0
     for folders in os.listdir(str(Path(parent_path, save_folder_path))):

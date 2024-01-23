@@ -7,15 +7,15 @@ dc_unit = "keithley2400"    # DC power supply
 v_max = 5                   # Max allowed voltaged
 
 #Saving stuff
-save_folder = "SPR_measurements_231220" # Save folder
-spr_measurement_name = "miRNA_DNA_attempt_2"
+save_folder = "SPR_measurements_240123" # Save folder
+spr_measurement_name = "miRNA_DNA_attempt_4"
 #spr_measurement_name = "y_max_ref"
 save_raw_images = 0
 
 # VCSEL parameters
 vcsel_chip           = "sigge" # Which chip is being used
-vcsel_biases         = [1, 1, 1]  # mA
-vcsel_array_bias     = 3
+vcsel_biases         = [2, 2, 5]  # mA
+vcsel_array_bias     = 7
 
 # Camera and measurement interval
 measurement_time            = 15000   # Measurement time in seconds

@@ -31,7 +31,7 @@ def process_image(cropped_image, reference_spectrum, use_reference_spectrum):
     
 def find_peaks(coords, values, reference_spectrum, use_reference_spectrum, spacing=15, px_avg = 3, smoothing=True):
 
-    zeroed_values = values[120:]
+    zeroed_values = values[600:]
     if use_reference_spectrum:
         zeroed_ref_values = reference_spectrum[7:]
     
@@ -246,7 +246,7 @@ class SPR_figure():
                 # self.ax_array[3].plot(np.array([x_c, x_c]), np.array([np.min(spry), np.max(spry)]), 'r', marker='o',markersize=3)
 
 
-                time.sleep(0.1)
+                time.sleep(2)
 
             else:
                 self.line_integrated_spectrum.set_data(x, y)
@@ -261,7 +261,7 @@ class SPR_figure():
 
                 # self.dip_spectrum.set_data(sprx, spry)
    
-                time.sleep(0.1)
+                time.sleep(2)
                 print(f'Plotting took: {time.time()-plot_start}')
                 
             self.fig.canvas.draw()
