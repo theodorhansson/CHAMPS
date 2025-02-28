@@ -1,21 +1,8 @@
 # Std units: mA, V, mW, nm
 
+
 [measurement]
-#Type = "spr_no_lam_vcsel_sweep"
-Type = "spr_alignment"
-dc_unit = "keithley2400"    # DC power supply
-v_max = 5                   # Max allowed voltaged
-
-#Saving stuff
-save_folder = "SPR_measurements_240916" # Save folder
-#spr_measurement_name = "miRNA_DNA_attempt_4"
-spr_measurement_name = "aligment"
-save_raw_images = 0
-
-# VCSEL parameters
-vcsel_chip           = "sigge" # Which chip is being used
-vcsel_biases         = [3, 3, 3]  # mA
-vcsel_array_bias     = 2
+Type = 'test_measurement'
 
 # Camera and measurement interval
 measurement_time            = 15000   # Measurement time in seconds
@@ -27,6 +14,3 @@ frame_average               = 10
 
 verbose_printing     = 1        # Flag for printing
 
-[keithley2400]
-Type = "keithley2400"       # The specific type of unit
-GPIB_address = "24"
