@@ -31,7 +31,7 @@ def savgol(data, window, order):
     return savgol_filter(data, window, order)
 
 ## Vcesls used in measurement
-vcsels = ['VCSEL_0', 'VCSEL_1', 'VCSEL_2', 'VCSEL_3', 'VCSEL_4','VCSEL_5']
+vcsels = ['VCSEL_0', 'VCSEL_1', 'VCSEL_2', 'VCSEL_3', 'VCSEL_4', 'VCSEL_5']
 filename = 'data'
 
 def load_measurement_data(spr_data_folder, files_to_plot, vcsels, time_mask=None, mov_avg_window=6, sav_gol_window=12, sav_gol_order=5):
@@ -41,6 +41,7 @@ def load_measurement_data(spr_data_folder, files_to_plot, vcsels, time_mask=None
     ## Names of measurement segments
     names = np.array(os.listdir(measurement_path))
     names = names[files_to_plot]
+    print('Loading data from: ' + str(names))
     
     ## Dict for plotting data
     plot_raw = {}

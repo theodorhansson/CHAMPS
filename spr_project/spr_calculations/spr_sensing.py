@@ -55,6 +55,18 @@ def pen_depth(lam, n_sub, n_bulk, theta_spr):
 def angle_grating_equation(lam, n, period):
     return np.arcsin(lam/(n*period))
 
+def bulk_sensitivity(refractive_index, n_glass, glass_thickness):
+    n_water = 1.33
+    n_highest_possible = 1.45
+    refractive_index_array = np.arange(n_water, n_highest_possible, 0.000001)
+
+    resonant_angles = theta_spr(eps_Au, n_glass, refractive_index_array) 
+    
+    detector_positions = x_spr_detector(resonant_angles, glass_thickness) - x_spr_detector(resonant_angles[0], glass_thickness)
+    dpos_dref          = np.gradient(detector_positions, refractive_index_array) 
+    
+    return dpos_dref[np.where(abs(refractive_index_array - n_water) < 0.0000005)][0]
+    
 
 #%% Sensor properties
 
@@ -69,13 +81,14 @@ deflection_to    = (deflection_angle*RAD_TO_DEG + angle_FWHM)*DEG_TO_RAD
 print('--------------------------------')
 print('Current design meant to center deflection at: ' + str(round(deflection_angle*RAD_TO_DEG, 1)))
 
-n_low = 1.33
+n_low = 1.333
 water_theta_spr_rad = theta_spr(eps_Au, n_glass, n_low)
 water_theta_spr_deg = water_theta_spr_rad*RAD_TO_DEG
 print('Predicted SPR for water: ' + str(round(water_theta_spr_deg, 2)))
 
-n_high = 1.44
+n_high = 1.379
 glycerol_theta_spr_rad = theta_spr(eps_Au, n_glass, n_high)
+print(x_spr_detector(glycerol_theta_spr_rad, glass_thickness)*1e6 - x_spr_detector(water_theta_spr_rad, glass_thickness)*1e6)
 
 ## Location of dip from vcsel row
 

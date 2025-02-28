@@ -6,7 +6,6 @@ if os.path.dirname(os.path.dirname(os.path.realpath(__file__))) not in sys.path:
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import convolve, butter, filtfilt, savgol_filter
-from spr_functions.spr_calculations import SPR_ang, ResonantN, ref_idx, ResonantAngle, SPR_loc
 
 from pathlib import Path
 

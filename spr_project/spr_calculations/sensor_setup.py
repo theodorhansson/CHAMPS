@@ -98,7 +98,7 @@ def plot_sensor_setup(glass_thickness,
     
     ## Plot
     scale = MM
-    plt.style.use('seaborn-v0_8-dark')
+    # plt.style.use('seaborn-v0_8-dark')
     plt.figure(1, figsize=(figure_width, figure_height))
     
     ## Extent of sensor  (Set smaller then it really is)
