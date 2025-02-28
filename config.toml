@@ -1,27 +1,27 @@
 # Std units: mA, V, mW, nm
 
 [measurement]
-Type = "spr_no_lam_vcsel_sweep"
-#Type = "spr_alignment"
+#Type = "spr_no_lam_vcsel_sweep"
+Type = "spr_alignment"
 dc_unit = "keithley2400"    # DC power supply
 v_max = 5                   # Max allowed voltaged
 
 #Saving stuff
-save_folder = "SPR_measurements_240123" # Save folder
-spr_measurement_name = "miRNA_DNA_attempt_4"
-#spr_measurement_name = "y_max_ref"
+save_folder = "SPR_measurements_240916" # Save folder
+#spr_measurement_name = "miRNA_DNA_attempt_4"
+spr_measurement_name = "aligment"
 save_raw_images = 0
 
 # VCSEL parameters
 vcsel_chip           = "sigge" # Which chip is being used
-vcsel_biases         = [2, 2, 5]  # mA
-vcsel_array_bias     = 7
+vcsel_biases         = [3, 3, 3]  # mA
+vcsel_array_bias     = 2
 
 # Camera and measurement interval
 measurement_time            = 15000   # Measurement time in seconds
 measurement_interval        = 1.5      # Take a picture every x sec
 measurement_subinterval     = 0.001  
-exposure_time               = 0.01   # Exposure time in sec
+exposure_time               = 0.1   # Exposure time in sec
 frame_average_buffer        = 10
 frame_average               = 10
 

@@ -1,12 +1,21 @@
-#define PIN1 22
-#define PIN2 24
-#define PIN3 26
+#define PIN1 31
+#define PIN2 33
+#define PIN3 35
+#define PIN4 37
+#define PIN5 39
+#define PIN6 41
+#define PIN7 43
+
 
 void setup() {
 	Serial.begin(115200);    
   pinMode(PIN1, OUTPUT);
   pinMode(PIN2, OUTPUT);
   pinMode(PIN3, OUTPUT);
+  pinMode(PIN4, OUTPUT);
+  pinMode(PIN5, OUTPUT);
+  pinMode(PIN6, OUTPUT);
+  pinMode(PIN7, OUTPUT);
 }
 
 void loop() {

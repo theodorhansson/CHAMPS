@@ -31,7 +31,7 @@ def process_image(cropped_image, reference_spectrum, use_reference_spectrum):
     
 def find_peaks(coords, values, reference_spectrum, use_reference_spectrum, spacing=15, px_avg = 3, smoothing=True):
 
-    zeroed_values = values[600:]
+    zeroed_values = values[100:]
     if use_reference_spectrum:
         zeroed_ref_values = reference_spectrum[7:]
     

@@ -112,6 +112,7 @@ def grab_image(camera, frame_average, measurement_subinterval, frame_average_buf
 def SPR_process_image(spr_figure, image, results, image_capture_time, measurement_time_start, frame_counter, IPV_config, y_max_index, ref_spectrums, use_reference_spectrum):
                             
     frame_time = image_capture_time - measurement_time_start
+    
     for i in range(len(y_max_index)):
         results['frame_time'][i].append(frame_time)
         results['spr_data'][i].append(spr_figure.analyze_image(image, y_max_index[i], frame_counter, i, IPV_config, ref_spectrums[i], use_reference_spectrum))
@@ -150,12 +151,16 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
     results = {"frame_list" : {},
                "frame_time" : {},
                "spr_data"   : {},
+               "Ib"         : {},
+               "Vb"         : {}
                }
     
     for i, biases in enumerate(vcsel_biases):
         results["frame_list"][i] = []
         results["frame_time"][i] = []
         results["spr_data"][i]   = []
+        results["Ib"][i]   = []
+        results["Vb"][i]   = []
         
     
     laser_control = aurora(vcsel_chip)
@@ -184,7 +189,7 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
     if not os.path.isdir(save_folder_path):
         print("Woops, your folder doesn't exist. Creating one here: ", save_folder_path)
         os.mkdir(save_folder_path)
-    hard_coded_reference_measurement = '20240123_08.54.20_y_max_ref'
+    hard_coded_reference_measurement = '20240222_14.28.30_y_max_ref'
     
     counter = 0
     for folders in os.listdir(str(Path(parent_path, save_folder_path))):
@@ -219,7 +224,13 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
             
             spr_figure = SPR_figure(integrate_over_um)
             results["fig_object"] = spr_figure.fig
-        
+                        
+            results["Ib"][0] = []
+            results["Vb"][0] = []
+            
+            results["Ib"][1] = []
+            results["Vb"][1] = []
+            
                     
             # Frame counter
             frame_counter = 0
@@ -239,6 +250,14 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
                         
                         # Ramp current to set bias
                         utils.ramp_current(DC_unit, 0, vcsel_array_bias)
+                        
+                        results["Ib"][0].append(DC_unit.get_current())
+                        results["Vb"][0].append(DC_unit.get_voltage())
+                        
+                        results["Ib"][1].append(DC_unit.get_current())
+                        results["Vb"][1].append(DC_unit.get_voltage())
+                        
+                            
                         
                         print(f'Taking Picture No {frame_counter}')
                         # Grab picture from Hamamatsu
@@ -318,7 +337,10 @@ def saving_results(IPV_config, results, measurement_timestamp):
         frame_list = results['frame_list'][laser]
         frame_time = results['frame_time'][laser]
         spr_data   = results['spr_data'][laser]
-        
+        Ib = results['Ib'][laser]
+        Vb = results['Vb'][laser]
+
+
         save_folder_current_VCSEL = Path(save_path_current_measurement,
                                           f'VCSEL_{laser}')
         
@@ -339,6 +361,13 @@ def saving_results(IPV_config, results, measurement_timestamp):
         xy = np.vstack((frame_time, spr_data)).T
         np.savetxt(os.path.join(save_folder_current_VCSEL, 'data.txt'), xy, 
                     delimiter=',') 
+        
+        np.savetxt(os.path.join(save_folder_current_VCSEL, 'Ib.txt'), np.array(Ib), 
+                    delimiter=',')
+        np.savetxt(os.path.join(save_folder_current_VCSEL, 'Vb.txt'), np.array(Vb), 
+                    delimiter=',') 
+        
+        
         
     fig_object = results['fig_object']
     fig_object.savefig(os.path.join(save_path_current_measurement, 

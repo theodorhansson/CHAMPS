@@ -19,22 +19,14 @@ laser_to_pin = {
                   1 : '24',
                   2 : '26'},
     'sigge' : {
-               # 0 : '35',
-               0 : '35',
-               1 : '31',
-               2 : '43',
-               # 2 : '29',
-               # 3 : '41',
-               # 3 : '43',s
+                0 : '33', # Works! 2.2mA. Channel 1
+                1 : '35', # Works! 2.0mA. Channel 1
+                2 : '31', # Works! 1.5mA. Channel 2
+                3 : '41', # Works! 1.1mA. Channel 3
+                4 : '43', # Broken
+                5 : '37', # Broken
+                6 : '39', # Broken
                },
-    # 'sigge' : {
-    #            # 0 : '35',
-    #            0 : '33',
-    #            1 : '31',
-    #            2 : '29',
-    #            3 : '41',
-    #            4 : '43',
-    #            }
     }
 
 
@@ -94,6 +86,6 @@ class aurora:
         
         
 johannes = aurora('sigge')
-# johannes.switch_to_laser(3)
+# johannes.switch_to_laser(0)
 # johannes.turn_on_all_lasers()
 johannes.turn_off_all_lasers()
