@@ -10,7 +10,7 @@ def argument_checker(
     expected_keys: list,
     optional_config: dict = dict(),
     warn_extra=True,
-    source_func="",
+    source_func='',
 ):
     # Behavior:
     # Checks if supplied dict contains required keys
@@ -26,19 +26,19 @@ def argument_checker(
     Missing_parameters = expected_set - config_values
 
     if source_func:
-        source_func = "in " + source_func
+        source_func = 'in ' + source_func
 
     if Extra_parameters != set() and Missing_parameters != set() and warn_extra:
         raise Exception(
-            f"Extra parameter {Extra_parameters} and missing parameter {Missing_parameters} detected{source_func}."
+            f'Extra parameter {Extra_parameters} and missing parameter {Missing_parameters} detected{source_func}.'
         )
 
     elif Extra_parameters != set() and warn_extra:
-        print(f"Warning: Unused parameter {Extra_parameters} {source_func}")
-        # warnings.warn(f"Unused parameter {Extra_parameters} {source_func}", UserWarning)
+        print(f'Warning: Unused parameter {Extra_parameters} {source_func}')
+        # warnings.warn(f'Unused parameter {Extra_parameters} {source_func}', UserWarning)
 
     elif Missing_parameters != set():
-        raise Exception  # (f"Missing parameters {Missing_parameters}{source_func}")
+        raise Exception  # (f'Missing parameters {Missing_parameters}{source_func}')
 
 
 def optional_arguments_merge(config: dict = dict(), optional_default=dict()):
@@ -50,7 +50,7 @@ def optional_arguments_merge(config: dict = dict(), optional_default=dict()):
 
 def list_number_recaster(input: list | float) -> list | float:
     # Recursivly tries to convert strings to floats in a list
-    # [1, "2"] -> [1, 2]
+    # [1, '2'] -> [1, 2]
     if type(input) == float or type(input) == int:
         output = input
     elif type(input) == str:
@@ -81,7 +81,7 @@ def interval_2_points(specification: list[list]) -> list:
         return out_list
     elif type(specification) != list:
         raise TypeError(
-            f"Interval specification {specification} neither list nor number"
+            f'Interval specification {specification} neither list nor number'
         )
 
     points = []
@@ -92,7 +92,7 @@ def interval_2_points(specification: list[list]) -> list:
             if len(sub_specification) != 3:
                 # Check if every sub-interval specified correct
                 raise TypeError(
-                    f"Interval sub-specification {sub_specification} not length 3."
+                    f'Interval sub-specification {sub_specification} not length 3.'
                 )
 
             # Extract the values
@@ -104,7 +104,7 @@ def interval_2_points(specification: list[list]) -> list:
                 # Check if they are valid type
                 if type(value) != float and type(value) != int:
                     raise TypeError(
-                        f"Interval sub-specification {sub_specification} component {value} not number"
+                        f'Interval sub-specification {sub_specification} component {value} not number'
                     )
 
             if start == end:
@@ -124,7 +124,7 @@ def interval_2_points(specification: list[list]) -> list:
 
         else:
             raise TypeError(
-                f"Interval sub-specification {sub_specification} in specification {specification} neither list nor number"
+                f'Interval sub-specification {sub_specification} in specification {specification} neither list nor number'
             )
 
         # Add sub_interval to point result
@@ -168,8 +168,8 @@ def create_save_list(result_dict: dict) -> tuple[list[list], str]:
     no_of_points = len(result_dict[keys[0]])  # How many rows there are
 
     if no_of_points == 0:
-        print("No data to save. Probably Ctrl+C too early.")
-        return [], ""  # Probably bad error behavior
+        print('No data to save. Probably Ctrl+C too early.')
+        return [], ''  # Probably bad error behavior
 
     for i in range(no_of_points):
         row = []
@@ -186,12 +186,12 @@ def create_save_list(result_dict: dict) -> tuple[list[list], str]:
     for key in keys:
         data = result_dict[key][0]
 
-        length = ""
+        length = ''
         if type(data) is list:
-            length = "(" + str(len(data)) + ")"
+            length = '(' + str(len(data)) + ')'
 
         result_headers.append(key + length)
-    header_string = " ".join(result_headers)
+    header_string = ' '.join(result_headers)
 
     return result_matrix, header_string
 
@@ -199,8 +199,8 @@ def create_save_list(result_dict: dict) -> tuple[list[list], str]:
 def closest_matcher(
     data: float,
     accepted_vals: list,
-    round_type: str = "up",
-    msg: str = "",
+    round_type: str = 'up',
+    msg: str = '',
 ):
     # Function checks if value is accepted, and tries to round it if possible
 
@@ -210,42 +210,42 @@ def closest_matcher(
 
     if msg:
         # Set message if not empty
-        msg = " in " + msg
+        msg = ' in ' + msg
 
     max_val = max(accepted_vals)
     min_val = min(accepted_vals)
 
     # If exact mode enabled, rasie exception if not in set
-    if round_type.lower() == "exact" and data not in accepted_vals:
+    if round_type.lower() == 'exact' and data not in accepted_vals:
         raise Exception(
-            f"{data} not a valid value{msg}. Please pick among {accepted_vals}."
+            f'{data} not a valid value{msg}. Please pick among {accepted_vals}.'
         )
 
     # If data bigger than all accepted
     elif data > max_val:
-        print(f"Warning: {data} larger than accepted{msg}, using {max_val} instead.")
+        print(f'Warning: {data} larger than accepted{msg}, using {max_val} instead.')
         return max_val
     elif data < min_val:
-        print(f"Warning: {data} smaller than accepted{msg}, using {min_val} instead.")
+        print(f'Warning: {data} smaller than accepted{msg}, using {min_val} instead.')
         return min_val
 
     # If not in list, round up to closest value in list
     elif data not in accepted_vals:
         match round_type.lower():
-            case "up":
+            case 'up':
                 custom_key = lambda x: math.inf if x - data < 0 else x - data
-            case "down":
+            case 'down':
                 custom_key = lambda x: math.inf if x - data > 0 else data - x
-            case "regularly":
+            case 'regularly':
                 custom_key = lambda x: abs(x - data)
             case _:
                 raise Exception(
-                    f"closest_matcher unknown round_type {round_type}{msg} detected."
+                    f'closest_matcher unknown round_type {round_type}{msg} detected.'
                 )
         data_old = data
         data = min(accepted_vals, key=custom_key)
         print(
-            f"Warning: {data_old} not accepted{msg}, rounding {round_type} to {data}."
+            f'Warning: {data_old} not accepted{msg}, rounding {round_type} to {data}.'
         )
         return data
 
@@ -258,9 +258,9 @@ class AnimatedPlot:
     # Used to dynamically add datapoints
     def __init__(
         self,
-        x_label: str = "",
-        y_label: str = "",
-        title: str = "",
+        x_label: str = '',
+        y_label: str = '',
+        title: str = '',
         enable_grid: bool = False,
     ):
         self.plot = plt.ion()
@@ -294,10 +294,10 @@ class AnimatedPlot:
         plt.pause(0.0001)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     pass
 
-    # plot = AnimatedPlot("A", "B", "C")
+    # plot = AnimatedPlot('A', 'B', 'C')
     # plot.add_point(1, 2)
     # plot.add_point(3, 2)
     # plot.keep_open()

@@ -105,7 +105,7 @@ fig = plt.figure(figsize=(14,8))
 ax1 = fig.add_subplot(221)
 
 n_glass = 1.51
-n_water = 1.34
+n_water = 1.39
 glass_thickness = 1.4*MM
 water_SPR = theta_spr(eps_Au, n_glass, n_water)
 water_SPR_deg = water_SPR*180/PI
@@ -288,11 +288,12 @@ ax2.set_ylabel(r'Sensor response [$^\circ$]')
 ax2.set_title(r'Shift as a function of layer thickness')
 ax2.legend()
 
-
 lam0    = 984e-9
 n_glass = 1.51
 glass_thickness = 1.4*MM
-refractive_index = np.arange(1.33, 1.450, 0.000001)
+# Refractive index of water
+n_water = 1.34
+refractive_index = np.arange(n_water, 1.46, 0.000001)
 
 resonant_angles = theta_spr(eps_Au, n_glass, refractive_index) 
 resonant_pos    = x_spr_detector(resonant_angles, glass_thickness)
@@ -303,10 +304,7 @@ dpos_dpos          = np.gradient(detector_positions, resonant_pos)
 
 
 # Refractive index of proteins
-n_BSA = 1.38
-
-# Refractive index of water
-n_water = 1.335
+n_BSA = 1.373
 
 # Initial Bulk sensitivity
 S = dpos_dref[np.where(np.abs(refractive_index - n_water) < 0.0000005)][0]
@@ -315,8 +313,8 @@ S = dpos_dref[np.where(np.abs(refractive_index - n_water) < 0.0000005)][0]
 d = 5*NM
 
 # How many layers to calculate for
-# m = np.arange(7) + 1
-m = np.arange(0, 7, 0.01) + 1
+m = np.arange(0, 7, 0.1) + 1
+# m = np.arange(0, 150, 0.1) + 1
 
 # Initialize shift and effective refractive index arrays
 dx = np.zeros_like(m, dtype=float)
@@ -328,18 +326,18 @@ spr_water = theta_spr(eps_Au, n_glass, n_water)
 # Intial penetration depth
 pen_depth_BSA = pen_depth(lam0, n_glass, n_water, resonant_angles[0])
 
+
 # For each layer
 for i, mm in  enumerate(m):  
     # Calculate the **effective** refractive index within the field
     neff[i] = n_BSA + (n_water - n_BSA)*np.exp(-2*d*mm/pen_depth_BSA)
-    
+
     # Calculate the new SPR angle with this new refractive index
     spr_BSA = theta_spr(eps_Au, n_glass, neff[i])
     
     # Calculate the new penetration depth with the new angle
     pen_depth_BSA = pen_depth(lam0, n_glass, neff[i], spr_BSA)
-    pen_depth_BSA = pen_depth_BSA - 70e-9
-    
+
     ## Calculate the new bulk sensitivity for this refractive index
     S = dpos_dref[np.where(np.abs(refractive_index - neff[i]) < 0.0000005)][0]
     

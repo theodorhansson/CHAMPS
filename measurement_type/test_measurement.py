@@ -2,6 +2,7 @@ import os, sys
 if os.path.dirname(os.path.dirname(os.path.realpath(__file__))) not in sys.path:
     sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
     
+import general_functions.pretty_printing as pp
 # Import CHAMPS module for GPIB connections
 # import communication
 
@@ -44,26 +45,22 @@ _optional_arguments = {
 }
 
 
-def init(config: dict):
+def init(config: dict, meas_output_dir_path: str):
     # Get config dict and check for optional arguments
     config = config['measurement']
+    
+    meas_type = config['type']
+    
     # Check and merge optional arguments
     utils.argument_checker(
-        config, _required_arguments, _optional_arguments, source_func='IPV init'
+        config, _required_arguments, _optional_arguments, source_func=meas_type
     )
-    config_opt = utils.optional_arguments_merge(config, _optional_arguments)
+    used_config = utils.optional_arguments_merge(config, _optional_arguments)
 
-    # # Used for getting instrument objects and their names
-    # IPV_name = IPV_config['type']
-    # DC_name = IPV_config[_DC_name_key]
-    # DC_config = config[DC_name]
-
-    results = test_measurement_main(config)
-
-    # # Get the used config and return it to main
-    return_dict = {config: config_opt}
+    ## Run measurement
+    results = measurement_main(config, meas_output_dir_path)
     
-    return results, return_dict
+    return used_config
 
 # def grab_image(camera, frame_average, measurement_subinterval, frame_average_buffer):
 #     average_buffer  = np.zeros(shape=(x_pixel, y_pixel))
@@ -85,47 +82,18 @@ def init(config: dict):
 #     return np.flip(captured_frames/frame_average)
 
 
-def test_measurement_main(config: dict):
+def measurement_main(config: dict, meas_output_dir_path: str):
     
-    # The main IPV function
-    # V_max = IPV_config['v_max']
-    # verbose = IPV_config['verbose_printing']
-    # measurement_time = IPV_config['measurement_time']
-    # measurement_interval = IPV_config['measurement_interval']
-    # measurement_subinterval = IPV_config['measurement_subinterval']
-
-    # vcsel_chip = IPV_config['vcsel_chip']
-    # vcsel_biases = IPV_config['vcsel_biases']
-    # laser_indexing = {index: value for index, value in enumerate(vcsel_biases)}
-    # vcsel_array_bias = IPV_config['vcsel_array_bias']
-    # ref_spectrums = {}
+    exposure_time = config['exposure_time']
+    frame_average = config['frame_average']
+    frame_average_buffer = config['frame_average_buffer']
     
-    # exposure_time = IPV_config['exposure_time']
-    # frame_average = IPV_config['frame_average']
-    # frame_average_buffer = IPV_config['frame_average_buffer']
-    # integrate_over_um = 80
-    
-    # use_reference_spectrum = False
     
     # periodic_saving = True
     # save_data = True
     # saving_interval = 300
     # save = 1
     
-    # start_trace = 0
-    # reset_trace_every = 200
-
-    # # Create result dict
-    # results = {'frame_list' : {},
-    #            'frame_time' : {},
-    #            'spr_data'   : {},
-    #            }
-    
-    # for i, biases in enumerate(vcsel_biases):
-    #     results['frame_list'][i] = []
-    #     results['frame_time'][i] = []
-    #     results['spr_data'][i]   = []
-        
     
     # laser_control = aurora(vcsel_chip)
     # lasers_on_chip = np.fromiter(laser_control.chip.keys(), dtype=int)

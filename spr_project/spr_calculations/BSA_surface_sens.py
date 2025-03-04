@@ -84,7 +84,7 @@ dpos_dref          = np.gradient(detector_positions, refractive_index)
 
 
 current_folder = Path(__file__)
-comsol_data = Path(current_folder.parents[1], 'comsol_data', 'spr_1d_comsol', 'SPR_angle_n_dc_13_n_bsa_148.txt')
+comsol_data = Path(current_folder.parents[1], 'comsol_data', 'spr_1d_comsol', 'SPR_angle_n_dc_135_n_bsa_142.txt')
 
 in_rad = []
 h_bsa = []
@@ -101,9 +101,9 @@ with open(str(comsol_data), 'r') as file:
 water_spr_rad = 1.121095417373438
 
 unique_in_rad = np.unique(in_rad)
-unique_in_deg = unique_in_rad*180/PI - 62
+unique_in_deg = unique_in_rad*180/PI - 66.7
 # unique_in_deg = unique_in_rad
-unique_h_bsa  = np.unique(h_bsa)/2
+unique_h_bsa  = np.unique(h_bsa)
 R_matrix = np.zeros(shape=(len(unique_h_bsa), len(unique_in_rad)))
 
 for j in range(len(unique_in_rad)):
@@ -118,6 +118,8 @@ plt.imshow(R_matrix, origin='lower', aspect='auto', cmap=cmap, extent=extent)
 
 plt.ylabel(r'Sensor response [$^\circ$]')
 plt.xlabel(r'$h_{BSA}$ [nm]')
+
+plt.xlim([0, 35])
 
 plt.tight_layout()
 

@@ -2,7 +2,8 @@
 
 
 [measurement]
-Type = 'test_measurement'
+type = 'test_measurement'
+name = 'test_1'
 
 # Camera and measurement interval
 measurement_time            = 15000   # Measurement time in seconds
@@ -12,5 +13,5 @@ exposure_time               = 0.1   # Exposure time in sec
 frame_average_buffer        = 10
 frame_average               = 10
 
-verbose_printing     = 1        # Flag for printing
+verbose_level     = 1        # 1. Verbose 0. Off
 

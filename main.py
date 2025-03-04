@@ -1,3 +1,4 @@
+## General python imports needed
 import tomllib
 import sys
 import time
@@ -6,43 +7,56 @@ import utils
 import json
 import os
 
-default_conf_path = 'config.toml'
-from pathlib import Path
+## Custom imports
+from general_functions.pretty_printing.verbose_printing import headline, check_flag_for_verbose_printing
+import general_functions.files_and_folders.ffp_functions as ffp
 
+## Hard coded config file path
+default_conf_path = 'config.toml'
+
+## Main running file for CHAMPS
+## Coordinates all measurements
 def main(config_path):
     
-    # Open the config file
+    ## Find root path for CHAMPS project
+    root_path = ffp.generate_CHAMP_paths(__file__)
+    
+    ## Open the config file
     with open(config_path, 'rb') as f:
         config = tomllib.load(f)
         
-    config_lower = utils.dict_2_lower(config)  # sanitize the config dict
+    ## Set all strings in config.toml to lower case
+    config_lower = utils.dict_2_lower(config)
+    
+    ## Extract measurement name and print
     meas_name = config_lower['measurement']['type']
+    headline('Sucessfully loaded config for ' + meas_name)
     
-    print('#-------- Sucessfully loaded config for ' + meas_name + ' --------#')
+    ## Check for verbose printing
+    verbose = check_flag_for_verbose_printing(config_lower)
+        
+    ## Current time
+    timestamp = time.strftime(rf'%Y%m%d_%H.%M')
     
-
-    # # Code for printing
-    # if 'verbose_printing' in config_lower['measurement'].keys():
-    #     verbose = config_lower['measurement']['verbose_printing']
-    # else:
-    #     verbose = 0
-    # print(f'Reading config {config_path} from disk') if verbose & 16 else None
-
-    # # get the current time in nice format
-    # timestamp = time.strftime(rf'%Y%m%d_%H.%M.%S')
-
-    # # Set file name to current time if undefined
-    # if 'custom_name' not in config_lower['measurement'].keys():
-    #     config_lower['measurement']['custom_name'] = meas_name
-    # config_lower['measurement']['custom_name'] += '-' + timestamp
-
-    # file_name = config_lower['measurement']['custom_name']
-
-    # # Get the measurement object
-    # measurement_init = identify_measurement_type(meas_name)
+    ## Create measurement output folder
+    output_dir_path = ffp.create_output_folder(root_path)
     
-    # # Begin the measurement!
-    # result_dict, used_config = measurement_init(config_lower)
+    ## Create folder for current measurement type
+    meas_type = config_lower['measurement']['type']
+    meas_output_dir_path = ffp.create_measurement_save_folder(output_dir_path, meas_type)
+    
+    ## Create folder for current measurement
+    meas_name = config_lower['measurement']['name']
+    meas_name_timestamp = str(meas_name) + '_' + timestamp
+    meas_output_dir_path = ffp.create_measurement_save_folder(meas_output_dir_path, meas_name_timestamp)
+
+    # Get the measurement object
+    measurement_init = identify_measurement_type(meas_type)
+    
+    # Begin the measurement!
+    used_config = measurement_init(config_lower, meas_output_dir_path)
+
+
 
     # # Logic on where to save file
     # parent_path = Path(__file__).resolve().parents[1]
@@ -122,7 +136,6 @@ def identify_measurement_type(measurement: str):
         case _:
             # TODO Change this
             raise Exception(f'No measurement of type {measurement} found.')
-
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
