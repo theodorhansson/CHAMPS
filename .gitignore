@@ -1,6 +1,7 @@
 # Measurement data
 /spr_measurements_*/*
 /spr_project/comsol_models/**
+/_output/**
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

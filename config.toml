@@ -1,17 +1,24 @@
-# Std units: mA, V, mW, nm
-
+## Std units: mA, V, mW, nm, sec
 
 [measurement]
-type = 'test_measurement'
-name = 'test_1'
+## Measurement type and name
+type = 'capture_stokes'
+name = 'align_quarter_waveplate'
 
-# Camera and measurement interval
-measurement_time            = 15000   # Measurement time in seconds
-measurement_interval        = 1.5      # Take a picture every x sec
-measurement_subinterval     = 0.001  
-exposure_time               = 0.1   # Exposure time in sec
-frame_average_buffer        = 10
-frame_average               = 10
+## Camera and capture control
+exposure_time = 0.03   # Exposure time in sec
+mirror_x      = 1      # Mirror image along x-axis
+mirror_y      = 1      # Mirror image along y-axis
+transpose     = 1      # Transpose image data
 
+## Save all images
+save_images = 1
+
+## Setup region of interest in image. [x_pos, y_pos, width, height] in pixels
+## Image from Hamamatsu camera is [2048, 2048]
+#ROI = [[1000, 1000, 500, 500], [1500, 400, 500, 500]]
+ROI = [[1000, 1000, 600, 600]]
+
+## Verbose printing
 verbose_level     = 1        # 1. Verbose 0. Off
 

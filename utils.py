@@ -35,18 +35,15 @@ def argument_checker(
 
     elif Extra_parameters != set() and warn_extra:
         print(f'Warning: Unused parameter {Extra_parameters} {source_func}')
-        # warnings.warn(f'Unused parameter {Extra_parameters} {source_func}', UserWarning)
 
     elif Missing_parameters != set():
-        raise Exception  # (f'Missing parameters {Missing_parameters}{source_func}')
-
+        raise Exception  
 
 def optional_arguments_merge(config: dict = dict(), optional_default=dict()):
     # Merges config and optional dicts. Value in config overwrites default
     out_dict = optional_default
     out_dict.update(config)
     return out_dict
-
 
 def list_number_recaster(input: list | float) -> list | float:
     # Recursivly tries to convert strings to floats in a list

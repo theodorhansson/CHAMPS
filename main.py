@@ -8,7 +8,7 @@ import json
 import os
 
 ## Custom imports
-from general_functions.pretty_printing.verbose_printing import headline, check_flag_for_verbose_printing
+import general_functions.pretty_printing.verbose_printing as vp
 import general_functions.files_and_folders.ffp_functions as ffp
 
 ## Hard coded config file path
@@ -30,10 +30,10 @@ def main(config_path):
     
     ## Extract measurement name and print
     meas_name = config_lower['measurement']['type']
-    headline('Sucessfully loaded config for ' + meas_name)
+    vp.headline('Sucessfully loaded config for ' + meas_name)
     
     ## Check for verbose printing
-    verbose = check_flag_for_verbose_printing(config_lower)
+    verbose = vp.check_flag_for_verbose_printing(config_lower)
         
     ## Current time
     timestamp = time.strftime(rf'%Y%m%d_%H.%M')
@@ -49,7 +49,7 @@ def main(config_path):
     meas_name = config_lower['measurement']['name']
     meas_name_timestamp = str(meas_name) + '_' + timestamp
     meas_output_dir_path = ffp.create_measurement_save_folder(meas_output_dir_path, meas_name_timestamp)
-
+    
     # Get the measurement object
     measurement_init = identify_measurement_type(meas_type)
     
@@ -57,46 +57,16 @@ def main(config_path):
     used_config = measurement_init(config_lower, meas_output_dir_path)
 
 
-
-    # # Logic on where to save file
-    # parent_path = Path(__file__).resolve().parents[1]
-    # save_folder_path = Path(parent_path, config_lower['measurement']['save_folder'])
-
-    # # Create save folder if it doesn't exist
-    # if not os.path.isdir(save_folder_path):
-    #     print('Woops, your folder doesn\'t exist. Creating one here: ', save_folder_path)
-    #     os.mkdir(save_folder_path)
-    # save_file_name = Path(save_folder_path, file_name)
-
-    # if config_lower['measurement']['type'] == 'missalignment' or \
-    #    config_lower['measurement']['type'] == 'spr_no_lam_sweep' or \
-    #    config_lower['measurement']['type'] == 'spr_lam_sweep' or \
-    #    config_lower['measurement']['type'] == 'spr_no_lam_vcsel_sweep' or \
-    #    config_lower['measurement']['type'] == 'spr_alignment'  :
-           
-    #     pass
-
-    # else:
-    #     # Save the data as json
-    #     print('Starting saving process. This might take a while for large files.')
-    #     data_save_name = save_file_name + '.json'
-    #     with open(data_save_name, 'w') as export_file:
-    #         json.dump(result_dict, export_file)
-    #     print(f'Saving data file {data_save_name} to disk.') if verbose & 16 else None
-    
-    #     # Save the config
-    #     config_save_name = save_file_name + '.toml'
-    #     with open(config_save_name, 'wb') as f:
-    #         tomli_w.dump(used_config, f)
-    #     print(f'Saving config file {config_save_name} to disk.') if verbose & 16 else None
-
-
 def identify_measurement_type(measurement: str):
     # Matches measurement name with correct module
     match measurement:
-        case 'test_measurement':
-            import measurement_type.test_measurement
-            return measurement_type.test_measurement.init
+        case 'capture_images':
+            import measurement_type.capture_images
+            return measurement_type.capture_images.init
+        
+        case 'capture_stokes':
+            import measurement_type.capture_stokes
+            return measurement_type.capture_stokes.init
         
         case 'ipv':
             import measurement_type.ipv

@@ -7,7 +7,7 @@ import cv2
 from PIL import Image
 
     
-def dcam_capture_image(iDevice=0, exposure_time=0.03):
+def dcam_capture_image(mirror_x, mirror_y, transpose, iDevice=0, exposure_time=0.03):
     """
     Capture and show a image
     """
@@ -49,6 +49,13 @@ def dcam_capture_image(iDevice=0, exposure_time=0.03):
         print('-NG: Dcamapi.init() fails with error {}'.format(Dcamapi.lasterr()))
 
     Dcamapi.uninit()
+    
+    if mirror_x:
+        data = np.flip(data, axis=0)
+    if mirror_y:
+        data = np.flip(data, axis=1)
+    if transpose:
+        data = data.T
     return data
 
 

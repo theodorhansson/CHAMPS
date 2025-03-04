@@ -1,8 +1,10 @@
 #%%
 
-
 def headline(message, verbose=True):
-    print('#-------- ' + message + ' --------#')
+    print('###-------- ' + message + ' --------###')
+    
+def message(message, verbose=True):
+    print('--- ' + message + ' ---')
     
     
 def check_flag_for_verbose_printing(config_lower):

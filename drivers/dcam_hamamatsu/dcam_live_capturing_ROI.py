@@ -9,7 +9,7 @@ import time
 
 import numpy as np
 
-def dcamtest_show_framedata(data, windowtitle, iShown):
+def dcamtest_show_framedata(data, windowtitle, iShown, ROI, mirror_x, mirror_y, transpose):
     """
     Show numpy buffer as an image
 
@@ -29,14 +29,46 @@ def dcamtest_show_framedata(data, windowtitle, iShown):
     cv2.namedWindow(windowtitle, cv2.WINDOW_NORMAL)
     cv2.resizeWindow(windowtitle, 1024, 1024)
     
-    
     if data.dtype == np.uint16:
         imax = np.amax(data)
         if imax > 0:
             imul = int(65535 / imax)
             data = data * imul
-
-        cv2.imshow(windowtitle, data)
+            
+        if mirror_x:
+            data = np.flip(data, axis=0)
+        if mirror_y:
+            data = np.flip(data, axis=1)
+        if transpose:
+            data = data.T
+            
+        for roi in ROI:
+            pos_x = roi[0]
+            pos_y = roi[1]
+            width = roi[2]
+            height = roi[3]
+            
+            line_width = 3
+            
+            ## Right line
+            data[pos_y - height//2:pos_y + height//2, 
+                 pos_x + width//2:pos_x + width//2 + line_width] = imax     
+            
+            ## Left line
+            data[pos_y - height//2:pos_y + height//2, 
+                 pos_x - width//2 - line_width:pos_x - width//2] = imax     
+            
+            ## Bottom line
+            data[pos_y + height//2:pos_y + height//2 + line_width, 
+                 pos_x - width//2:pos_x + width//2] = imax 
+            
+            ## Top line
+            data[pos_y - height//2 - line_width:pos_y - height//2,
+                 pos_x - width//2:pos_x + width//2] = imax 
+            
+            
+            
+        img = cv2.imshow(windowtitle, data)
         
         return (1, cv2)
     
@@ -45,7 +77,7 @@ def dcamtest_show_framedata(data, windowtitle, iShown):
         return (-1, cv2)
 
 
-def dcamtest_thread_live(dcam):
+def dcamtest_thread_live(dcam, ROI, mirror_x, mirror_y, transpose):
     """
     Show live image
 
@@ -58,7 +90,13 @@ def dcamtest_thread_live(dcam):
         while iWindowStatus >= 0:
             if dcam.wait_capevent_frameready(timeout_milisec) is not False:
                 data = dcam.buf_getlastframedata()
-                (iWindowStatus, cv_object) = dcamtest_show_framedata(data, 'Live image', iWindowStatus)
+                (iWindowStatus, cv_object) = dcamtest_show_framedata(data, 
+                                                                     'Live image', 
+                                                                     iWindowStatus, 
+                                                                     ROI,
+                                                                     mirror_x,
+                                                                     mirror_y,
+                                                                     transpose)
             else:
                 dcamerr = dcam.lasterr()
                 if dcamerr.is_timeout():
@@ -77,7 +115,7 @@ def dcamtest_thread_live(dcam):
         print('-NG: Dcam.cap_start() fails with error {}'.format(dcam.lasterr()))
 
 
-def dcam_live_capturing(iDevice=0, exposure_time=0.03):
+def dcam_live_capturing(ROI, mirror_x, mirror_y, transpose, iDevice=0, exposure_time=0.03):
     """
     Capture and show a image
     """
@@ -88,7 +126,7 @@ def dcam_live_capturing(iDevice=0, exposure_time=0.03):
             dcam.prop_setvalue(DCAM_IDPROP.EXPOSURETIME, exposure_time)
             
             if dcam.buf_alloc(3) is not False:
-                dcamtest_thread_live(dcam)
+                dcamtest_thread_live(dcam, ROI, mirror_x, mirror_y, transpose)
 
                 # release buffer
                 dcam.buf_release()
