@@ -16,22 +16,22 @@ except:
     sys.path.append(util_path)
     import utils
 
-_DC_name_key = "dc_unit"
+_DC_name_key = 'dc_unit'
 _required_arguments = [
-    "type",
-    "dc_unit",
-    "current",
-    "v_max",
-    "save_folder",
-    "custom_name",
+    'type',
+    'dc_unit',
+    'current',
+    'v_max',
+    'save_folder',
+    'custom_name',
 ]
 _optional_arguments = {
-    "rollover_threshold": 0,
-    "rollover_min": 0,
-    "plot_interval": 20,
-    "verbose_printing": 0,
-    "keep_plot": False,
-    "offset_background": 0,
+    'rollover_threshold': 0,
+    'rollover_min': 0,
+    'plot_interval': 20,
+    'verbose_printing': 0,
+    'keep_plot': False,
+    'offset_background': 0,
 }
 
 from drivers.dcam_hamamatsu.dcam_live_capturing import dcam_live_capturing
@@ -44,15 +44,15 @@ from PIL import Image
 
 def init(config: dict):
     # Get config dict and check for optional arguments
-    IPV_config = config["measurement"]
+    IPV_config = config['measurement']
     # Check and merge optional arguments
     utils.argument_checker(
-        IPV_config, _required_arguments, _optional_arguments, source_func="IPV init"
+        IPV_config, _required_arguments, _optional_arguments, source_func='IPV init'
     )
     IPV_config_opt = utils.optional_arguments_merge(IPV_config, _optional_arguments)
 
     # Used for getting instrument objects and their names
-    IPV_name = IPV_config["type"]
+    IPV_name = IPV_config['type']
     DC_name = IPV_config[_DC_name_key]
     DC_config = config[DC_name]
 
@@ -70,25 +70,25 @@ def missalignment_main(IPV_config: dict, DC_config: dict):
     
     
     # The main IPV function
-    V_max = IPV_config["v_max"]
-    plot_update_interval = IPV_config["plot_interval"]
-    rollover_threshold = IPV_config["rollover_threshold"]
-    rollover_min = IPV_config["rollover_min"]
-    intervals = IPV_config["current"]
-    verbose = IPV_config["verbose_printing"]
-    keep_plot = IPV_config["keep_plot"]
-    offset_background = IPV_config["offset_background"]
+    V_max = IPV_config['v_max']
+    plot_update_interval = IPV_config['plot_interval']
+    rollover_threshold = IPV_config['rollover_threshold']
+    rollover_min = IPV_config['rollover_min']
+    intervals = IPV_config['current']
+    verbose = IPV_config['verbose_printing']
+    keep_plot = IPV_config['keep_plot']
+    offset_background = IPV_config['offset_background']
     interval_list = utils.interval_2_points(intervals)
 
     # Create result dict
     Results = {
-        "header": "Current[mA], Optical Power [mW], Voltage [V]",
-        "voltage": [],
-        "current": [],
-        "power": [],
+        'header': 'Current[mA], Optical Power [mW], Voltage [V]',
+        'voltage': [],
+        'current': [],
+        'power': [],
     }
     
-    figure_folder = "C:\\Users\\Mindaugas Juodenas\\Documents\\GitHub\\CHAMPS_data"
+    figure_folder = 'C:\\Users\\Mindaugas Juodenas\\Documents\\GitHub\\CHAMPS_data'
     figure_number = 0
 
     figure_list = []
@@ -96,10 +96,10 @@ def missalignment_main(IPV_config: dict, DC_config: dict):
     
     # Send verbose_printing to instruments if not specified
     for instru_dict in [DC_config]:
-        if "verbose_printing" not in instru_dict.keys():
-            instru_dict["verbose_printing"] = verbose
+        if 'verbose_printing' not in instru_dict.keys():
+            instru_dict['verbose_printing'] = verbose
 
-    # Plot = utils.AnimatedPlot("Current[mA]", "Optical Power [mW]", "IPV")
+    # Plot = utils.AnimatedPlot('Current[mA]', 'Optical Power [mW]', 'IPV')
     Instrument_COM = communication.Communication()
 
     # Gets isntruments
@@ -129,23 +129,23 @@ def missalignment_main(IPV_config: dict, DC_config: dict):
 
                     volt, current = DC_unit.get_voltage_and_current()
 
-                    Results["voltage"].append(volt)
-                    Results["current"].append(current)
+                    Results['voltage'].append(volt)
+                    Results['current'].append(current)
                     
                     if verbose & 1:
-                        print("IPV data", volt, current)
+                        print('IPV data', volt, current)
                         
                     data = dcam_show_single_captured_image()
                     figure_list.append(data)
                     
         except KeyboardInterrupt:
-            print("Keyboard interrupt detected, stopping.")
+            print('Keyboard interrupt detected, stopping.')
         except:
             # print error if error isn't catched
             traceback.print_exc()
 
     for i, figure_data in enumerate(figure_list):
         im = Image.fromarray(figure_data)
-        im.save(figure_folder + "\\" + str(interval_list[0][i]) + ".png")
+        im.save(figure_folder + '\\' + str(interval_list[0][i]) + '.png')
 
     return Results

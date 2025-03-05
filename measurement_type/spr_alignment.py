@@ -42,45 +42,45 @@ except:
     sys.path.append(util_path)
     import utils
 
-_DC_name_key = "dc_unit"
+_DC_name_key = 'dc_unit'
 _required_arguments = [
-    "type",
-    "dc_unit",
-    "v_max",
-    "save_folder",
-    "custom_name",
-    "spr_measurement_name",
-    "vcsel_chip",
-    "vcsel_biases",
-    "vcsel_array_bias",
-    "frame_average",
+    'type',
+    'dc_unit',
+    'v_max',
+    'save_folder',
+    'custom_name',
+    'spr_measurement_name',
+    'vcsel_chip',
+    'vcsel_biases',
+    'vcsel_array_bias',
+    'frame_average',
     
 ]
 _optional_arguments = {
-    "rollover_threshold": 0,
-    "rollover_min": 0,
-    "verbose_printing": 0,
-    "keep_plot": False,
-    "offset_background": 0,
-    "check_bias": 1,
-    "measurement_time": 1,
-    "measurement_interval": 1,
-    "exposure_time": 0.03,
-    "save_raw_images": 0,
+    'rollover_threshold': 0,
+    'rollover_min': 0,
+    'verbose_printing': 0,
+    'keep_plot': False,
+    'offset_background': 0,
+    'check_bias': 1,
+    'measurement_time': 1,
+    'measurement_interval': 1,
+    'exposure_time': 0.03,
+    'save_raw_images': 0,
 }
 
 
 def init(config: dict):
     # Get config dict and check for optional arguments
-    IPV_config = config["measurement"]
+    IPV_config = config['measurement']
     # Check and merge optional arguments
     utils.argument_checker(
-        IPV_config, _required_arguments, _optional_arguments, source_func="IPV init"
+        IPV_config, _required_arguments, _optional_arguments, source_func='IPV init'
     )
     IPV_config_opt = utils.optional_arguments_merge(IPV_config, _optional_arguments)
 
     # Used for getting instrument objects and their names
-    IPV_name = IPV_config["type"]
+    IPV_name = IPV_config['type']
     DC_name = IPV_config[_DC_name_key]
     DC_config = config[DC_name]
 
@@ -131,22 +131,22 @@ def SPR_process_image(laser, spr_figure, line, image, results, image_capture_tim
 def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
     
     # The main IPV function
-    V_max = IPV_config["v_max"]
-    check_bias = IPV_config["check_bias"]
-    verbose = IPV_config["verbose_printing"]
-    measurement_time = IPV_config["measurement_time"]
-    measurement_interval = IPV_config["measurement_interval"]
-    measurement_subinterval = IPV_config["measurement_subinterval"]
+    V_max = IPV_config['v_max']
+    check_bias = IPV_config['check_bias']
+    verbose = IPV_config['verbose_printing']
+    measurement_time = IPV_config['measurement_time']
+    measurement_interval = IPV_config['measurement_interval']
+    measurement_subinterval = IPV_config['measurement_subinterval']
     
-    vcsel_chip = IPV_config["vcsel_chip"]
-    vcsel_biases = IPV_config["vcsel_biases"]
+    vcsel_chip = IPV_config['vcsel_chip']
+    vcsel_biases = IPV_config['vcsel_biases']
     laser_indexing = {index: value for index, value in enumerate(vcsel_biases)}
     ref_spectrums = {}
-    vcsel_array_bias = IPV_config["vcsel_array_bias"]
+    vcsel_array_bias = IPV_config['vcsel_array_bias']
     
-    exposure_time = IPV_config["exposure_time"]
-    frame_average = IPV_config["frame_average"]
-    frame_average_buffer = IPV_config["frame_average_buffer"]
+    exposure_time = IPV_config['exposure_time']
+    frame_average = IPV_config['frame_average']
+    frame_average_buffer = IPV_config['frame_average_buffer']
     integrate_over_um = 80
     
     periodic_saving = True
@@ -155,15 +155,15 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
     save = 1
 
     # Create result dict
-    results = {"frame_list" : {},
-               "frame_time" : {},
-               "spr_data"   : {},
+    results = {'frame_list' : {},
+               'frame_time' : {},
+               'spr_data'   : {},
                }
     
     for i, biases in enumerate(vcsel_biases):
-        results["frame_list"][i] = []
-        results["frame_time"][i] = []
-        results["spr_data"][i]   = []
+        results['frame_list'][i] = []
+        results['frame_time'][i] = []
+        results['spr_data'][i]   = []
         
     # Initialize figure for plotting
     # TODO: MAKE NUMBER OF FIGURES AS MANY AS VCSELS OR MERGE INTO ONE FIGURE ##
@@ -175,8 +175,8 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
 
     # Send verbose_printing to instruments if not specified
     for instru_dict in [DC_config]:
-        if "verbose_printing" not in instru_dict.keys():
-            instru_dict["verbose_printing"] = verbose
+        if 'verbose_printing' not in instru_dict.keys():
+            instru_dict['verbose_printing'] = verbose
 
     Instrument_COM = communication.Communication()
 
@@ -185,7 +185,7 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
 
     # Start time of measurement
     measurement_time_start = time.time()
-    measurement_timestamp = time.strftime(rf"%Y%m%d_%H.%M.%S")
+    measurement_timestamp = time.strftime(rf'%Y%m%d_%H.%M.%S')
     
     with DC_unit_obj(DC_config) as DC_unit:
         try:
@@ -204,7 +204,7 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
                     camera = dcam[0]
                     
                     with camera:
-                        camera["exposure_time"] = exposure_time 
+                        camera['exposure_time'] = exposure_time 
                         
                         image = grab_image(camera, frame_average, measurement_subinterval, frame_average_buffer)
                         y_max_index, ref_spectrum = a_figure.update_alignment_image(image)
@@ -220,7 +220,7 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
             
                     
         except KeyboardInterrupt:
-            print("Keyboard interrupt detected, stopping.")
+            print('Keyboard interrupt detected, stopping.')
         except:
             # print error if error isn't catched
             traceback.print_exc()
@@ -231,11 +231,11 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
 def saving_results(IPV_config, ref_spectrums, a_figure, measurement_timestamp):
             
     parent_path = Path(__file__).resolve().parents[1]
-    save_folder_path = Path(parent_path, IPV_config["save_folder"])
+    save_folder_path = Path(parent_path, IPV_config['save_folder'])
     if not os.path.isdir(save_folder_path):
-        print("Woops, your folder doesn't exist. Creating one here: ", save_folder_path)
+        print('Woops, your folder doesn't exist. Creating one here: ', save_folder_path)
         os.mkdir(save_folder_path)
-    SPR_measurement_name = IPV_config["spr_measurement_name"]
+    SPR_measurement_name = IPV_config['spr_measurement_name']
     measurement_timestamp = measurement_timestamp + '_' + SPR_measurement_name
     save_path_current_measurement = os.path.join(save_folder_path, 
                                                   measurement_timestamp)
@@ -253,10 +253,10 @@ def saving_results(IPV_config, ref_spectrums, a_figure, measurement_timestamp):
         if not os.path.isdir(save_folder_current_VCSEL):
             os.mkdir(save_folder_current_VCSEL)
 
-        # iio.imwrite(os.path.join(save_folder_current_VCSEL, f'{SPR_measurement_name}_image{ref}.png'), ref_spectrums[ref]["raw_image"])
+        # iio.imwrite(os.path.join(save_folder_current_VCSEL, f'{SPR_measurement_name}_image{ref}.png'), ref_spectrums[ref]['raw_image'])
 
-        np.savetxt(os.path.join(save_folder_current_VCSEL, 'ref_spectrum.txt'), ref_spectrums[ref]["ref_spectrum"], delimiter=',') 
-        all_y_max.append(ref_spectrums[ref]["y_max_index"])
+        np.savetxt(os.path.join(save_folder_current_VCSEL, 'ref_spectrum.txt'), ref_spectrums[ref]['ref_spectrum'], delimiter=',') 
+        all_y_max.append(ref_spectrums[ref]['y_max_index'])
     
     
     np.savetxt(os.path.join(save_path_current_measurement, 'y_max.txt'), np.array(all_y_max))

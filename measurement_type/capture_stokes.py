@@ -48,9 +48,9 @@ def init(config: dict, meas_output_dir_path: str):
     meas_type = config['type']
     
     # Check and merge optional arguments
-    utils.argument_checker(
-        config, _required_arguments, _optional_arguments, source_func=meas_type
-    )
+    # utils.argument_checker(
+    #     config, _required_arguments, _optional_arguments, source_func=meas_type
+    # )
     used_config = utils.optional_arguments_merge(config, _optional_arguments)
 
     ## Run measurement

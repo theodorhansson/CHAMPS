@@ -30,45 +30,45 @@ except:
     sys.path.append(util_path)
     import utils
 
-_DC_name_key = "dc_unit"
+_DC_name_key = 'dc_unit'
 _required_arguments = [
-    "type",
-    "dc_unit",
-    "current",
-    "v_max",
-    "save_folder",
-    "custom_name",
-    "spr_measurement_name",
-    "vcsel_chip",
-    "vcsel_to_bias"
+    'type',
+    'dc_unit',
+    'current',
+    'v_max',
+    'save_folder',
+    'custom_name',
+    'spr_measurement_name',
+    'vcsel_chip',
+    'vcsel_to_bias'
     
 ]
 _optional_arguments = {
-    "rollover_threshold": 0,
-    "rollover_min": 0,
-    "verbose_printing": 0,
-    "keep_plot": False,
-    "offset_background": 0,
-    "check_bias": 1,
-    "measurement_time": 1,
-    "measurement_interval": 1,
-    "find_det_lines": 1,
-    "find_line_biased": 1,
-    "exposure_time": 0.03,
+    'rollover_threshold': 0,
+    'rollover_min': 0,
+    'verbose_printing': 0,
+    'keep_plot': False,
+    'offset_background': 0,
+    'check_bias': 1,
+    'measurement_time': 1,
+    'measurement_interval': 1,
+    'find_det_lines': 1,
+    'find_line_biased': 1,
+    'exposure_time': 0.03,
 }
 
 
 def init(config: dict):
     # Get config dict and check for optional arguments
-    IPV_config = config["measurement"]
+    IPV_config = config['measurement']
     # Check and merge optional arguments
     utils.argument_checker(
-        IPV_config, _required_arguments, _optional_arguments, source_func="IPV init"
+        IPV_config, _required_arguments, _optional_arguments, source_func='IPV init'
     )
     IPV_config_opt = utils.optional_arguments_merge(IPV_config, _optional_arguments)
 
     # Used for getting instrument objects and their names
-    IPV_name = IPV_config["type"]
+    IPV_name = IPV_config['type']
     DC_name = IPV_config[_DC_name_key]
     DC_config = config[DC_name]
 
@@ -82,27 +82,27 @@ def init(config: dict):
 def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
     
     # The main IPV function
-    V_max = IPV_config["v_max"]
-    check_bias = IPV_config["check_bias"]
-    measurement_bias = IPV_config["current"]
-    verbose = IPV_config["verbose_printing"]
-    measurement_time = IPV_config["measurement_time"]
-    measurement_interval = IPV_config["measurement_interval"]
+    V_max = IPV_config['v_max']
+    check_bias = IPV_config['check_bias']
+    measurement_bias = IPV_config['current']
+    verbose = IPV_config['verbose_printing']
+    measurement_time = IPV_config['measurement_time']
+    measurement_interval = IPV_config['measurement_interval']
     
-    find_det_lines = IPV_config["find_det_lines"]
-    find_line_biased = IPV_config["find_line_biased"]
+    find_det_lines = IPV_config['find_det_lines']
+    find_line_biased = IPV_config['find_line_biased']
     
-    exposure_time = IPV_config["exposure_time"]
+    exposure_time = IPV_config['exposure_time']
     
-    vcsel_chip = IPV_config["vcsel_chip"]
-    vcsel_to_bias = IPV_config["vcsel_to_bias"]
+    vcsel_chip = IPV_config['vcsel_chip']
+    vcsel_to_bias = IPV_config['vcsel_to_bias']
     
     # Create result dict
     Results = {
-        "header": "Current[mA], Optical Power [mW], Voltage [V]",
-        "voltage": [],
-        "current": [],
-        "power": [],
+        'header': 'Current[mA], Optical Power [mW], Voltage [V]',
+        'voltage': [],
+        'current': [],
+        'power': [],
     }
 
     frame_list = []
@@ -113,12 +113,12 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
     
     # Send verbose_printing to instruments if not specified
     for instru_dict in [DC_config]:
-        if "verbose_printing" not in instru_dict.keys():
-            instru_dict["verbose_printing"] = verbose
+        if 'verbose_printing' not in instru_dict.keys():
+            instru_dict['verbose_printing'] = verbose
 
     
     
-    # Plot = utils.AnimatedPlot("Current[mA]", "Optical Power [mW]", "IPV")
+    # Plot = utils.AnimatedPlot('Current[mA]', 'Optical Power [mW]', 'IPV')
     Instrument_COM = communication.Communication()
 
     # Gets isntruments
@@ -178,14 +178,14 @@ def SPR_no_lam_sweep_main(IPV_config: dict, DC_config: dict):
                 time.sleep(measurement_interval - duration if duration < measurement_interval else 0)
                 
         except KeyboardInterrupt:
-            print("Keyboard interrupt detected, stopping.")
+            print('Keyboard interrupt detected, stopping.')
         except:
             # print error if error isn't catched
             traceback.print_exc()
 
-    Results["frame_list"] = frame_list
-    Results["frame_time"] = frame_time
-    Results["SPR_data"] = SPR_data
-    Results["fig_object"] = fig
+    Results['frame_list'] = frame_list
+    Results['frame_time'] = frame_time
+    Results['SPR_data'] = SPR_data
+    Results['fig_object'] = fig
 
     return Results
