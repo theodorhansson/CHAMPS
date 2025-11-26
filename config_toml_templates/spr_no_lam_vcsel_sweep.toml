@@ -1,0 +1,29 @@
+# Std units: mA, V, mW, nm
+[measurement]
+Type = "spr_no_lam_vcsel_sweep"
+dc_unit = "keithley2400"    # DC power supply
+v_max = 5                   # Max allowed voltaged
+
+#Saving stuff
+#spr_measurement_name = "miRNA_DNA_attempt_4"
+measurement_name = "name"
+save_raw_images = 0
+
+# VCSEL parameters
+vcsel_chip           = "sigge" # Which chip is being used
+vcsel_biases         = [2, 2, 5, 2]  # mA
+vcsel_array_bias     = 7
+
+# Camera and measurement interval
+measurement_time            = 15000   # Measurement time in seconds
+measurement_interval        = 1.5      # Take a picture every x sec
+measurement_subinterval     = 0.001  
+exposure_time               = 0.001   # Exposure time in sec
+frame_average_buffer        = 10
+frame_average               = 10
+
+verbose_printing     = 1        # Flag for printing
+
+[keithley2400]
+Type = "keithley2400"       # The specific type of unit
+GPIB_address = "24"

@@ -1,24 +1,45 @@
-## Std units: mA, V, mW, nm, sec
-
+# Std units: mA, V, mW, nm
 [measurement]
-## Measurement type and name
-type = 'capture_stokes'
-name = 'align_quarter_waveplate'
+type = "SPR_CH1"
+#type = "spr_no_lam_vcsel_sweep"
+dc_unit = "keithley2400"    # DC power supply
+v_max = 5                   # Max allowed voltaged
 
-## Camera and capture control
-exposure_time = 0.03   # Exposure time in sec
-mirror_x      = 1      # Mirror image along x-axis
-mirror_y      = 1      # Mirror image along y-axis
-transpose     = 1      # Transpose image data
+# Saving stuff
+# Spr_measurement_name = "test"
+measurement_name = "karola_test_4_VCSELs"
+save_raw_images = 0
 
-## Save all images
-save_images = 1
+# What to do in the script
+run_measurement = 1
 
-## Setup region of interest in image. [x_pos, y_pos, width, height] in pixels
-## Image from Hamamatsu camera is [2048, 2048]
-#ROI = [[1000, 1000, 500, 500], [1500, 400, 500, 500]]
-ROI = [[1000, 1000, 600, 600]]
+# What region to use in second image while measuring
+start_cropped_image_from = 1000
+stopp_cropped_image_from = 5000
 
-## Verbose printing
-verbose_level     = 1        # 1. Verbose 0. Off
+# What region to use in third image for searching for SPR dip (IMPORTANT THAT THE SPR DIP IS THE MINIMUM!)
+start_look_for_dip_from  = 2200
+stopp_look_for_dip_from  = 2700
 
+# Width around the dip to interpolate over. Larger = better
+width_around_SPR_dip_um = 20
+
+# VCSEL parameters
+vcsel_chip           = "karola_top" # Which chip is being used
+
+# A0, A2, C3, D1
+vcsel_biases         = [4.8, 5.1, 4.7, 3.8]  # mA
+vcsel_array_bias     = 7
+
+# Camera and measurement interval
+measurement_time            = 10000   # Measurement time in seconds
+measurement_interval        = 1.0     # Take a picture every x sec
+exposure_time               = 0.1     # Exposure time in sec
+integrate_over_um           = 10
+
+verbose_printing     = 1        # Flag for printing
+
+[dc_unit]
+#type = "dummy"
+type = "keithley2400"       # The specific type of unit
+GPIB_address = "24"

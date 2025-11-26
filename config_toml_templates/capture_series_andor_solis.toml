@@ -1,0 +1,21 @@
+# Std units: mA, V, mW, nm
+[measurement]
+type = "capture_series_andor_solis"
+
+dc_unit = "keithley2400"    # DC power supply
+v_max   = 5                 # Max allowed voltaged
+
+# Save folder
+date      = "250915" 
+measurement_name = "testing"
+
+# Settings
+verbose          = 1        # Flag for printing
+exposure_time    = 10       # ms
+num_images       = 5       # number of images to capture
+time_spacing     = 2.0      # spacing between images (s)
+
+
+[keithley2400]
+Type = "keithley2400"       # The specific type of unit
+GPIB_address = "24"

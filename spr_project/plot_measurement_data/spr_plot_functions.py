@@ -34,21 +34,17 @@ def savgol(data, window, order):
 vcsels = ['VCSEL_0', 'VCSEL_1', 'VCSEL_2', 'VCSEL_3', 'VCSEL_4', 'VCSEL_5']
 filename = 'data'
 
-def load_measurement_data(spr_data_folder, files_to_plot, vcsels, time_mask=None, mov_avg_window=6, sav_gol_window=12, sav_gol_order=5):
-    parent_path = Path(__file__).resolve().parents[1]
-    measurement_path = Path(parent_path, 'spr_measurement_data', spr_data_folder)
+def load_measurement_data(spr_data_folder, vcsels, time_mask=None, mov_avg_window=6, sav_gol_window=12, sav_gol_order=5):
+    parent_path = Path(__file__).resolve().parents[2]
+    measurement_path = Path(parent_path, '_output', spr_data_folder)
 
-    ## Names of measurement segments
-    names = np.array(os.listdir(measurement_path))
-    names = names[files_to_plot]
-    print('Loading data from: ' + str(names))
+    print("Loading from:", measurement_path)
     
     ## Dict for plotting data
     plot_raw = {}
     plot_moving_avg = {}
     plot_savgol = {}
-
-
+    
     ## Concatenate measurement segements
     for vcsel in vcsels:
         frame_time = np.array([])
@@ -56,24 +52,24 @@ def load_measurement_data(spr_data_folder, files_to_plot, vcsels, time_mask=None
         
         start_time_segment = 0
         reference_level = 0
-        for i, name in enumerate(names):
-            data_path = Path(measurement_path, name, vcsel, filename)
 
-            data = np.genfromtxt(str(data_path) + '.txt', delimiter=',')
-       
-            current_frame_time = data[:, 0] + start_time_segment
-            start_time_segment = current_frame_time[-1]
+        data_path = Path(measurement_path, vcsel)
+
+        data = np.genfromtxt(str(data_path) + '.txt', delimiter=',')
+   
+        current_frame_time = data[:, 0] + start_time_segment
+        start_time_segment = current_frame_time[-1]
+        
+        # if reference_level == 0:
+            # reference_level = data[0, 1]
+        current_spr_data = data[:, 1]
+        # - reference_level
+        # else:
+            # current_spr_data = data[:, 1] - reference_level
             
-            # if reference_level == 0:
-                # reference_level = data[0, 1]
-            current_spr_data = data[:, 1]
-            # - reference_level
-            # else:
-                # current_spr_data = data[:, 1] - reference_level
-                
-                
-            frame_time = np.concatenate((frame_time, current_frame_time))
-            spr_data   = np.concatenate((spr_data, current_spr_data))
+            
+        frame_time = np.concatenate((frame_time, current_frame_time))
+        spr_data   = np.concatenate((spr_data, current_spr_data))
         
         if time_mask != None:
             for mask in time_mask:

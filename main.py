@@ -2,10 +2,7 @@
 import tomllib
 import sys
 import time
-import tomli_w
 import utils
-import json
-import os
 
 ## Custom imports
 import general_functions.pretty_printing.verbose_printing as vp
@@ -24,7 +21,7 @@ def main(config_path):
     ## Open the config file
     with open(config_path, 'rb') as f:
         config = tomllib.load(f)
-        
+    
     ## Set all strings in config.toml to lower case
     config_lower = utils.dict_2_lower(config)
     
@@ -33,9 +30,9 @@ def main(config_path):
     vp.headline('Sucessfully loaded config for ' + meas_name)
     
     ## Check for verbose printing
-    verbose = vp.check_flag_for_verbose_printing(config_lower)
+    vp.check_flag_for_verbose_printing(config_lower)
         
-    ## Current time
+    ## Current times
     timestamp = time.strftime(rf'%Y%m%d_%H.%M')
     
     ## Create measurement output folder
@@ -46,8 +43,8 @@ def main(config_path):
     meas_output_dir_path = ffp.create_measurement_save_folder(output_dir_path, meas_type)
     
     ## Create folder for current measurement
-    meas_name = config_lower['measurement']['name']
-    meas_name_timestamp = str(meas_name) + '_' + timestamp
+    meas_name = config_lower['measurement']['measurement_name']
+    meas_name_timestamp = timestamp + '_' + str(meas_name)
     meas_output_dir_path = ffp.create_measurement_save_folder(meas_output_dir_path, meas_name_timestamp)
     
     # Get the measurement object
@@ -56,8 +53,8 @@ def main(config_path):
     # Begin the measurement!
     used_config = measurement_init(config_lower, meas_output_dir_path)
 
-
 def identify_measurement_type(measurement: str):
+    
     # Matches measurement name with correct module
     match measurement:
         case 'capture_images':
@@ -71,6 +68,7 @@ def identify_measurement_type(measurement: str):
         case 'ipv':
             import measurement_type.ipv
             return measurement_type.ipv.init
+        
         case 'spectrum':
             import measurement_type.spectrum
             return measurement_type.spectrum.init
@@ -87,31 +85,44 @@ def identify_measurement_type(measurement: str):
             import measurement_type.missalignment
             return measurement_type.missalignment.init
         
-        case 'spr_no_lam_sweep':
-            import measurement_type.SPR_no_lam_sweep
-            return measurement_type.SPR_no_lam_sweep.init
-        
-        case 'spr_lam_sweep':
-            import measurement_type.SPR_lam_sweep
-            return measurement_type.SPR_lam_sweep.init
-        
-        case 'spr_no_lam_vcsel_sweep':
-            import measurement_type.SPR_no_lam_VCSEL_sweep
-            return measurement_type.SPR_no_lam_VCSEL_sweep.init
-        
-        case 'spr_alignment':
-            import measurement_type.spr_alignment
-            return measurement_type.spr_alignment.init
+        case 'capture_image_andor_solis':
+            import measurement_type.capture_image_andor_solis
+            return measurement_type.capture_image_andor_solis.init
             
+        case 'capture_series_andor_solis':
+            import measurement_type.capture_series_andor_solis
+            return measurement_type.capture_series_andor_solis.init
+        
+        case 'smu_test':
+            import measurement_type.smu_test
+            return measurement_type.smu_test.init
+        
+        case 'spr_ch':
+            import measurement_type.SPR_CH
+            return measurement_type.SPR_CH.init
+        
+        case 'spr_ch1':
+            import measurement_type.SPR_CH
+            return measurement_type.SPR_CH.init
+        
+        case 'spr_ch_v2':
+            import measurement_type.SPR_CH_V2
+            return measurement_type.SPR_CH_V2.init
+        
+        case 'subtract_background':
+            import measurement_type.subtract_background
+            return measurement_type.subtract_background.init
+        
         case _:
             # TODO Change this
             raise Exception(f'No measurement of type {measurement} found.')
 
 if __name__ == '__main__':
+    
     if len(sys.argv) == 1:
         config_path = default_conf_path
     else:
         # for optional system path
         config_path = sys.argv[1]
-
+        
     main(config_path)

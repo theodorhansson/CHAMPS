@@ -15,18 +15,17 @@ timeout = 0.1
 
 ## Laser to pin dicts for different chip configurations
 laser_to_pin = {
-    'johannes' : {0 : '22',
-                  1 : '24',
-                  2 : '26'},
-    'sigge' : {
-                0 : '33', # Works! 2.2mA. Channel 1
-                1 : '35', # Works! 2.0mA. Channel 1
-                2 : '31', # Works! 1.5mA. Channel 2
-                3 : '41', # Works! 1.1mA. Channel 3
-                4 : '43', # Broken
-                5 : '37', # Broken
-                6 : '39', # Broken
-               },
+    'karola_top' : {
+                       0 : '33',
+                       1 : '35',
+                       2 : '37',
+                       3 : '39',
+                       },
+    
+    'karola_top_single' : {
+                       0 : '33',
+                       },
+    
     }
 
 
@@ -53,6 +52,16 @@ class aurora:
                 
         self.update_chip_state()
         
+    def switch_to_lasers(self, lasers_on):
+        for laser in self.chip.keys():
+            if laser in lasers_on:
+                self.chip[laser]['state'] = 1
+            else:
+                self.chip[laser]['state'] = 0
+                
+        self.update_chip_state()
+    
+        
     def turn_off_all_lasers(self):
         self.modify_all_lasers(0)
         
@@ -70,6 +79,7 @@ class aurora:
         for laser in self.chip.keys():
             command = self.create_command_from_key(laser)
             arduino.write(command)
+            
         arduino.close()
         
         
@@ -84,8 +94,8 @@ class aurora:
         return (pin + state).encode()
         
         
-        
-johannes = aurora('sigge')
-# johannes.switch_to_laser(0)
-# johannes.turn_on_all_lasers()
-johannes.turn_off_all_lasers()
+chip = aurora('karola_top')
+chip.switch_to_laser(3)
+#chip.switch_to_lasers([0, 2])'
+#chip.turn_on_all_lasers()
+# chip.turn_off_all_lasers()
