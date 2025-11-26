@@ -1,3 +1,4 @@
+#%%
 # IMPORTS --------------------------------------------------------------------
 import os, sys
 import traceback
@@ -29,7 +30,7 @@ x_axis_um = np.arange(0, x_pixel*um_scale, um_scale)
 y_axis_um = np.arange(0, y_pixel*um_scale, um_scale)
 extent_raw = [x_axis_um.min(), x_axis_um.max(), y_axis_um.min(), y_axis_um.max()]
 
-colors = ['tab:blue', 'tab:red', 'tab:green', 'black']
+colors = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red']
 
 class alignment_figure():
     def __init__(self, integrate_over_um):
@@ -59,7 +60,7 @@ class alignment_figure():
         
         self.fig = fig
         
-    def update_alignment_image(self, image):
+    def update_alignment_image(self, image, color):
         
         ## Plot full image
         self.ax_array[0].imshow(image, extent=extent_raw, origin='lower', cmap='magma')
@@ -71,11 +72,11 @@ class alignment_figure():
 
         ## Plot in full image where I think the maxium is
         self.ax_array[0].plot(np.array([0, np.max(x_axis_um)]), np.array([y_axis_um[y_max_index], y_axis_um[y_max_index]]), color='red', linewidth=0.5)
-        self.ax_array[0].plot(np.array([0, np.max(x_axis_um)]), np.array([y_axis_um[min(y_max_index+self.integrate_over_pixel, y_pixel-1)], y_axis_um[min(y_max_index+self.integrate_over_pixel, y_pixel-1)]]), color='red', linewidth=0.3)
-        self.ax_array[0].plot(np.array([0, np.max(x_axis_um)]), np.array([y_axis_um[max(y_max_index-self.integrate_over_pixel, 0)], y_axis_um[max(y_max_index-self.integrate_over_pixel, 0)]]), '--', color='red', linewidth=0.3)
+        self.ax_array[0].plot(np.array([0, np.max(x_axis_um)]), np.array([y_axis_um[y_max_index+self.integrate_over_pixel], y_axis_um[y_max_index+self.integrate_over_pixel]]), color='red', linewidth=0.3)
+        self.ax_array[0].plot(np.array([0, np.max(x_axis_um)]), np.array([y_axis_um[y_max_index-self.integrate_over_pixel], y_axis_um[y_max_index-self.integrate_over_pixel]]), '--', color='red', linewidth=0.3)
                
         ## Plot y-integrated image
-        self.ax_array[1].plot(y_cross, y_axis_um)
+        self.ax_array[1].plot(y_cross, y_axis_um, color=color)
         self.ax_array[1].plot(y_cross[y_max_index], x_axis_um[y_max_index],  'x', color='black')
 
         minimum_index_integration = y_max_index - self.integrate_over_pixel
@@ -84,15 +85,8 @@ class alignment_figure():
             vp.headline('You, Cassandra, are finding a laser beam to close to the edge of the image. Move stage or integrate less wide.')
         
         ## How does the laser beam actually look
-        min_row = max(minimum_index_integration, 0)
-        max_row = min(maximum_index_integration, image.shape[0])
-        if max_row <= min_row:
-            spr_spectrum = np.zeros(image.shape[1])
-        else:
-            spr_spectrum = np.sum(image[min_row:max_row, :], axis=0)
-
-        if np.max(spr_spectrum) > 0:
-            self.ax_array[2].plot(x_axis_um, spr_spectrum/np.max(spr_spectrum))
+        spr_spectrum = np.sum(image[y_max_index - self.integrate_over_pixel:y_max_index + self.integrate_over_pixel, :], axis=0)
+        self.ax_array[2].plot(x_axis_um, spr_spectrum/np.max(spr_spectrum))
         
         ## Update canvas
         self.fig.canvas.draw()
@@ -100,7 +94,6 @@ class alignment_figure():
             
         return y_max_index, spr_spectrum
     
-
 def create_peak_spectrum(coords, values, start_cropped_image_from_pixel, stopp_cropped_image_from_pixel):
     
     gold_line_spacing = 15
@@ -108,90 +101,84 @@ def create_peak_spectrum(coords, values, start_cropped_image_from_pixel, stopp_c
     
     ## Remove starting edge of image. Define in config.toml!
     zeroed_values = values[start_cropped_image_from_pixel:stopp_cropped_image_from_pixel]
-    if zeroed_values.size == 0:
-        print("create_peak_spectrum: empty zeroed_values, returning empty arrays.")
-        return np.array([]), np.array([])
     zeroed_coords = np.arange(zeroed_values.size)*px_scale
     
     ### Zeroed coordinates
-    if zeroed_coords.size == 0:
-        print("create_peak_spectrum: zeroed_coords empty, returning empty arrays.")
-        return np.array([]), np.array([])
     peak_coords = np.arange(0, max(zeroed_coords), gold_line_spacing)
-    if peak_coords.size == 0:
-        print("create_peak_spectrum: peak_coords empty, returning empty arrays.")
-        return np.array([]), np.array([])
     
     ### Find peaks at the line coordinates within px_avg number of pixels
     peaks = []
     for peak_x in peak_coords:
-        mask = np.abs(zeroed_coords - peak_x) < px_scale*pixel_average
-        if not np.any(mask):
-            peaks.append(0.0)
-        else:
-            peaks.append(np.max(zeroed_values[mask]))
+        peaks.append(np.max(zeroed_values[abs(zeroed_coords - peak_x) < px_scale*pixel_average]))
     
-    peaks = np.array(peaks, dtype=float)
-
-    ### Butterworth Filtering – only if enough samples
-    if peaks.size > 6:  # filtfilt needs some length; 6 is safe for 2nd order
-        sampling_freq = 1/gold_line_spacing
-        cutoff_freq   = 1/200
-        order         = 2
-        nyquist_freq  = 0.5 * sampling_freq
-        normalized_cutoff_freq = cutoff_freq / nyquist_freq
-        b, a = butter(order, normalized_cutoff_freq, btype='lowpass')
-        peaks = filtfilt(b, a, peaks)
+    ### Butterworth Filtering
+    sampling_freq = 1/15
+    cutoff_freq   = 1/200
+    order         = 2
+    nyquist_freq  = 0.5 * sampling_freq
+    normalized_cutoff_freq = cutoff_freq / nyquist_freq
+    b, a = butter(order, normalized_cutoff_freq, btype='lowpass')
+    peaks = filtfilt(b, a, peaks)
     
     ## Set x-scale to match the choosen from config.toml
     peak_coords = peak_coords + start_cropped_image_from_pixel*px_scale
     
-    return peak_coords, peaks
-
+    return peak_coords, np.array(peaks)
 
 def isolate_SPR(peak_coords, peak_values, width_around_SPR_dip_um):
-    # convert window from µm to pixels
     width_around_SPR_dip_px = int(width_around_SPR_dip_um * um_scale)
-
-    # SAFETY: make sure the window is at least a few pixels wide
-    if width_around_SPR_dip_px < 4:
-        width_around_SPR_dip_px = 4
 
     # TODO: stupid hard coded value. Please solve someone.
     start_from = 3
     stopp_at   = 10
 
-    peak_coords = np.asarray(peak_coords)
-    peak_values = np.asarray(peak_values)
-
-    # SAFETY: make sure we actually have enough points to do [start_from:-stopp_at]
-    if peak_values.size <= (start_from + stopp_at):
-        print("isolate_SPR: peak_values too short, cannot isolate dip.")
+    # Not enough points to even apply start/stopp range
+    if len(peak_values) <= (start_from + stopp_at):
         return np.array([]), np.array([])
 
-    # Find location of the minimum (assuming SPR is the minimum)
-    spr_dip_index = np.argmin(peak_values[start_from:-stopp_at])
-    spr_dip_index = spr_dip_index + start_from
+    # Find location of the minimum (assumes SPR is the minimum)
+    spr_dip_index = np.argmin(peak_values[start_from:-stopp_at]) + start_from
 
-    # Define window around dip and clamp to valid indices
-    n = len(peak_coords)
-    half_win = width_around_SPR_dip_px // 2
-    left  = max(spr_dip_index - half_win, 0)
-    right = min(spr_dip_index + half_win, n)
+    # Clamp index to valid range
+    spr_dip_index = max(0, min(spr_dip_index, len(peak_coords) - 1))
 
+    # Half window in index space
+    half_w = max(1, width_around_SPR_dip_px // 2)
+
+    left  = spr_dip_index - half_w
+    right = spr_dip_index + half_w
+
+    # Clamp again to valid range
+    left  = max(0, left)
+    right = min(len(peak_coords), right)
+
+    # If this still gives an empty slice, bail out
     spr_x = peak_coords[left:right]
-
     if spr_x.size == 0:
-        print("isolate_SPR: empty SPR x-window (check width_around_spr_dip_um and ROI).")
         return np.array([]), np.array([])
 
-    # Values around the SPR dip
-    spr_y = peak_values[left:right]
+    # Now build spr_y with the same size as spr_x
+    if spr_dip_index < 2:
+        # Near the edge – you already treat this as a special case
+        spr_y = np.zeros_like(spr_x, dtype=float)
+        print('SPR dip is in the corner of the peak spectrum')
+    else:
+        center = spr_dip_index
+        half_len = spr_x.size // 2
 
-    # Extra guard, though it should match spr_x.size
-    if spr_y.size == 0:
-        print("isolate_SPR: empty SPR y-window after slicing.")
-        return np.array([]), np.array([])
+        left_y  = max(0, center - half_len)
+        right_y = min(len(peak_values), center + half_len)
+
+        spr_y = peak_values[left_y:right_y]
+
+        # Make sure spr_y is not empty and matches spr_x length
+        if spr_y.size == 0:
+            return np.array([]), np.array([])
+        if spr_y.size != spr_x.size:
+            # Trim or pad if you really care about equal length
+            min_len = min(spr_x.size, spr_y.size)
+            spr_x = spr_x[:min_len]
+            spr_y = spr_y[:min_len]
 
     return spr_x, spr_y
 
@@ -200,21 +187,16 @@ def find_SPR_dip(x, y):
     
     ## Create cubicspline
     try:
-        x = np.asarray(x)
-        y = np.asarray(y)
-        if x.size == 0 or y.size == 0:
-            return np.nan
         x_fit = np.linspace(np.min(x), np.max(x), 10000)
         spline = CubicSpline(x, y)
         x_centroid = x_fit[np.argmax(spline(x_fit))]
         
-    except Exception as e:
-        x_centroid = np.nan
-        print('Failed to find SPR Dip!', e)
+    except:
+        x_centroid = 1000
+        print('Failed to find SPR Dip!')
         
     return x_centroid
         
-
 class SPR_figure():
     def __init__(self, integrate_over_um):
         self.integrate_over_pixel = int(integrate_over_um/px_scale)
@@ -245,11 +227,11 @@ class SPR_figure():
         
         # Integrate spectrum
         fig.axes[1].set_title(r'Integrate spectrum')
-        fig.axes[1].set_ylabel(r'Intensity [Counts]')
+        fig.axes[1].set_ylabel(r'Intensity (normalized)')
         
         # Filtered peaks
         fig.axes[2].set_title(r'Filtered peaks')
-        fig.axes[2].set_ylabel(r'Intensity [Counts]')
+        fig.axes[2].set_ylabel(r'Intensity (normalized)')
         
         # SPR dip
         fig.axes[3].set_title(r'SPR dip')
@@ -264,198 +246,164 @@ class SPR_figure():
         plt.tight_layout()
         
         self.fig = fig
-
-        # placeholders so .set_data() is always safe
-        self.im_raw_data = None
-        self.line_integrated_spectrum = None
-        self.filtered_spectrum = None
-        self.dip_spectrum = None
-        self.left_line_peak_spectrum = None
-        self.right_line_peak_spectrum = None
         
     def analyze_image(self, 
-                      image, 
-                      y_max_index, 
-                      frame_counter, 
-                      laser, 
-                      config, 
-                      start_cropped_image_from,
-                      stopp_cropped_image_from,
-                      start_look_for_dip_from,
-                      stopp_look_for_dip_from,
-                      width_around_SPR_dip_um,
-                      colors): 
-        # Pick color for this channel
-        channel_color = colors[int(laser) % len(colors)]
-        
-        # --- crop around laser ------------------------------------------------
-        row_min = max(int(y_max_index - self.integrate_over_pixel), 0)
-        row_max = min(int(y_max_index + self.integrate_over_pixel), image.shape[0])
-        if row_max <= row_min:
-            cropped_image = np.zeros((1, image.shape[1]))
-        else:
-            cropped_image = image[row_min:row_max, :]
-
-        # --- integrate along y and build x axis ------------------------------
+                  image, 
+                  y_max_index, 
+                  frame_counter, 
+                  laser, 
+                  config, 
+                  start_cropped_image_from,
+                  stopp_cropped_image_from,
+                  start_look_for_dip_from,
+                  stopp_look_for_dip_from,
+                  width_around_SPR_dip_um, 
+                  colors): 
+        """
+        Analyze one image for a specific laser and update the plots.
+    
+        image  : 2D numpy array from camera
+        laser  : laser index (0,1,2,3,...)
+        """
+    
+        color = colors[laser]
+    
+        # --- lazy init of per-laser line dicts (in case __init__ wasn't changed) ---
+        if not hasattr(self, "line_integrated_spectrum"):
+            self.line_integrated_spectrum = {}
+            self.filtered_spectrum = {}
+            self.dip_spectrum = {}
+            self.left_line_peak_spectrum = {}
+            self.right_line_peak_spectrum = {}
+    
+        # --- crop image around this laser's y-position ---
+        cropped_image = image[
+            int(y_max_index - self.integrate_over_pixel):
+            int(y_max_index + self.integrate_over_pixel),
+            :
+        ]
+    
+        # Integrate along y and create x-coordinates for cropped image
         x = np.arange(cropped_image.shape[1]) * px_scale
         y = np.mean(cropped_image, axis=0)
-
-        # convert ROI limits from µm to pixel indices in x
+    
+        # Convert look-for-dip window from um to pixel index in x
         start_look_for_dip_from_pixel = np.argmin(np.abs(x - start_look_for_dip_from))
         stopp_look_for_dip_from_pixel = np.argmin(np.abs(x - stopp_look_for_dip_from))
-        
-        # --- coarse "gold line" spectrum -------------------------------------
+    
+        # Find gold-line peaks
         peak_x, peak_y = create_peak_spectrum(
-            x, y, 
-            start_look_for_dip_from_pixel, 
+            x, y,
+            start_look_for_dip_from_pixel,
             stopp_look_for_dip_from_pixel
         )
-
-        # --- isolate SPR region ----------------------------------------------
+    
+        # Locate spectrum around SPR dip
         spr_x, spr_y = isolate_SPR(peak_x, peak_y, width_around_SPR_dip_um)
-
-        # --- normalize for plotting & for dip finding ------------------------
-        # safe normalization (avoid division by 0)
-        if peak_y.size > 0 and np.max(peak_y) > 0:
-            peak_y_norm = peak_y / np.max(peak_y)
-        else:
-            peak_y_norm = np.zeros_like(peak_y)
-
-        if spr_y.size > 0 and np.max(spr_y) > 0:
-            spr_y_norm = spr_y / np.max(spr_y)
-        else:
-            spr_y_norm = np.zeros_like(spr_y)
-
-        # find SPR location using normalized curve (same minimum position)
-        if spr_x.size == 0 or spr_y_norm.size == 0:
-            print(f"SPR analysis warning (laser {laser}): empty SPR window, returning NaN.")
-            spr_location = np.nan
-        else:
-            # we still look for the *dip*, so use (1 - normalized)
-            spr_location = find_SPR_dip(spr_x, 1.0 - spr_y_norm)
-
-        # =====================================================================
-        # PLOTTING
-        # =====================================================================
-        if frame_counter == 0:
-            # --- ax0: raw image ------------------------------------------------
+    
+        # If we failed to isolate anything, don't update plots for this laser
+        if spr_x.size == 0 or spr_y.size == 0:
+            return np.nan
+    
+        # Find location of SPR dip (invert so dip becomes peak)
+        spr_location = find_SPR_dip(spr_x, np.max(spr_y) - spr_y)
+    
+        # --- raw image plot (shared) ---
+        if not hasattr(self, "im_raw_data"):
+            # First time: create image
             self.im_raw_data = self.ax_array[0].imshow(
                 image, extent=extent_raw, origin='lower'
-            ) 
-
-            # --- ax1: integrated spectrum (unnormalized is fine) --------------
-            self.line_integrated_spectrum, = self.ax_array[1].plot(
-                x, y, linewidth=0.5, color=channel_color
+            )
+        else:
+            # Update data only
+            self.im_raw_data.set_data(image)
+    
+        # --- create or update line objects for THIS laser only ---
+    
+        # First time we see this laser: create its lines
+        if laser not in self.line_integrated_spectrum:
+            # Integrated detected spectrum (normalized)
+            y_norm = y / np.max(y)
+            self.line_integrated_spectrum[laser], = self.ax_array[1].plot(
+                x, y_norm, linewidth=0.5, color=color
             )
             self.ax_array[1].set_xlim([start_cropped_image_from, stopp_cropped_image_from])
-            if y.size > 0:
-                self.ax_array[1].set_ylim([np.min(y), np.max(y)])
-            
-            # vertical ROI lines in ax1
-            if y.size > 0:
+            self.ax_array[1].set_ylim([0, 1])
+    
+            # Filtered peaks (normalized)
+            peak_y_norm = peak_y / np.max(peak_y)
+            self.filtered_spectrum[laser], = self.ax_array[2].plot(
+                peak_x, peak_y_norm, color=color, marker='o', markersize=3
+            )
+            self.ax_array[2].set_xlim([np.min(peak_x), np.max(peak_x)])
+            self.ax_array[2].set_ylim([0, 1])
+    
+            # Isolated SPR dip (normalized)
+            spr_y_norm = spr_y / np.max(spr_y)
+            self.dip_spectrum[laser], = self.ax_array[3].plot(
+                spr_x, spr_y_norm, color=color, marker='o', markersize=3
+            )
+            self.ax_array[3].set_ylim([0, 1])
+    
+            # Window markers for this laser in peak spectrum
+            self.left_line_peak_spectrum[laser], = self.ax_array[2].plot(
+                [np.min(spr_x), np.min(spr_x)],
+                [np.min(peak_y), np.max(peak_y)],
+                '--', color='black', linewidth=1
+            )
+            self.right_line_peak_spectrum[laser], = self.ax_array[2].plot(
+                [np.max(spr_x), np.max(spr_x)],
+                [np.min(peak_y), np.max(peak_y)],
+                '--', color='black', linewidth=1
+            )
+    
+            # Draw vertical lines in the integrated spectrum window only once (global)
+            if not hasattr(self, "_dip_window_drawn"):
                 self.ax_array[1].plot(
                     [start_look_for_dip_from, start_look_for_dip_from],
-                    [np.min(y), np.max(y)],
+                    [0, 1],
                     '--', color='black', linewidth=1
                 )
                 self.ax_array[1].plot(
                     [stopp_look_for_dip_from, stopp_look_for_dip_from],
-                    [np.min(y), np.max(y)],
-                    '--', color='black', linewidth=1
-                )
-
-            # --- ax2: filtered peaks, NORMALIZED 0–1 -------------------------
-            if peak_x.size > 0 and peak_y_norm.size > 0:
-                self.filtered_spectrum, = self.ax_array[2].plot(
-                    peak_x, peak_y_norm,
-                    color=channel_color,
-                    marker='o', markersize=3
-                )
-                self.ax_array[2].set_xlim([np.min(peak_x), np.max(peak_x)])
-            else:
-                self.filtered_spectrum, = self.ax_array[2].plot(
-                    [], [], color=channel_color, marker='o', markersize=3
-                )
-            # fix y-range to 0–1 so all channels share the same scale
-            self.ax_array[2].set_ylim([0, 1])
-
-            # vertical lines bracketing SPR window in ax2 (also 0–1)
-            if spr_x.size > 0:
-                self.left_line_peak_spectrum, = self.ax_array[2].plot(
-                    [np.min(spr_x), np.min(spr_x)],
                     [0, 1],
                     '--', color='black', linewidth=1
                 )
-                self.right_line_peak_spectrum, = self.ax_array[2].plot(
-                    [np.max(spr_x), np.max(spr_x)],
-                    [0, 1],
-                    '--', color='black', linewidth=1
-                )
-            else:
-                self.left_line_peak_spectrum, = self.ax_array[2].plot([], [], '--', color='black', linewidth=1)
-                self.right_line_peak_spectrum, = self.ax_array[2].plot([], [], '--', color='black', linewidth=1)
-
-            # --- ax3: SPR dip, NORMALIZED 0–1 --------------------------------
-            if spr_x.size > 0 and spr_y_norm.size > 0:
-                self.dip_spectrum, = self.ax_array[3].plot(
-                    spr_x, spr_y_norm,
-                    color=channel_color,
-                    marker='o', markersize=3
-                )
-                self.ax_array[3].set_xlim([np.min(spr_x), np.max(spr_x)])
-            else:
-                self.dip_spectrum, = self.ax_array[3].plot(
-                    [], [], color=channel_color,
-                    marker='o', markersize=3
-                )
-            self.ax_array[3].set_ylim([0, 1])
-
+                self._dip_window_drawn = True
+    
         else:
-            # --- ax1 updates ---------------------------------------------------
-            self.line_integrated_spectrum.set_data(x, y)
-            self.line_integrated_spectrum.set_color(channel_color)
-            if y.size > 0:
-                self.ax_array[1].set_ylim([np.min(y), np.max(y)])
-
-            # --- ax2 updates (normalized 0–1) ---------------------------------
-            self.filtered_spectrum.set_data(peak_x, peak_y_norm)
-            self.filtered_spectrum.set_color(channel_color)
-            if peak_x.size > 0:
-                self.ax_array[2].set_xlim([np.min(peak_x), np.max(peak_x)])
+            # Update existing lines for THIS laser
+            y_norm = y / np.max(y)
+            self.line_integrated_spectrum[laser].set_data(x, y_norm)
+            self.ax_array[1].set_ylim([0, 1])
+    
+            peak_y_norm = peak_y / np.max(peak_y)
+            self.filtered_spectrum[laser].set_data(peak_x, peak_y_norm)
+            self.ax_array[2].set_xlim([np.min(peak_x), np.max(peak_x)])
             self.ax_array[2].set_ylim([0, 1])
-
-            # vertical lines in ax2 use 0–1 as well
-            if spr_x.size > 0:
-                self.left_line_peak_spectrum.set_data(
-                    [np.min(spr_x), np.min(spr_x)],
-                    [0, 1]
-                )
-                self.right_line_peak_spectrum.set_data(
-                    [np.max(spr_x), np.max(spr_x)],
-                    [0, 1]
-                )
-            else:
-                self.left_line_peak_spectrum.set_data([], [])
-                self.right_line_peak_spectrum.set_data([], [])
-
-            # --- ax3 updates (normalized 0–1) ---------------------------------
-            if spr_x.size > 0 and spr_y_norm.size > 0:
-                self.dip_spectrum.set_data(spr_x, spr_y_norm)
-                self.dip_spectrum.set_color(channel_color)
-                self.ax_array[3].set_xlim([np.min(spr_x), np.max(spr_x)])
-            else:
-                self.dip_spectrum.set_data([], [])
+    
+            spr_y_norm = spr_y / np.max(spr_y)
+            self.dip_spectrum[laser].set_data(spr_x, spr_y_norm)
+            self.ax_array[3].set_xlim([np.min(spr_x), np.max(spr_x)])
             self.ax_array[3].set_ylim([0, 1])
-
-        # redraw
+    
+            self.left_line_peak_spectrum[laser].set_data(
+                [np.min(spr_x), np.min(spr_x)],
+                [np.min(peak_y), np.max(peak_y)]
+            )
+            self.right_line_peak_spectrum[laser].set_data(
+                [np.max(spr_x), np.max(spr_x)],
+                [np.min(peak_y), np.max(peak_y)]
+            )
+    
+        # --- redraw ---
         self.fig.canvas.draw()
         self.fig.canvas.flush_events()
     
-        return spr_location
-
+        return spr_location, y_norm
 
     
-    def update_spr_trace(self, lasers_on_chip, results, colors, frame_counter, start_trace, clear_trace):
+    def update_spr_trace(self, lasers_on_chip, results, color, frame_counter, start_trace, clear_trace):
         # Update spr trace
         if clear_trace:
             self.fig.axes[4].clear()
@@ -470,7 +418,7 @@ class SPR_figure():
             spr_trace  = results['spr_data'][channels][start_trace:]
             self.fig.axes[4].plot(frame_time, spr_trace, 
                                   marker='o', linewidth=0.2, markersize=3, 
-                                  color=colors[channels], label=f'Laser {channels}') 
+                                  color=color[channels], label=f'Laser {channels}') 
             
         
             if frame_counter == 0: 
@@ -479,7 +427,6 @@ class SPR_figure():
         self.fig.canvas.draw()
         self.fig.canvas.flush_events()
         
-
 # ---- Dummy DC class (for running code without DCunit)  ----------------------
 class DummyDC:
     def __init__(self, config):
@@ -541,7 +488,6 @@ _optional_arguments = {
 
 # -----------------------------------------------------------------------------
 
-
 def init(config: dict, meas_output_dir_path: str):
     # Read config and select DC object
     DC_unit_obj = get_DC_unit(config)
@@ -576,10 +522,9 @@ def get_DC_unit(config):
 
 # -----------------------------------------------------------------------------
 
-
 def SPR_main(IPV_config: dict, DC_config: dict, DC_unit_obj,  meas_output_dir_path):
     
-    plt.clf()
+    plt.close('all')
     
     ## Definitions from config file:
     ## Compliance voltage
@@ -626,14 +571,23 @@ def SPR_main(IPV_config: dict, DC_config: dict, DC_unit_obj,  meas_output_dir_pa
     Instrument_COM = communication.Communication()
     
     # Create result dict. Is this the best way to do it?
-    results = {'frame_list' : {},
-               'frame_time' : {},
-               'spr_data'   : {}
-               }
-    for i in range(len(vcsel_biases)):
-        results['frame_list'][i] = []
-        results['frame_time'][i] = []
-        results['spr_data'][i]   = []
+    results = {
+    'frame_list': {},
+    'frame_time': {},
+    'spr_data': {},
+}
+
+    # Saving integrated y spect
+    if IPV_config.get('save_y_spectrum', 0) == 1:
+        results['y_spectrum'] = {}
+    
+    for laser in lasers_on_chip:
+        results['frame_list'][laser] = []
+        results['frame_time'][laser] = []
+        results['spr_data'][laser]   = []
+        if IPV_config.get('save_y_spectrum', 0) == 1:
+            results['y_spectrum'][laser] = []
+
         
     ## Which frame are we at?
     global frame_counter ## Global definitions suck!
@@ -680,6 +634,8 @@ def SPR_main(IPV_config: dict, DC_config: dict, DC_unit_obj,  meas_output_dir_pa
                 utils.ramp_current(DC_unit, 0, vcsel_biases[laser])
                 
                 ## Grab image
+                # image_array = cam.grab(1)
+                # image = image_array[0]
                 image_array = cam.grab(nframes=10, frame_timeout=1.0, missing_frame='zero', return_info=False, buff_size=None)
     
                 image = np.zeros_like(image_array[0])
@@ -687,7 +643,8 @@ def SPR_main(IPV_config: dict, DC_config: dict, DC_unit_obj,  meas_output_dir_pa
                     image = image + i
                 
                 ## Find peak position of laser beam
-                y_max_index, ref_spectrum = alignment_figure_obj.update_alignment_image(image)
+                color=colors[laser]
+                y_max_index, ref_spectrum = alignment_figure_obj.update_alignment_image(image, color)
                 laser_locations.append(y_max_index)
                 
                 ## Get current and voltage during alignment
@@ -717,36 +674,54 @@ def SPR_main(IPV_config: dict, DC_config: dict, DC_unit_obj,  meas_output_dir_pa
                 # Ramp current to set bias
                 utils.ramp_current(DC_unit, 0, vcsel_biases[0])
                 
+                start_time = time.time()
                 ## MAIN MEASUREMENT LOOP: --------------------------------------
-                while (time.time() - measurement_time_start) < measurement_time:
+                while (start_time - measurement_time_start) < measurement_time:
                     camera_start = time.time()
                     
                     for laser in lasers_on_chip:
                         laser_control.switch_to_laser(laser)
+                        
+                        
   
                         ## Grabbing image
                         image_array = cam.grab(nframes=1, frame_timeout=0.5, missing_frame='zero', buff_size=None)
+
+                        image = np.zeros_like(image_array[0])
+                        for i in image_array:
+                            image = image + i
+                            
                         image = image_array[0]
                         
+                        # Ramp down current
+                        # utils.ramp_current(DC_unit, vcsel_biases[laser], 0)
+
                         image_capture_time = time.time()
                         frame_time = image_capture_time - measurement_time_start
                         
                         # Analyzing image and adding data to file
                         results['frame_time'][laser].append(frame_time)
-                        results['spr_data'][laser].append(
-                            spr_figure.analyze_image(
-                                image, 
-                                laser_locations[laser], 
-                                frame_counter, 
-                                laser,
-                                IPV_config,
-                                start_cropped_image_from,
-                                stopp_cropped_image_from,
-                                start_look_for_dip_from,
-                                stopp_look_for_dip_from,
-                                width_around_SPR_dip_um, 
-                                colors)
+
+                        spr_location, y_norm = spr_figure.analyze_image(
+                            image,
+                            laser_locations[laser],
+                            frame_counter,
+                            laser,
+                            IPV_config,
+                            start_cropped_image_from,
+                            stopp_cropped_image_from,
+                            start_look_for_dip_from,
+                            stopp_look_for_dip_from,
+                            width_around_SPR_dip_um,
+                            colors
                         )
+                        
+                        results['spr_data'][laser].append(spr_location)
+                        
+                        # Save y spectra (if enabled  )
+                        if IPV_config.get('save_y_spectrum', 0) == 1:
+                            results['y_spectrum'][laser].append(y_norm)
+
                         
                     spr_figure.update_spr_trace(lasers_on_chip, 
                                                 results, 
@@ -788,18 +763,32 @@ def save_results(IPV_config, results, measurement_timestamp, meas_output_dir_pat
         frame_time = results['frame_time'][laser]
         spr_data   = results['spr_data'][laser]
 
+            
         if IPV_config['save_raw_images']:
             for i, im in enumerate(frame_list):      
                 iio.imwrite(os.path.join(meas_output_dir_path, 
                                           f'image{i}.png'), im)
         
         if len(frame_time) > len(spr_data):
-            frame_time = frame_time[:-1]
+                frame_time = frame_time[:-1]
         elif len(frame_time) < len(spr_data):
-            spr_data = spr_data[:-1]
+                spr_data = spr_data[:-1]
             
         xy = np.vstack((frame_time, spr_data)).T
         np.savetxt(os.path.join(meas_output_dir_path, f'VCSEL_{laser}.txt'), xy, delimiter=',') 
+        
+        # Save y-integrated spectra only if enabled in config::
+        if IPV_config.get('save_y_spectrum', 0) == 1:
+            if 'y_spectrum' in results and laser in results['y_spectrum']:
+                spectra_list = [s for s in results['y_spectrum'][laser] if s is not None]
+        
+                if len(spectra_list) > 0:
+                    spectra_array = np.vstack(spectra_list)  # 2D array: (n_frames, n_pixels)
+                    np.save(
+                        os.path.join(meas_output_dir_path, f'VCSEL_{laser}_y_spectrum.npy'),
+                        spectra_array
+                    )
+
 
 def save_alignment(alignment_figure_obj, alignment_voltage, alignment_current, vcsel_chip, measurement_timestamp, meas_output_dir_path):
     vp.headline(f'Saving alignment data to {meas_output_dir_path}')
@@ -818,3 +807,4 @@ def save_alignment(alignment_figure_obj, alignment_voltage, alignment_current, v
     # Save alignment data
     alignment_bias = np.vstack((alignment_voltage, alignment_current)).T
     np.savetxt(alignment_csv, alignment_bias, delimiter=',', header='Voltage,Current', comments='')
+

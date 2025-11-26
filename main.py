@@ -102,8 +102,8 @@ def identify_measurement_type(measurement: str):
             return measurement_type.SPR_CH.init
         
         case 'spr_ch1':
-            import measurement_type.SPR_CH
-            return measurement_type.SPR_CH.init
+            import measurement_type.SPR_CH1
+            return measurement_type.SPR_CH1.init
         
         case 'spr_ch_v2':
             import measurement_type.SPR_CH_V2

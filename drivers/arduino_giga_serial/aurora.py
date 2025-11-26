@@ -98,4 +98,4 @@ chip = aurora('karola_top')
 chip.switch_to_laser(3)
 #chip.switch_to_lasers([0, 2])'
 #chip.turn_on_all_lasers()
-# chip.turn_off_all_lasers()
+#chip.turn_off_all_lasers()
