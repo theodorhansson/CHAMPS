@@ -25,9 +25,8 @@ deg_to_rad = 180/np.pi
 x_pixel  = 1024
 y_pixel  = 1024
 px_scale = 5.596  ## um/px  For 2.5x objective with manual infinity correction
-um_scale = 0.1787 ## px/um
-x_axis_um = np.arange(0, x_pixel*um_scale, um_scale)
-y_axis_um = np.arange(0, y_pixel*um_scale, um_scale)
+x_axis_um = np.arange(0, x_pixel*px_scale, px_scale)
+y_axis_um = np.arange(0, y_pixel*px_scale, px_scale)
 extent_raw = [x_axis_um.min(), x_axis_um.max(), y_axis_um.min(), y_axis_um.max()]
 
 colors = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red']
@@ -126,7 +125,7 @@ def create_peak_spectrum(coords, values, start_cropped_image_from_pixel, stopp_c
     return peak_coords, np.array(peaks)
 
 def isolate_SPR(peak_coords, peak_values, width_around_SPR_dip_um):
-    width_around_SPR_dip_px = int(width_around_SPR_dip_um * um_scale)
+    width_around_SPR_dip_px = int(width_around_SPR_dip_um/px_scale)
 
     # TODO: stupid hard coded value. Please solve someone.
     start_from = 3
@@ -288,8 +287,8 @@ class SPR_figure():
         y = np.mean(cropped_image, axis=0)
     
         # Convert look-for-dip window from um to pixel index in x
-        start_look_for_dip_from_pixel = np.argmin(np.abs(x - start_look_for_dip_from))
-        stopp_look_for_dip_from_pixel = np.argmin(np.abs(x - stopp_look_for_dip_from))
+        start_look_for_dip_from_pixel = np.argmin(np.abs(x - start_look_for_dip_from[laser]))
+        stopp_look_for_dip_from_pixel = np.argmin(np.abs(x - stopp_look_for_dip_from[laser]))
     
         # Find gold-line peaks
         peak_x, peak_y = create_peak_spectrum(
@@ -360,12 +359,12 @@ class SPR_figure():
             # Draw vertical lines in the integrated spectrum window only once (global)
             if not hasattr(self, "_dip_window_drawn"):
                 self.ax_array[1].plot(
-                    [start_look_for_dip_from, start_look_for_dip_from],
+                    [start_look_for_dip_from[laser], start_look_for_dip_from[laser]],
                     [0, 1],
                     '--', color='black', linewidth=1
                 )
                 self.ax_array[1].plot(
-                    [stopp_look_for_dip_from, stopp_look_for_dip_from],
+                    [stopp_look_for_dip_from[laser], stopp_look_for_dip_from[laser]],
                     [0, 1],
                     '--', color='black', linewidth=1
                 )
@@ -416,7 +415,8 @@ class SPR_figure():
         for channels in lasers_on_chip:
             frame_time = results['frame_time'][channels][start_trace:]
             spr_trace  = results['spr_data'][channels][start_trace:]
-            self.fig.axes[4].plot(frame_time, spr_trace, 
+            spr_shift = spr_trace - spr_trace[0]
+            self.fig.axes[4].plot(frame_time, spr_shift, 
                                   marker='o', linewidth=0.2, markersize=3, 
                                   color=color[channels], label=f'Laser {channels}') 
             
